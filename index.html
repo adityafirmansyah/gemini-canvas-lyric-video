@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini Canvas Lyric Video Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,600;1,600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Bar -->
+    <header class="app-header">
+      <div class="logo">
+        <span class="icon">✨</span>
+        <span class="brand-text"><strong>Gemini</strong> Lyric Canvas</span>
+        <span class="badge">PROTOTYPE</span>
+      </div>
+      <div class="header-actions">
+        <div class="aspect-ratio-selector">
+          <label>Format:</label>
+          <button class="ratio-btn active" data-ratio="16:9">16:9 YouTube</button>
+          <button class="ratio-btn" data-ratio="9:16">9:16 Shorts</button>
+          <button class="ratio-btn" data-ratio="1:1">1:1 Square</button>
+        </div>
+        <a href="https://github.com/adityafirmansyah/gemini-canvas-lyric-video" target="_blank" class="github-btn" title="View Source on GitHub">
+          <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          GitHub
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="main-workspace">
+      <!-- Left Panel: Controls & Inputs -->
+      <aside class="control-panel">
+        <!-- Tab Navigation -->
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="tab-audio">1. Audio & AI</button>
+          <button class="tab-btn" data-tab="tab-style">2. Visual Style</button>
+          <button class="tab-btn" data-tab="tab-export">3. Export</button>
+        </div>
+
+        <div class="tab-content active" id="tab-audio">
+          <!-- Audio Upload Section -->
+          <section class="card">
+            <h3>🎵 Audio Track</h3>
+            <div class="drop-zone" id="drop-zone">
+              <span class="drop-icon">📂</span>
+              <p>Drag & drop MP3 / WAV here</p>
+              <span class="subtext">or click to browse</span>
+              <input type="file" id="audio-input" accept="audio/*">
+            </div>
+            <div id="audio-info" class="audio-info hidden">
+              <div class="track-details">
+                <span id="track-name" class="track-title">track.mp3</span>
+                <span id="track-duration" class="track-time">0:00</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Gemini AI Sync Section -->
+          <section class="card">
+            <h3>🤖 Gemini AI Auto-Sync</h3>
+            <div class="input-group">
+              <label for="gemini-key">Gemini API Key</label>
+              <div class="key-input-wrapper">
+                <input type="password" id="gemini-key" placeholder="AIzaSy..." autocomplete="off">
+                <button type="button" id="toggle-key-visibility" class="mini-btn">👁️</button>
+              </div>
+              <small class="helper-text">Key is saved only in your browser local storage.</small>
+            </div>
+
+            <div class="input-group">
+              <label for="gemini-model">Gemini Model</label>
+              <select id="gemini-model">
+                <option value="gemini-2.5-flash">gemini-2.5-flash (Fast & Multimodal Audio)</option>
+                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+                <option value="gemini-1.5-pro">gemini-1.5-pro (Highest Accuracy)</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="optional-lyrics">Reference Lyrics (Optional)</label>
+              <textarea id="optional-lyrics" rows="3" placeholder="Paste known lyrics here to guide AI alignment, or leave blank to let Gemini auto-transcribe."></textarea>
+            </div>
+
+            <button id="btn-sync-gemini" class="primary-btn" disabled>
+              <span class="btn-icon">⚡</span> Analyze & Sync with Gemini
+            </button>
+            <div id="ai-status" class="status-msg hidden"></div>
+          </section>
+
+          <!-- Lyric Editor / Preview -->
+          <section class="card">
+            <div class="section-header">
+              <h3>📝 Timed Lyrics (LRC / JSON)</h3>
+              <button id="btn-sample-lyrics" class="text-link">Load Sample</button>
+            </div>
+            <textarea id="lyrics-data" rows="8" placeholder='[
+  {"start": 0.0, "end": 3.5, "text": "Neon lights reflect the rain"},
+  {"start": 3.8, "end": 7.0, "text": "Drifting down the empty street"}
+]'></textarea>
+            <small class="helper-text">JSON array with start, end (seconds), and text. You can edit timing manually anytime.</small>
+          </section>
+        </div>
+
+        <!-- Tab 2: Visual Style -->
+        <div class="tab-content" id="tab-style">
+          <section class="card">
+            <h3>🎨 Aesthetic Presets</h3>
+            <div class="preset-grid">
+              <button class="preset-card active" data-preset="lofi">
+                <div class="preset-preview lofi-bg"></div>
+                <span>Lofi Chill</span>
+              </button>
+              <button class="preset-card" data-preset="cyberpunk">
+                <div class="preset-preview cyberpunk-bg"></div>
+                <span>Cyberpunk</span>
+              </button>
+              <button class="preset-card" data-preset="minimal">
+                <div class="preset-preview minimal-bg"></div>
+                <span>Minimal Dark</span>
+              </button>
+              <button class="preset-card" data-preset="karaoke">
+                <div class="preset-preview karaoke-bg"></div>
+                <span>Karaoke Glow</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="card">
+            <h3>✨ Typography & Colors</h3>
+            <div class="form-row">
+              <div class="input-group">
+                <label for="font-family">Font Family</label>
+                <select id="font-family">
+                  <option value="'Outfit', sans-serif">Outfit (Modern Clean)</option>
+                  <option value="'Space Grotesk', sans-serif">Space Grotesk (Tech / Cyber)</option>
+                  <option value="'Playfair Display', serif">Playfair Display (Classy Serif)</option>
+                  <option value="system-ui, sans-serif">System Sans</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label for="font-size">Font Size</label>
+                <input type="range" id="font-size" min="28" max="72" value="48">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="input-group">
+                <label for="text-color">Text Color</label>
+                <input type="color" id="text-color" value="#ffffff">
+              </div>
+              <div class="input-group">
+                <label for="accent-color">Accent Glow / Active</label>
+                <input type="color" id="accent-color" value="#64ffda">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label for="bg-type">Background Mode</label>
+              <select id="bg-type">
+                <option value="gradient">Animated Gradient</option>
+                <option value="particles">Floating Dust Particles</option>
+                <option value="waveform">Audio Reactive Waveform</option>
+                <option value="custom-img">Custom Image Background</option>
+              </select>
+            </div>
+
+            <div class="input-group hidden" id="custom-img-group">
+              <label for="custom-bg-input">Upload Background Image</label>
+              <input type="file" id="custom-bg-input" accept="image/*">
+            </div>
+
+            <div class="toggle-group">
+              <label class="switch-label">
+                <input type="checkbox" id="toggle-audio-reactive" checked>
+                <span>Audio-reactive Beat Pulse (RMS / Kick)</span>
+              </label>
+            </div>
+          </section>
+        </div>
+
+        <!-- Tab 3: Export -->
+        <div class="tab-content" id="tab-export">
+          <section class="card">
+            <h3>🎬 Video Export</h3>
+            <div class="input-group">
+              <label for="export-res">Render Resolution</label>
+              <select id="export-res">
+                <option value="1080p">Full HD 1080p (High Quality)</option>
+                <option value="720p">HD 720p (Faster / Lighter)</option>
+              </select>
+            </div>
+
+            <div class="export-banner">
+              <div class="info-icon">💡</div>
+              <p>Uses high-performance browser stream capture combining the animated Canvas and Web Audio bus into a synchronized video file.</p>
+            </div>
+
+            <button id="btn-start-record" class="record-btn" disabled>
+              <span class="rec-dot"></span> Record & Export Video
+            </button>
+            <button id="btn-stop-record" class="stop-btn hidden">
+              ⏹️ Stop & Save Video
+            </button>
+
+            <div id="record-progress" class="record-progress hidden">
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+              </div>
+              <span id="record-status" class="record-status-text">Recording 00:00 / 00:00</span>
+            </div>
+          </section>
+        </div>
+      </aside>
+
+      <!-- Center / Right Stage: Live Canvas Preview -->
+      <section class="stage-container">
+        <div class="canvas-wrapper" id="canvas-wrapper">
+          <canvas id="lyric-canvas"></canvas>
+          
+          <!-- Overlay Controls -->
+          <div class="playback-bar">
+            <button id="btn-play-pause" class="play-btn" disabled>▶</button>
+            <div class="time-slider-wrapper">
+              <span id="current-time-display">0:00</span>
+              <input type="range" id="seek-slider" min="0" max="100" value="0" step="0.1" disabled>
+              <span id="total-time-display">0:00</span>
+            </div>
+            <div class="volume-wrapper">
+              <span>🔊</span>
+              <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.8">
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Audio Element (Hidden) -->
+  <audio id="audio-player" preload="auto"></audio>
+
+  <!-- Modular Scripts -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
