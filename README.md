@@ -18,19 +18,27 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
   - **Custom OpenAI-Compatible Endpoint:** Connect to your own local Whisper/Ollama server.
 - **📄 Zero-API .LRC / .SRT Direct Import:**
   - Already have timed lyrics from Spotify, Musixmatch, or Suno? Drag & drop `.lrc` or `.srt` files and render immediately—no AI calls, no internet connection, zero API keys required.
-- **🎨 60 FPS HTML5 Canvas Animation Engine:**
-  - Smooth kinetic typography, glowing active states, multi-line auto-wrapping, and previous/next line context fading.
-- **🔊 Audio-Reactive Beat Dynamics:**
-  - Built-in Web Audio API `AnalyserNode` drives real-time bass/kick bounce and audio-reactive glow that syncs to the music rhythm.
-- **📐 Multi-Aspect Ratio Support:**
-  - `16:9` Landscape (YouTube Full HD)
-  - `9:16` Portrait (YouTube Shorts, TikTok, Instagram Reels)
-  - `1:1` Square (Feeds & Album Art visualizers)
+- **🎨 60 FPS Kinetic Typography Animation Engine:**
+  - **Smooth Slide-Up:** Cinematic cubic ease-out glide upward.
+  - **Karaoke Progressive Fill:** Spotify/Apple Music style progressive left-to-right highlight wipe.
+  - **Beat Pop & Scale:** Punchy spring bounce timed to vocal onsets and kick drum bass.
+  - **Floating Ambient Wave:** Dreamy vertical sine-wave undulating motion.
+  - **Typewriter Reveal:** Vintage terminal character-by-character typing with blinking cursor.
+  - **Cyber Glitch:** Chromatic aberration RGB channel splitting and digital jitter.
+- **🌌 Dynamic Background Engines:**
+  - **Floating Dust Bokeh:** Relaxed particles for lofi/chillout.
+  - **Dreamy Rainy Window:** Vertical falling rain streaks on glass.
+  - **Starfield Hyperspace:** 3D flying stars warping toward camera.
+  - **Retro Synthwave Grid:** 80s neon perspective wireframe rolling grid & horizon sun.
+  - **Audio Reactive Waveform:** Symmetrical equalizer bars bouncing with bass.
+  - **Breathing Gradient & Custom Image:** Support for custom image backgrounds with audio-reactive Ken Burns zoom.
 - **✨ Curated Aesthetic Presets:**
-  - **Lofi Chill:** Floating bokeh particles, soft pastel accents, relaxed pacing.
-  - **Cyberpunk:** Neon magenta/cyan glow, frequency bars, tech typography.
-  - **Minimal Dark:** Classy serif font, dark aesthetic gradient, editorial layout.
-  - **Karaoke Glow:** Active lyric line pop and high contrast.
+  - **Lofi Chill:** Lavender & soft blue particles with clean slide typography.
+  - **Cyberpunk:** Neon magenta/cyan chromatic glitch and frequency visualizer.
+  - **Synthwave:** Sunset orange/magenta glow, rolling 3D wireframe grid, and beat pop.
+  - **Rainy Dream:** Atmospheric moody rain window with floating wave text.
+  - **Minimal Dark:** Luxury serif typography on deep monochrome backdrop.
+  - **Karaoke Glow:** Electric cyan progressive wipe fill on high-contrast stage.
 - **🎬 In-Browser Video Export:**
   - Combines the Canvas render stream and Web Audio destination into a synchronized video export (`.webm` / `.mp4`) directly inside your browser—no backend server, FFmpeg installation, or cloud rendering required.
 - **🔒 Privacy First:**

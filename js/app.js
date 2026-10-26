@@ -44,6 +44,7 @@ const btnSampleLyrics = document.getElementById('btn-sample-lyrics');
 
 // Style Controls
 const presetCards = document.querySelectorAll('.preset-card');
+const animTypeSelect = document.getElementById('anim-type');
 const fontFamilySelect = document.getElementById('font-family');
 const fontSizeRange = document.getElementById('font-size');
 const textColorInput = document.getElementById('text-color');
@@ -332,28 +333,48 @@ const presets = {
     fontSize: 52,
     textColor: '#ffffff',
     accentColor: '#93c5fd',
-    bgType: 'particles'
+    bgType: 'particles',
+    animType: 'smooth-slide'
   },
   cyberpunk: {
     font: "'Space Grotesk', sans-serif",
     fontSize: 56,
     textColor: '#ffffff',
     accentColor: '#ff007f',
-    bgType: 'waveform'
+    bgType: 'waveform',
+    animType: 'cyber-glitch'
+  },
+  synthwave: {
+    font: "'Montserrat', sans-serif",
+    fontSize: 54,
+    textColor: '#ffffff',
+    accentColor: '#ffbe0b',
+    bgType: 'synthwave-grid',
+    animType: 'pop-bounce'
+  },
+  rainy: {
+    font: "'Playfair Display', serif",
+    fontSize: 50,
+    textColor: '#e2e8f0',
+    accentColor: '#38bdf8',
+    bgType: 'rain',
+    animType: 'floating-wave'
   },
   minimal: {
-    font: "'Playfair Display', serif",
+    font: "'Cinzel', serif",
     fontSize: 48,
-    textColor: '#f1f5f9',
+    textColor: '#f8fafc',
     accentColor: '#ffffff',
-    bgType: 'gradient'
+    bgType: 'gradient',
+    animType: 'smooth-slide'
   },
   karaoke: {
     font: "'Outfit', sans-serif",
     fontSize: 58,
     textColor: '#ffffff',
     accentColor: '#22d3ee',
-    bgType: 'gradient'
+    bgType: 'gradient',
+    animType: 'karaoke-fill'
   }
 };
 
@@ -369,6 +390,7 @@ presetCards.forEach(card => {
       renderer.textColor = p.textColor;
       renderer.accentColor = p.accentColor;
       renderer.bgType = p.bgType;
+      renderer.animType = p.animType;
 
       // Sync form inputs
       fontFamilySelect.value = p.font;
@@ -376,11 +398,13 @@ presetCards.forEach(card => {
       textColorInput.value = p.textColor;
       accentColorInput.value = p.accentColor;
       bgTypeSelect.value = p.bgType;
+      animTypeSelect.value = p.animType;
       customImgGroup.classList.toggle('hidden', p.bgType !== 'custom-img');
     }
   });
 });
 
+animTypeSelect.addEventListener('change', (e) => renderer.animType = e.target.value);
 fontFamilySelect.addEventListener('change', (e) => renderer.fontFamily = e.target.value);
 fontSizeRange.addEventListener('input', (e) => renderer.baseFontSize = parseInt(e.target.value));
 textColorInput.addEventListener('input', (e) => renderer.textColor = e.target.value);

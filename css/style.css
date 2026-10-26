@@ -403,22 +403,22 @@ textarea:focus {
 /* Preset Cards */
 .preset-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
 
 .preset-card {
   background: var(--bg-dark);
   border: 2px solid var(--border-color);
   border-radius: var(--radius-sm);
-  padding: 8px;
+  padding: 8px 6px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   gap: 6px;
   text-align: center;
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
   transition: all 0.2s;
 }
@@ -434,7 +434,7 @@ textarea:focus {
 }
 
 .preset-preview {
-  height: 50px;
+  height: 44px;
   border-radius: 4px;
 }
 
@@ -444,6 +444,14 @@ textarea:focus {
 
 .cyberpunk-bg {
   background: linear-gradient(135deg, #ff007f, #00f0ff);
+}
+
+.synthwave-bg {
+  background: linear-gradient(135deg, #240046, #7b2cbf, #ff007f, #ff9e00);
+}
+
+.rainy-bg {
+  background: linear-gradient(135deg, #1e293b, #0f172a, #334155);
 }
 
 .minimal-bg {
