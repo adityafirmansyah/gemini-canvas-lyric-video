@@ -343,29 +343,15 @@ export class CanvasRenderer {
 
     // 1. Before first lyric starts (Intro / Instrumental opening)
     if (t < firstLyric.start) {
-      const timeToStart = firstLyric.start - t;
-      if (timeToStart <= 1.8) {
-        // Smoothly fade in first lyric as subtle upcoming text
-        const alpha = Math.max(0, Math.min(0.5, (1.8 - timeToStart) / 1.8 * 0.5));
-        ctx.save();
-        ctx.globalAlpha = alpha;
-        const fontSize = this.baseFontSize * 0.68;
-        ctx.font = `500 ${fontSize}px ${this.fontFamily}`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
-        this.wrapAndDrawText(ctx, firstLyric.text, W / 2, H / 2, W * 0.85, fontSize * 1.3);
-        ctx.restore();
-      }
-      return; // Do NOT render any active line during intro
+      return; // Screen is completely clean during intro
     }
 
     // 2. After last lyric ends (Outro / Instrumental ending)
     if (t > lastLyric.end) {
       const timePastEnd = t - lastLyric.end;
-      const fadeDuration = 0.8;
+      const fadeDuration = 0.5;
       if (timePastEnd < fadeDuration) {
-        // Smooth fade out of the final lyric line
+        // Quick smooth fade out of the final lyric line
         const alpha = Math.max(0, 1.0 - (timePastEnd / fadeDuration));
         ctx.save();
         ctx.globalAlpha = alpha;
@@ -385,11 +371,10 @@ export class CanvasRenderer {
         });
         ctx.restore();
       }
-      // Past fadeDuration: Screen is completely clean for the outro visualizer!
-      return;
+      return; // Clean screen for outro visualizer
     }
 
-    // 3. During lyrics playback
+    // 3. During lyrics playback — find only the active lyric
     let activeIdx = -1;
     let isInGap = false;
 
@@ -409,33 +394,22 @@ export class CanvasRenderer {
     if (activeIdx === -1) return;
 
     const currentLine = this.lyrics[activeIdx];
-    const prevLine = activeIdx > 0 ? this.lyrics[activeIdx - 1] : null;
-    const nextLine = activeIdx < this.lyrics.length - 1 ? this.lyrics[activeIdx + 1] : null;
-
     const centerY = H / 2;
     const baseSize = this.baseFontSize;
 
-    // Handle gap / pause between lines
+    // Handle brief pause/gap between lines (fade out previous line quickly)
     let activeAlpha = 1.0;
-    if (isInGap && nextLine) {
-      const gapTotal = nextLine.start - currentLine.end;
+    if (isInGap) {
       const timeInGap = t - currentLine.end;
-
-      if (gapTotal > 1.2) {
-        // For long instrumental gaps, fade out previous line quickly
-        const fadeOutTime = 0.7;
-        if (timeInGap < fadeOutTime) {
-          activeAlpha = 1.0 - (timeInGap / fadeOutTime);
-        } else {
-          activeAlpha = 0; // Completely clean screen during instrumental break!
-        }
+      const fadeOutTime = 0.35;
+      if (timeInGap < fadeOutTime) {
+        activeAlpha = 1.0 - (timeInGap / fadeOutTime);
       } else {
-        // For short pauses, smooth gradual transition
-        activeAlpha = Math.max(0.15, 1.0 - (timeInGap / gapTotal));
+        return; // Gap is active: clean screen between lines
       }
     }
 
-    // 1. Draw Active Line (if visible)
+    // Draw ONLY the Active Lyric Line in the center
     if (currentLine && activeAlpha > 0.01) {
       const lineDuration = Math.max(0.1, currentLine.end - currentLine.start);
       const lineProgress = Math.min(1, Math.max(0, (t - currentLine.start) / lineDuration));
@@ -457,46 +431,6 @@ export class CanvasRenderer {
         end: currentLine.end
       });
       ctx.restore();
-    }
-
-    // 2. Draw Previous Line (Context above)
-    if (prevLine && activeAlpha > 0.25) {
-      ctx.save();
-      const prevSize = baseSize * 0.62;
-      ctx.font = `500 ${prevSize}px ${this.fontFamily}`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = 'rgba(148, 163, 184, 0.3)';
-      ctx.shadowBlur = 0;
-      ctx.globalAlpha = activeAlpha * 0.75;
-      this.wrapAndDrawText(ctx, prevLine.text, W / 2, centerY - (baseSize * 1.65), W * 0.85, prevSize * 1.3);
-      ctx.restore();
-    }
-
-    // 3. Draw Next Line (Context below)
-    if (nextLine) {
-      let nextAlpha = 0.4;
-      if (isInGap && (nextLine.start - currentLine.end) > 1.2) {
-        const timeUntilNext = nextLine.start - t;
-        if (timeUntilNext <= 1.5) {
-          nextAlpha = (1.5 - timeUntilNext) / 1.5 * 0.45;
-        } else {
-          nextAlpha = 0;
-        }
-      }
-
-      if (nextAlpha > 0.02) {
-        ctx.save();
-        const nextSize = baseSize * 0.62;
-        ctx.font = `500 ${nextSize}px ${this.fontFamily}`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.45)';
-        ctx.shadowBlur = 0;
-        ctx.globalAlpha = nextAlpha;
-        this.wrapAndDrawText(ctx, nextLine.text, W / 2, centerY + (baseSize * 1.65), W * 0.85, nextSize * 1.3);
-        ctx.restore();
-      }
     }
   }
 

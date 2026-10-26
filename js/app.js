@@ -3,11 +3,11 @@
  * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
  */
 
-import { AudioManager } from './audio-player.js?v=2.4';
-import { AiService } from './ai-service.js?v=2.4';
-import { LrcParser } from './lrc-parser.js?v=2.4';
-import { CanvasRenderer } from './canvas-renderer.js?v=2.4';
-import { VideoRecorder } from './recorder.js?v=2.4';
+import { AudioManager } from './audio-player.js?v=2.5';
+import { AiService } from './ai-service.js?v=2.5';
+import { LrcParser } from './lrc-parser.js?v=2.5';
+import { CanvasRenderer } from './canvas-renderer.js?v=2.5';
+import { VideoRecorder } from './recorder.js?v=2.5';
 
 // DOM Elements
 const canvas = document.getElementById('lyric-canvas');
