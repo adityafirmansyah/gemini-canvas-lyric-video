@@ -559,7 +559,31 @@ btnStopRecord.addEventListener('click', () => {
   }
 });
 
-// 10. Main Animation Loop (60 FPS)
+// 10. Thumbnail Snapshot Export
+function captureThumbnail() {
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+    const trackBase = currentAudioFile ? currentAudioFile.name.replace(/\.[^/.]+$/, "") : "lyric_canvas";
+    const filename = `${trackBase}_thumbnail_${Date.now()}.png`;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 1000);
+  }, 'image/png');
+}
+
+const btnExportThumbnail = document.getElementById('btn-export-thumbnail');
+const btnSnapshotBar = document.getElementById('btn-snapshot-bar');
+if (btnExportThumbnail) btnExportThumbnail.addEventListener('click', captureThumbnail);
+if (btnSnapshotBar) btnSnapshotBar.addEventListener('click', captureThumbnail);
+
+// 11. Main Animation Loop (60 FPS)
 let lastTimestamp = performance.now();
 function animate(now) {
   const dt = (now - lastTimestamp) / 1000;

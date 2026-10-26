@@ -157,51 +157,83 @@
             <h3>🎨 Aesthetic Presets</h3>
             <div class="preset-grid">
               <button class="preset-card active" data-preset="lofi">
-                <div class="preset-preview lofi-bg"></div>
+                <div class="preset-preview lofi-bg">
+                  <div class="thumb-fx lofi-fx"></div>
+                  <span class="thumb-tag font-outfit">LO-FI</span>
+                </div>
                 <span>Lofi Chill</span>
               </button>
               <button class="preset-card" data-preset="cyberpunk">
-                <div class="preset-preview cyberpunk-bg"></div>
+                <div class="preset-preview cyberpunk-bg">
+                  <div class="thumb-fx cyber-fx"></div>
+                  <span class="thumb-tag font-space cyber-glow">CYBER</span>
+                </div>
                 <span>Cyberpunk</span>
               </button>
               <button class="preset-card" data-preset="synthwave">
-                <div class="preset-preview synthwave-bg"></div>
+                <div class="preset-preview synthwave-bg">
+                  <div class="thumb-fx synth-fx"></div>
+                  <span class="thumb-tag font-mont synth-glow">1984</span>
+                </div>
                 <span>Synthwave</span>
               </button>
               <button class="preset-card" data-preset="rainy">
-                <div class="preset-preview rainy-bg"></div>
+                <div class="preset-preview rainy-bg">
+                  <div class="thumb-fx rain-fx"></div>
+                  <span class="thumb-tag font-serif rain-glow">RAIN</span>
+                </div>
                 <span>Rainy Dream</span>
               </button>
               <button class="preset-card" data-preset="minimal">
-                <div class="preset-preview minimal-bg"></div>
+                <div class="preset-preview minimal-bg">
+                  <div class="thumb-fx minimal-fx"></div>
+                  <span class="thumb-tag font-cinzel">NOIR</span>
+                </div>
                 <span>Minimal Dark</span>
               </button>
               <button class="preset-card" data-preset="karaoke">
-                <div class="preset-preview karaoke-bg"></div>
+                <div class="preset-preview karaoke-bg">
+                  <span class="thumb-tag font-outfit karaoke-text">LYRIC</span>
+                </div>
                 <span>Karaoke Glow</span>
               </button>
               <button class="preset-card" data-preset="phonk">
-                <div class="preset-preview phonk-bg"></div>
+                <div class="preset-preview phonk-bg">
+                  <div class="thumb-fx phonk-fx"></div>
+                  <span class="thumb-tag font-mont phonk-glow">DRIFT</span>
+                </div>
                 <span>Phonk Drift</span>
               </button>
               <button class="preset-card" data-preset="sakura">
-                <div class="preset-preview sakura-bg"></div>
+                <div class="preset-preview sakura-bg">
+                  <span class="thumb-tag font-outfit sakura-glow">桜 CHILL</span>
+                </div>
                 <span>Sakura Pastel</span>
               </button>
               <button class="preset-card" data-preset="academia">
-                <div class="preset-preview academia-bg"></div>
+                <div class="preset-preview academia-bg">
+                  <span class="thumb-tag font-cinzel academia-glow">POETRY</span>
+                </div>
                 <span>Dark Academia</span>
               </button>
               <button class="preset-card" data-preset="cosmic">
-                <div class="preset-preview cosmic-bg"></div>
+                <div class="preset-preview cosmic-bg">
+                  <div class="thumb-fx cosmic-fx"></div>
+                  <span class="thumb-tag font-space cosmic-glow">SPACE</span>
+                </div>
                 <span>Cosmic Space</span>
               </button>
               <button class="preset-card" data-preset="retro">
-                <div class="preset-preview retro-bg"></div>
+                <div class="preset-preview retro-bg">
+                  <span class="thumb-tag font-courier retro-glow">VINYL</span>
+                </div>
                 <span>Vintage Soul</span>
               </button>
               <button class="preset-card" data-preset="acid">
-                <div class="preset-preview acid-bg"></div>
+                <div class="preset-preview acid-bg">
+                  <div class="thumb-fx acid-fx"></div>
+                  <span class="thumb-tag font-mont acid-glow">RAVE</span>
+                </div>
                 <span>Acid Rave</span>
               </button>
             </div>
@@ -312,6 +344,15 @@
               <span id="record-status" class="record-status-text">Recording 00:00 / 00:00</span>
             </div>
           </section>
+
+          <!-- Thumbnail Export Section -->
+          <section class="card">
+            <h3>📸 YouTube Video Thumbnail</h3>
+            <p class="helper-text">Capture the current canvas frame as a high-resolution PNG image (1920x1080 or current aspect ratio) ready for YouTube cover art.</p>
+            <button id="btn-export-thumbnail" class="secondary-btn">
+              📸 Snapshot Frame as Thumbnail (.PNG)
+            </button>
+          </section>
         </div>
       </aside>
 
@@ -328,6 +369,7 @@
               <input type="range" id="seek-slider" min="0" max="100" value="0" step="0.1" disabled>
               <span id="total-time-display">0:00</span>
             </div>
+            <button id="btn-snapshot-bar" class="mini-tool-btn" title="Snapshot Frame as Thumbnail">📸</button>
             <div class="volume-wrapper">
               <span>🔊</span>
               <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.8">
