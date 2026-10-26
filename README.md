@@ -32,13 +32,19 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
   - **Retro Synthwave Grid:** 80s neon perspective wireframe rolling grid & horizon sun.
   - **Audio Reactive Waveform:** Symmetrical equalizer bars bouncing with bass.
   - **Breathing Gradient & Custom Image:** Support for custom image backgrounds with audio-reactive Ken Burns zoom.
-- **✨ Curated Aesthetic Presets:**
+- **✨ 12 Curated Aesthetic Presets (1-Click Styling):**
   - **Lofi Chill:** Lavender & soft blue particles with clean slide typography.
   - **Cyberpunk:** Neon magenta/cyan chromatic glitch and frequency visualizer.
   - **Synthwave:** Sunset orange/magenta glow, rolling 3D wireframe grid, and beat pop.
   - **Rainy Dream:** Atmospheric moody rain window with floating wave text.
   - **Minimal Dark:** Luxury serif typography on deep monochrome backdrop.
   - **Karaoke Glow:** Electric cyan progressive wipe fill on high-contrast stage.
+  - **Phonk Drift:** Blood crimson aura, aggressive beat bounce, and high-energy punch.
+  - **Sakura Pastel:** Japanese lofi aesthetic with cherry blossom blush & floating wave text.
+  - **Dark Academia:** Warm candlelit amber, espresso background, and retro typewriter reveal.
+  - **Cosmic Space:** Starfield hyperspace warp with electric violet aura.
+  - **Vintage Soul:** 70s warm terracotta & gold tones with Courier typewriter typography.
+  - **Acid Rave:** High-voltage neon lime green with reactive equalizer bars and cyber glitch.
 - **🎬 In-Browser Video Export:**
   - Combines the Canvas render stream and Web Audio destination into a synchronized video export (`.webm` / `.mp4`) directly inside your browser—no backend server, FFmpeg installation, or cloud rendering required.
 - **🔒 Privacy First:**

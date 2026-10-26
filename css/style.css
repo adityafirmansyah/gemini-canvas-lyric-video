@@ -463,6 +463,30 @@ textarea:focus {
   background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
 }
 
+.phonk-bg {
+  background: linear-gradient(135deg, #450a0a, #7f1d1d, #dc2626, #000000);
+}
+
+.sakura-bg {
+  background: linear-gradient(135deg, #fce7f3, #f472b6, #db2777);
+}
+
+.academia-bg {
+  background: linear-gradient(135deg, #1c1917, #451a03, #78350f, #d97706);
+}
+
+.cosmic-bg {
+  background: linear-gradient(135deg, #0f172a, #3b0764, #7e22ce, #06b6d4);
+}
+
+.retro-bg {
+  background: linear-gradient(135deg, #292524, #7c2d12, #ea580c, #fbbf24);
+}
+
+.acid-bg {
+  background: linear-gradient(135deg, #022c22, #14532d, #84cc16, #00ff88);
+}
+
 /* Export Tab */
 .export-banner {
   display: flex;

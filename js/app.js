@@ -375,6 +375,54 @@ const presets = {
     accentColor: '#22d3ee',
     bgType: 'gradient',
     animType: 'karaoke-fill'
+  },
+  phonk: {
+    font: "'Space Grotesk', sans-serif",
+    fontSize: 58,
+    textColor: '#ffffff',
+    accentColor: '#ef4444',
+    bgType: 'waveform',
+    animType: 'pop-bounce'
+  },
+  sakura: {
+    font: "'Outfit', sans-serif",
+    fontSize: 52,
+    textColor: '#fff1f2',
+    accentColor: '#f472b6',
+    bgType: 'particles',
+    animType: 'floating-wave'
+  },
+  academia: {
+    font: "'Cinzel', serif",
+    fontSize: 48,
+    textColor: '#fef3c7',
+    accentColor: '#d97706',
+    bgType: 'gradient',
+    animType: 'typewriter'
+  },
+  cosmic: {
+    font: "'Space Grotesk', sans-serif",
+    fontSize: 52,
+    textColor: '#f8fafc',
+    accentColor: '#c084fc',
+    bgType: 'starfield',
+    animType: 'floating-wave'
+  },
+  retro: {
+    font: "'Courier Prime', monospace",
+    fontSize: 46,
+    textColor: '#fef08a',
+    accentColor: '#f97316',
+    bgType: 'particles',
+    animType: 'typewriter'
+  },
+  acid: {
+    font: "'Montserrat', sans-serif",
+    fontSize: 56,
+    textColor: '#ffffff',
+    accentColor: '#84cc16',
+    bgType: 'waveform',
+    animType: 'cyber-glitch'
   }
 };
 
