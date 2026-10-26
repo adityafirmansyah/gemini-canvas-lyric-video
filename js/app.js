@@ -3,11 +3,11 @@
  * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
  */
 
-import { AudioManager } from './audio-player.js?v=2.6';
-import { AiService } from './ai-service.js?v=2.6';
-import { LrcParser } from './lrc-parser.js?v=2.6';
-import { CanvasRenderer } from './canvas-renderer.js?v=2.6';
-import { VideoRecorder } from './recorder.js?v=2.6';
+import { AudioManager } from './audio-player.js?v=2.7';
+import { AiService } from './ai-service.js?v=2.7';
+import { LrcParser } from './lrc-parser.js?v=2.7';
+import { CanvasRenderer } from './canvas-renderer.js?v=2.7';
+import { VideoRecorder } from './recorder.js?v=2.7';
 
 // DOM Elements
 const canvas = document.getElementById('lyric-canvas');
@@ -53,6 +53,17 @@ const fontSizeRange = document.getElementById('font-size');
 const textColorInput = document.getElementById('text-color');
 const accentColorInput = document.getElementById('accent-color');
 const overlayTypeSelect = document.getElementById('overlay-type');
+const overlaySettingsPanel = document.getElementById('overlay-settings-panel');
+const overlayDensityInput = document.getElementById('overlay-density');
+const overlayDensityVal = document.getElementById('overlay-density-val');
+const overlaySpeedInput = document.getElementById('overlay-speed');
+const overlaySpeedVal = document.getElementById('overlay-speed-val');
+const overlayDirectionSelect = document.getElementById('overlay-direction');
+const overlaySizeInput = document.getElementById('overlay-size');
+const overlaySizeVal = document.getElementById('overlay-size-val');
+const overlayOpacityInput = document.getElementById('overlay-opacity');
+const overlayOpacityVal = document.getElementById('overlay-opacity-val');
+
 const bgDropZone = document.getElementById('bg-drop-zone');
 const customBgInput = document.getElementById('custom-bg-input');
 const bgImgInfo = document.getElementById('bg-img-info');
@@ -518,7 +529,12 @@ presetCards.forEach(card => {
       fontSizeRange.value = p.fontSize;
       textColorInput.value = p.textColor;
       accentColorInput.value = p.accentColor;
-      if (overlayTypeSelect) overlayTypeSelect.value = p.overlayType;
+      if (overlayTypeSelect) {
+        overlayTypeSelect.value = p.overlayType;
+        if (overlaySettingsPanel) {
+          overlaySettingsPanel.classList.toggle('hidden', p.overlayType === 'none');
+        }
+      }
       animTypeSelect.value = p.animType;
     }
   });
@@ -532,7 +548,49 @@ accentColorInput.addEventListener('input', (e) => renderer.accentColor = e.targe
 
 if (overlayTypeSelect) {
   overlayTypeSelect.addEventListener('change', (e) => {
-    renderer.overlayType = e.target.value;
+    renderer.setOverlayType(e.target.value);
+    if (overlaySettingsPanel) {
+      overlaySettingsPanel.classList.toggle('hidden', e.target.value === 'none');
+    }
+  });
+}
+
+// Overlay Fine-tuning Listeners
+if (overlayDensityInput) {
+  overlayDensityInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.setOverlayConfig({ density: val / 100 });
+    if (overlayDensityVal) overlayDensityVal.textContent = `${val}%`;
+  });
+}
+
+if (overlaySpeedInput) {
+  overlaySpeedInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.setOverlayConfig({ speed: val / 100 });
+    if (overlaySpeedVal) overlaySpeedVal.textContent = `${(val / 100).toFixed(1)}x`;
+  });
+}
+
+if (overlayDirectionSelect) {
+  overlayDirectionSelect.addEventListener('change', (e) => {
+    renderer.setOverlayConfig({ direction: e.target.value });
+  });
+}
+
+if (overlaySizeInput) {
+  overlaySizeInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.setOverlayConfig({ size: val / 100 });
+    if (overlaySizeVal) overlaySizeVal.textContent = `${(val / 100).toFixed(1)}x`;
+  });
+}
+
+if (overlayOpacityInput) {
+  overlayOpacityInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.setOverlayConfig({ opacity: val / 100 });
+    if (overlayOpacityVal) overlayOpacityVal.textContent = `${val}%`;
   });
 }
 

@@ -646,6 +646,15 @@ textarea:focus {
   background: linear-gradient(135deg, #022c22, #14532d, #84cc16, #00ff88);
 }
 
+.overlay-settings-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+  margin-top: 4px;
+}
+
 /* Export Tab */
 .export-banner {
   display: flex;

@@ -26,6 +26,15 @@ export class CanvasRenderer {
     this.bgDim = 0.55; // 0.0 to 0.95 dark tint over custom image
     this.enableAudioReactive = true;
 
+    // Overlay fine-tuning configuration
+    this.overlayConfig = {
+      density: 1.0,         // Multiplier: 0.2 to 2.5
+      speed: 1.0,           // Multiplier: 0.2 to 3.0
+      direction: 'default', // 'default', 'down', 'up', 'left', 'right'
+      size: 1.0,            // Multiplier: 0.4 to 2.5
+      opacity: 1.0          // Multiplier: 0.2 to 1.5
+    };
+
     // Visual elements state
     this.particles = [];
     this.rainDrops = [];
@@ -65,9 +74,12 @@ export class CanvasRenderer {
   }
 
   initVisualElements() {
-    // 1. Dust Particles
+    const density = (this.overlayConfig && this.overlayConfig.density) ? this.overlayConfig.density : 1.0;
+
+    // 1. Dust Particles (base 70)
+    const particleCount = Math.floor(70 * density);
     this.particles = [];
-    for (let i = 0; i < 70; i++) {
+    for (let i = 0; i < particleCount; i++) {
       this.particles.push({
         x: Math.random() * this.targetWidth,
         y: Math.random() * this.targetHeight,
@@ -78,9 +90,10 @@ export class CanvasRenderer {
       });
     }
 
-    // 2. Rain Drops
+    // 2. Rain Drops (base 120)
+    const rainCount = Math.floor(120 * density);
     this.rainDrops = [];
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < rainCount; i++) {
       this.rainDrops.push({
         x: Math.random() * this.targetWidth,
         y: Math.random() * this.targetHeight,
@@ -90,9 +103,10 @@ export class CanvasRenderer {
       });
     }
 
-    // 3. 3D Stars
+    // 3. 3D Stars (base 150)
+    const starCount = Math.floor(150 * density);
     this.stars = [];
-    for (let i = 0; i < 150; i++) {
+    for (let i = 0; i < starCount; i++) {
       this.stars.push({
         x: (Math.random() - 0.5) * this.targetWidth,
         y: (Math.random() - 0.5) * this.targetHeight,
@@ -107,6 +121,19 @@ export class CanvasRenderer {
 
   setCustomImage(imgElement) {
     this.customBgImage = imgElement;
+  }
+
+  setOverlayType(type) {
+    this.overlayType = type;
+    this.bgType = type;
+  }
+
+  setOverlayConfig(newConfig) {
+    const prevDensity = this.overlayConfig ? this.overlayConfig.density : 1.0;
+    this.overlayConfig = { ...this.overlayConfig, ...newConfig };
+    if (newConfig.density !== undefined && newConfig.density !== prevDensity) {
+      this.initVisualElements();
+    }
   }
 
   updateState({ currentTime, audioMetrics, lyrics }) {
@@ -182,20 +209,44 @@ export class CanvasRenderer {
     const effect = this.overlayType || this.bgType || 'particles';
     if (effect === 'none') return;
 
+    const cfg = this.overlayConfig || {
+      speed: 1.0,
+      direction: 'default',
+      size: 1.0,
+      opacity: 1.0
+    };
+    const speed = cfg.speed;
+    const size = cfg.size;
+    const opacity = cfg.opacity;
+    const dir = cfg.direction;
+
     // 1. Rain on Glass Overlay
     if (effect === 'rain') {
       ctx.save();
-      ctx.strokeStyle = 'rgba(186, 230, 253, 0.42)';
-      ctx.lineWidth = 1.6;
+      const alpha = Math.min(1, 0.42 * opacity);
+      ctx.strokeStyle = `rgba(186, 230, 253, ${alpha})`;
+      ctx.lineWidth = 1.6 * size;
       ctx.beginPath();
+
+      let vx = -1 * speed;
+      let vy = (1 + beatPulse) * speed;
+      if (dir === 'down') { vx = 0; vy = (1 + beatPulse) * speed; }
+      else if (dir === 'up') { vx = 0; vy = -(1 + beatPulse) * speed; }
+      else if (dir === 'left') { vx = -12 * speed; vy = 3 * speed; }
+      else if (dir === 'right') { vx = 12 * speed; vy = 3 * speed; }
+
       for (const r of this.rainDrops) {
-        r.y += r.speed * (1 + beatPulse);
-        if (r.y > H) {
-          r.y = -r.length;
-          r.x = Math.random() * W;
-        }
+        r.x += vx;
+        r.y += r.speed * vy;
+
+        if (vy > 0 && r.y > H) { r.y = -r.length * size; r.x = Math.random() * W; }
+        else if (vy < 0 && r.y < -r.length * size) { r.y = H; r.x = Math.random() * W; }
+        if (vx < 0 && r.x < 0) r.x = W;
+        else if (vx > 0 && r.x > W) r.x = 0;
+
+        const dropLen = r.length * size;
         ctx.moveTo(r.x, r.y);
-        ctx.lineTo(r.x - 1, r.y + r.length);
+        ctx.lineTo(r.x + (vx * 2), r.y + (vy >= 0 ? dropLen : -dropLen));
       }
       ctx.stroke();
       ctx.restore();
@@ -206,16 +257,33 @@ export class CanvasRenderer {
     if (effect === 'particles') {
       ctx.save();
       for (const p of this.particles) {
-        p.x += p.speedX;
-        p.y += p.speedY;
+        let vx = p.speedX * speed;
+        let vy = p.speedY * speed;
+
+        if (dir === 'down') {
+          vy = Math.abs(p.speedY) * 2.2 * speed;
+        } else if (dir === 'up') {
+          vy = -Math.abs(p.speedY) * 2.2 * speed;
+        } else if (dir === 'left') {
+          vx = -Math.abs(p.speedX + 0.6) * 2.0 * speed;
+        } else if (dir === 'right') {
+          vx = Math.abs(p.speedX + 0.6) * 2.0 * speed;
+        }
+
+        p.x += vx;
+        p.y += vy;
+
         if (p.y < 0) p.y = H;
+        if (p.y > H) p.y = 0;
         if (p.x < 0) p.x = W;
         if (p.x > W) p.x = 0;
 
+        const radius = p.radius * size * (1 + beatPulse * 2.2);
+        const pAlpha = Math.min(1, p.alpha * opacity);
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius * (1 + beatPulse * 2.2), 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(100, 255, 218, ${p.alpha})`;
-        ctx.shadowBlur = 10;
+        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(100, 255, 218, ${pAlpha})`;
+        ctx.shadowBlur = 10 * size;
         ctx.shadowColor = this.accentColor;
         ctx.fill();
       }
@@ -227,14 +295,25 @@ export class CanvasRenderer {
     if (effect === 'starfield') {
       ctx.save();
       ctx.translate(W / 2, H / 2);
-      const starSpeed = (600 + beatPulse * 900) * dt;
+      let starSpeed = (600 + beatPulse * 900) * dt * speed;
+      if (dir === 'down') starSpeed = -starSpeed;
 
       for (const s of this.stars) {
-        s.z -= starSpeed;
-        if (s.z <= 0) {
-          s.z = W;
-          s.x = (Math.random() - 0.5) * W;
-          s.y = (Math.random() - 0.5) * H;
+        if (dir === 'left') {
+          s.x -= starSpeed * 0.8;
+          if (s.x < -W / 2) s.x = W / 2;
+        } else if (dir === 'right') {
+          s.x += starSpeed * 0.8;
+          if (s.x > W / 2) s.x = -W / 2;
+        } else {
+          s.z -= starSpeed;
+          if (s.z <= 0) {
+            s.z = W;
+            s.x = (Math.random() - 0.5) * W;
+            s.y = (Math.random() - 0.5) * H;
+          } else if (s.z > W) {
+            s.z = 10;
+          }
         }
 
         const k = 250 / s.z;
@@ -242,11 +321,11 @@ export class CanvasRenderer {
         const py = s.y * k;
 
         if (px >= -W / 2 && px <= W / 2 && py >= -H / 2 && py <= H / 2) {
-          const size = Math.max(0.8, (1 - s.z / W) * 3);
-          const alpha = Math.min(1, (1 - s.z / W) * 1.5);
+          const sSize = Math.max(0.8, (1 - s.z / W) * 3) * size;
+          const sAlpha = Math.min(1, (1 - s.z / W) * 1.5) * opacity;
           ctx.beginPath();
-          ctx.arc(px, py, size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+          ctx.arc(px, py, sSize, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${sAlpha})`;
           ctx.fill();
         }
       }
@@ -258,25 +337,23 @@ export class CanvasRenderer {
     if (effect === 'synthwave-grid') {
       ctx.save();
       if (!this.customBgImage) {
-        // Draw synthwave sunset horizon only if there's no custom photo
         const sunY = H * 0.52;
-        const sunR = Math.min(W, H) * 0.22;
+        const sunR = Math.min(W, H) * 0.22 * size;
         const sunGrad = ctx.createLinearGradient(0, sunY - sunR, 0, sunY + sunR);
         sunGrad.addColorStop(0, '#ffbe0b');
         sunGrad.addColorStop(0.5, '#fb5607');
         sunGrad.addColorStop(1, '#ff006e');
         ctx.fillStyle = sunGrad;
         ctx.shadowColor = '#ff007f';
-        ctx.shadowBlur = 30 + beatPulse * 40;
+        ctx.shadowBlur = (30 + beatPulse * 40) * size;
         ctx.beginPath();
         ctx.arc(W / 2, sunY, sunR, Math.PI, 0, false);
         ctx.fill();
       }
 
-      // Rolling perspective grid along the lower half
-      ctx.strokeStyle = 'rgba(0, 240, 255, 0.45)';
-      ctx.lineWidth = 1.5;
-      this.gridOffset = (this.gridOffset + (40 + beatPulse * 80) * dt) % 35;
+      ctx.strokeStyle = `rgba(0, 240, 255, ${Math.min(1, 0.45 * opacity)})`;
+      ctx.lineWidth = 1.5 * size;
+      this.gridOffset = (this.gridOffset + (40 + beatPulse * 80) * dt * speed) % 35;
 
       const horizonY = H * 0.56;
       const fovCenter = W / 2;

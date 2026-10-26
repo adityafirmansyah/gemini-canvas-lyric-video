@@ -29,13 +29,13 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
   - **Upload Any Background:** Drag & drop Midjourney art, anime illustrations, lofi room visuals, or album covers.
   - **Audio-Reactive Ken Burns Zoom:** Subtle cinematic zoom that pulses with the music bass.
   - **Adjustable Dimming Tint:** Slider from 10% to 90% so lyrics maintain perfect contrast against bright artwork.
-- **🌌 Atmospheric Overlay Effects (Layered on top of your background):**
-  - **Floating Dust Bokeh:** Relaxed bokeh sparks floating over your artwork.
-  - **Dreamy Rain on Glass:** Real-time vertical rain streaks on window glass layered on top of the image.
-  - **Starfield Hyperspace:** 3D flying stars warping toward the viewer.
-  - **Audio Reactive Waveform:** Equalizer bars jumping with the song rhythm.
-  - **Retro Synthwave 3D Grid:** Rolling perspective wireframe neon grid.
-  - **None (Clean):** Display the pristine artwork with no overlay.
+- **🌌 Atmospheric Overlay Effects & Real-Time Physics Tuning:**
+  - **Layered Effects:** Floating Dust Bokeh, Dreamy Rain on Glass, Starfield Hyperspace, Audio Reactive Waveform, Retro Synthwave 3D Grid.
+  - **Density / Particle Count:** Slider (20% to 250%) to adjust sparse vs dense storms of rain, dust, or stars.
+  - **Speed Multiplier:** Slider (0.2x to 3.0x) for gentle slow-motion floating or rapid high-energy motion.
+  - **Flow Direction:** Custom physics direction: Default drift, Downward (rain/snow), Upward (rising embers/floating), Left, or Right.
+  - **Particle Size & Opacity:** Fine-tune the thickness, radius, and glow transparency of the overlay layer.
+  - **None (Clean):** Display pristine artwork with zero overlay.
 - **✨ 12 Curated Aesthetic Presets (1-Click Styling):**
   - **Lofi Chill:** Lavender & soft blue particles with clean slide typography.
   - **Cyberpunk:** Neon magenta/cyan chromatic glitch and frequency visualizer.

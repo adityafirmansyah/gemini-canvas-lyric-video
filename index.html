@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@700;900&family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,600;1,600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=2.6">
+  <link rel="stylesheet" href="css/style.css?v=2.7">
 </head>
 <body>
   <div class="app-container">
@@ -341,6 +341,54 @@
                 <option value="none">None (Clean Background Only)</option>
               </select>
             </div>
+
+            <!-- Overlay Fine-Tuning Controls -->
+            <div id="overlay-settings-panel" class="overlay-settings-wrapper">
+              <div class="form-row">
+                <div class="input-group">
+                  <div class="label-with-link">
+                    <label for="overlay-density">Density / Count</label>
+                    <span id="overlay-density-val" class="helper-text">100%</span>
+                  </div>
+                  <input type="range" id="overlay-density" min="20" max="250" value="100" step="10">
+                </div>
+                <div class="input-group">
+                  <div class="label-with-link">
+                    <label for="overlay-speed">Speed</label>
+                    <span id="overlay-speed-val" class="helper-text">1.0x</span>
+                  </div>
+                  <input type="range" id="overlay-speed" min="20" max="300" value="100" step="10">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="input-group">
+                  <label for="overlay-direction">Flow Direction</label>
+                  <select id="overlay-direction">
+                    <option value="default">Default Drift (Natural)</option>
+                    <option value="down">Downward (Rain / Snow)</option>
+                    <option value="up">Upward (Rising Embers / Float)</option>
+                    <option value="left">Drifting Left</option>
+                    <option value="right">Drifting Right</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <div class="label-with-link">
+                    <label for="overlay-size">Particle Size</label>
+                    <span id="overlay-size-val" class="helper-text">1.0x</span>
+                  </div>
+                  <input type="range" id="overlay-size" min="40" max="250" value="100" step="10">
+                </div>
+              </div>
+
+              <div class="input-group">
+                <div class="label-with-link">
+                  <label for="overlay-opacity">Overlay Opacity</label>
+                  <span id="overlay-opacity-val" class="helper-text">100%</span>
+                </div>
+                <input type="range" id="overlay-opacity" min="20" max="150" value="100" step="5">
+              </div>
+            </div>
           </section>
         </div>
 
@@ -415,6 +463,6 @@
   <audio id="audio-player" preload="auto"></audio>
 
   <!-- Modular Scripts -->
-  <script type="module" src="js/app.js?v=2.6"></script>
+  <script type="module" src="js/app.js?v=2.7"></script>
 </body>
 </html>
