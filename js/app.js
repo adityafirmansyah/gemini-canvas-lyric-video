@@ -3,11 +3,11 @@
  * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
  */
 
-import { AudioManager } from './audio-player.js';
-import { AiService } from './ai-service.js';
-import { LrcParser } from './lrc-parser.js';
-import { CanvasRenderer } from './canvas-renderer.js';
-import { VideoRecorder } from './recorder.js';
+import { AudioManager } from './audio-player.js?v=2.2';
+import { AiService } from './ai-service.js?v=2.2';
+import { LrcParser } from './lrc-parser.js?v=2.2';
+import { CanvasRenderer } from './canvas-renderer.js?v=2.2';
+import { VideoRecorder } from './recorder.js?v=2.2';
 
 // DOM Elements
 const canvas = document.getElementById('lyric-canvas');
@@ -187,27 +187,41 @@ toggleKeyBtn.addEventListener('click', () => {
 });
 
 if (btnTestKey) {
-  btnTestKey.addEventListener('click', async () => {
+  const runTest = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     const provider = aiProviderSelect.value;
     const apiKey = apiKeyInput.value.trim();
     const customUrl = customEndpointUrl.value.trim();
 
+    btnTestKey.textContent = '⏳ Checking...';
+    btnTestKey.disabled = true;
+
     keyTestResult.className = 'key-status-badge loading';
-    keyTestResult.textContent = 'Testing connection... ⏳';
+    keyTestResult.textContent = `Connecting to ${provider.toUpperCase()} servers... ⏳`;
     keyTestResult.classList.remove('hidden');
-    btnTestKey.classList.add('testing');
 
     try {
       const successMsg = await aiService.testApiKey({ provider, apiKey, customUrl });
       keyTestResult.className = 'key-status-badge success';
       keyTestResult.textContent = successMsg;
+      btnTestKey.textContent = '✓ OK';
     } catch (err) {
       keyTestResult.className = 'key-status-badge error';
       keyTestResult.textContent = `Error: ${err.message}`;
+      btnTestKey.textContent = '✗ Error';
     } finally {
-      btnTestKey.classList.remove('testing');
+      setTimeout(() => {
+        btnTestKey.textContent = '⚡ Test';
+        btnTestKey.disabled = false;
+      }, 3500);
     }
-  });
+  };
+
+  btnTestKey.addEventListener('click', runTest);
+  btnTestKey.addEventListener('touchend', runTest);
 }
 
 updateProviderUI();
