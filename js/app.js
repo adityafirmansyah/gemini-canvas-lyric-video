@@ -34,6 +34,8 @@ const groupApiKey = document.getElementById('group-api-key');
 const labelApiKey = document.getElementById('label-api-key');
 const apiKeyLink = document.getElementById('api-key-link');
 const apiKeyInput = document.getElementById('api-key');
+const btnTestKey = document.getElementById('btn-test-key');
+const keyTestResult = document.getElementById('key-test-result');
 const toggleKeyBtn = document.getElementById('toggle-key-visibility');
 const optionalLyricsInput = document.getElementById('optional-lyrics');
 const btnSyncAi = document.getElementById('btn-sync-ai');
@@ -167,15 +169,47 @@ function updateProviderUI() {
   }
 
   apiKeyInput.value = aiService.getSavedApiKey(provider);
+  if (keyTestResult) {
+    keyTestResult.classList.add('hidden');
+    keyTestResult.textContent = '';
+  }
 }
 
 aiProviderSelect.addEventListener('change', updateProviderUI);
 apiKeyInput.addEventListener('input', (e) => {
   aiService.saveApiKey(aiProviderSelect.value, e.target.value);
+  if (keyTestResult) {
+    keyTestResult.classList.add('hidden');
+  }
 });
 toggleKeyBtn.addEventListener('click', () => {
   apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
 });
+
+if (btnTestKey) {
+  btnTestKey.addEventListener('click', async () => {
+    const provider = aiProviderSelect.value;
+    const apiKey = apiKeyInput.value.trim();
+    const customUrl = customEndpointUrl.value.trim();
+
+    keyTestResult.className = 'key-status-badge loading';
+    keyTestResult.textContent = 'Testing connection... ⏳';
+    keyTestResult.classList.remove('hidden');
+    btnTestKey.classList.add('testing');
+
+    try {
+      const successMsg = await aiService.testApiKey({ provider, apiKey, customUrl });
+      keyTestResult.className = 'key-status-badge success';
+      keyTestResult.textContent = successMsg;
+    } catch (err) {
+      keyTestResult.className = 'key-status-badge error';
+      keyTestResult.textContent = `Error: ${err.message}`;
+    } finally {
+      btnTestKey.classList.remove('testing');
+    }
+  });
+}
+
 updateProviderUI();
 
 // 2. Sync Method Switcher (AI vs LRC)

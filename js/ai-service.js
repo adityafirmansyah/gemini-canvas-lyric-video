@@ -80,6 +80,61 @@ export class AiService {
   }
 
   /**
+   * Fast lightweight connection test to verify API key validity without full audio processing
+   */
+  async testApiKey({ provider, apiKey, customUrl }) {
+    if (!apiKey && provider !== 'custom') {
+      throw new Error('Please enter an API key first.');
+    }
+
+    if (provider === 'gemini') {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey.trim())}`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error?.message || `HTTP ${res.status}: Invalid key`);
+      }
+      return 'Google Gemini API key is valid & connected! ✓';
+    }
+
+    if (provider === 'groq') {
+      const res = await fetch('https://api.groq.com/openai/v1/models', {
+        headers: { 'Authorization': `Bearer ${apiKey.trim()}` }
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error?.message || `HTTP ${res.status}: Invalid key`);
+      }
+      return 'Groq API key is valid & connected! ✓';
+    }
+
+    if (provider === 'openai') {
+      const res = await fetch('https://api.openai.com/v1/models', {
+        headers: { 'Authorization': `Bearer ${apiKey.trim()}` }
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error?.message || `HTTP ${res.status}: Invalid key`);
+      }
+      return 'OpenAI API key is valid & connected! ✓';
+    }
+
+    if (provider === 'custom') {
+      const base = customUrl ? customUrl.replace(/\/audio\/transcriptions\/?$/, '') : 'http://localhost:8000/v1';
+      const testEndpoint = `${base}/models`;
+      const headers = {};
+      if (apiKey) headers['Authorization'] = `Bearer ${apiKey.trim()}`;
+      const res = await fetch(testEndpoint, { headers });
+      if (!res.ok) {
+        throw new Error(`Custom endpoint responded with HTTP ${res.status}`);
+      }
+      return 'Custom endpoint responded successfully! ✓';
+    }
+
+    throw new Error(`Unsupported provider: ${provider}`);
+  }
+
+  /**
    * 1. Google Gemini Audio Sync
    */
   async syncWithGemini({ apiKey, model, audioFile, referenceLyrics, onProgress }) {

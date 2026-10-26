@@ -358,6 +358,57 @@ textarea:focus {
   cursor: pointer;
 }
 
+.mini-btn:hover {
+  color: #fff;
+  border-color: #4b5563;
+}
+
+.test-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.test-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.test-btn.testing {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.key-status-badge {
+  font-size: 0.72rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-top: 2px;
+  display: block;
+}
+
+.key-status-badge.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.key-status-badge.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.key-status-badge.loading {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
