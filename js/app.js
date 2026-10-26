@@ -3,11 +3,11 @@
  * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
  */
 
-import { AudioManager } from './audio-player.js?v=3.0';
-import { AiService } from './ai-service.js?v=3.0';
-import { LrcParser } from './lrc-parser.js?v=3.0';
-import { CanvasRenderer } from './canvas-renderer.js?v=3.0';
-import { VideoRecorder } from './recorder.js?v=3.0';
+import { AudioManager } from './audio-player.js?v=3.1';
+import { AiService } from './ai-service.js?v=3.1';
+import { LrcParser } from './lrc-parser.js?v=3.1';
+import { CanvasRenderer } from './canvas-renderer.js?v=3.1';
+import { VideoRecorder } from './recorder.js?v=3.1';
 
 // DOM Elements
 const canvas = document.getElementById('lyric-canvas');
@@ -52,6 +52,10 @@ const fontFamilySelect = document.getElementById('font-family');
 const fontSizeRange = document.getElementById('font-size');
 const textColorInput = document.getElementById('text-color');
 const accentColorInput = document.getElementById('accent-color');
+const glowSizeInput = document.getElementById('glow-size');
+const glowSizeVal = document.getElementById('glow-size-val');
+const glowDensityInput = document.getElementById('glow-density');
+const glowDensityVal = document.getElementById('glow-density-val');
 const overlayTypeSelect = document.getElementById('overlay-type');
 const overlaySettingsPanel = document.getElementById('overlay-settings-panel');
 const overlayDensityInput = document.getElementById('overlay-density');
@@ -431,6 +435,8 @@ const presets = {
     fontSize: 52,
     textColor: '#ffffff',
     accentColor: '#93c5fd',
+    glowSize: 22,
+    glowDensity: 1.0,
     overlayType: 'particles',
     animType: 'smooth-slide'
   },
@@ -439,6 +445,8 @@ const presets = {
     fontSize: 56,
     textColor: '#ffffff',
     accentColor: '#ff007f',
+    glowSize: 38,
+    glowDensity: 1.5,
     overlayType: 'waveform',
     animType: 'cyber-glitch'
   },
@@ -447,6 +455,8 @@ const presets = {
     fontSize: 54,
     textColor: '#ffffff',
     accentColor: '#ffbe0b',
+    glowSize: 32,
+    glowDensity: 1.3,
     overlayType: 'synthwave-grid',
     animType: 'pop-bounce'
   },
@@ -455,6 +465,8 @@ const presets = {
     fontSize: 50,
     textColor: '#e2e8f0',
     accentColor: '#38bdf8',
+    glowSize: 20,
+    glowDensity: 0.9,
     overlayType: 'rain',
     animType: 'floating-wave'
   },
@@ -463,6 +475,8 @@ const presets = {
     fontSize: 48,
     textColor: '#f8fafc',
     accentColor: '#ffffff',
+    glowSize: 0,
+    glowDensity: 0,
     overlayType: 'none',
     animType: 'smooth-slide'
   },
@@ -471,6 +485,8 @@ const presets = {
     fontSize: 58,
     textColor: '#ffffff',
     accentColor: '#22d3ee',
+    glowSize: 25,
+    glowDensity: 1.0,
     overlayType: 'none',
     animType: 'karaoke-fill'
   },
@@ -479,6 +495,8 @@ const presets = {
     fontSize: 58,
     textColor: '#ffffff',
     accentColor: '#ef4444',
+    glowSize: 42,
+    glowDensity: 1.6,
     overlayType: 'waveform',
     animType: 'pop-bounce'
   },
@@ -487,6 +505,8 @@ const presets = {
     fontSize: 52,
     textColor: '#fff1f2',
     accentColor: '#f472b6',
+    glowSize: 24,
+    glowDensity: 1.0,
     overlayType: 'particles',
     animType: 'floating-wave'
   },
@@ -495,6 +515,8 @@ const presets = {
     fontSize: 48,
     textColor: '#fef3c7',
     accentColor: '#d97706',
+    glowSize: 12,
+    glowDensity: 0.6,
     overlayType: 'none',
     animType: 'typewriter'
   },
@@ -503,6 +525,8 @@ const presets = {
     fontSize: 52,
     textColor: '#f8fafc',
     accentColor: '#c084fc',
+    glowSize: 35,
+    glowDensity: 1.3,
     overlayType: 'starfield',
     animType: 'floating-wave'
   },
@@ -511,6 +535,8 @@ const presets = {
     fontSize: 46,
     textColor: '#fef08a',
     accentColor: '#f97316',
+    glowSize: 10,
+    glowDensity: 0.5,
     overlayType: 'particles',
     animType: 'typewriter'
   },
@@ -519,6 +545,8 @@ const presets = {
     fontSize: 56,
     textColor: '#ffffff',
     accentColor: '#84cc16',
+    glowSize: 40,
+    glowDensity: 1.5,
     overlayType: 'waveform',
     animType: 'cyber-glitch'
   }
@@ -537,12 +565,19 @@ presetCards.forEach(card => {
       renderer.accentColor = p.accentColor;
       renderer.overlayType = p.overlayType;
       renderer.animType = p.animType;
+      renderer.glowSize = p.glowSize !== undefined ? p.glowSize : 25;
+      renderer.glowDensity = p.glowDensity !== undefined ? p.glowDensity : 1.0;
 
       // Sync form inputs
       fontFamilySelect.value = p.font;
       fontSizeRange.value = p.fontSize;
       textColorInput.value = p.textColor;
       accentColorInput.value = p.accentColor;
+      if (glowSizeInput) glowSizeInput.value = renderer.glowSize;
+      if (glowSizeVal) glowSizeVal.textContent = `${renderer.glowSize}px`;
+      if (glowDensityInput) glowDensityInput.value = Math.round(renderer.glowDensity * 100);
+      if (glowDensityVal) glowDensityVal.textContent = `${Math.round(renderer.glowDensity * 100)}%`;
+
       const partColor = p.particleColor || p.accentColor || '#64ffda';
       renderer.setOverlayConfig({ color: partColor });
       if (overlayColorInput) overlayColorInput.value = partColor;
@@ -563,6 +598,22 @@ fontFamilySelect.addEventListener('change', (e) => renderer.fontFamily = e.targe
 fontSizeRange.addEventListener('input', (e) => renderer.baseFontSize = parseInt(e.target.value));
 textColorInput.addEventListener('input', (e) => renderer.textColor = e.target.value);
 accentColorInput.addEventListener('input', (e) => renderer.accentColor = e.target.value);
+
+if (glowSizeInput) {
+  glowSizeInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.glowSize = val;
+    if (glowSizeVal) glowSizeVal.textContent = `${val}px`;
+  });
+}
+
+if (glowDensityInput) {
+  glowDensityInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.glowDensity = val / 100;
+    if (glowDensityVal) glowDensityVal.textContent = `${val}%`;
+  });
+}
 
 if (overlayTypeSelect) {
   overlayTypeSelect.addEventListener('change', (e) => {

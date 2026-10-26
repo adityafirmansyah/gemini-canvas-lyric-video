@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@700;900&family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,600;1,600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=3.0">
+  <link rel="stylesheet" href="css/style.css?v=3.1">
 </head>
 <body>
   <div class="app-container">
@@ -292,6 +292,23 @@
               </div>
             </div>
 
+            <div class="form-row">
+              <div class="input-group">
+                <div class="label-with-link">
+                  <label for="glow-size">Glow Size</label>
+                  <span id="glow-size-val" class="helper-text">25px</span>
+                </div>
+                <input type="range" id="glow-size" min="0" max="60" value="25" step="2">
+              </div>
+              <div class="input-group">
+                <div class="label-with-link">
+                  <label for="glow-density">Glow Density</label>
+                  <span id="glow-density-val" class="helper-text">100%</span>
+                </div>
+                <input type="range" id="glow-density" min="0" max="200" value="100" step="10">
+              </div>
+            </div>
+
             <div class="toggle-group">
               <label class="switch-label">
                 <input type="checkbox" id="toggle-audio-reactive" checked>
@@ -533,6 +550,6 @@
   <audio id="audio-player" preload="auto"></audio>
 
   <!-- Modular Scripts -->
-  <script type="module" src="js/app.js?v=3.0"></script>
+  <script type="module" src="js/app.js?v=3.1"></script>
 </body>
 </html>

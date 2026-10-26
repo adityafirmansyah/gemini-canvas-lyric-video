@@ -19,6 +19,8 @@ export class CanvasRenderer {
     this.baseFontSize = 52;
     this.textColor = '#ffffff';
     this.accentColor = '#22d3ee';
+    this.glowSize = 25; // in pixels (0 to 60)
+    this.glowDensity = 1.0; // multiplier (0.0 to 2.0)
     this.overlayType = 'particles';
     this.bgType = 'particles';
     this.animType = 'smooth-slide';
@@ -621,6 +623,10 @@ export class CanvasRenderer {
   renderActiveLineAnimation({ ctx, text, x, y, maxWidth, baseSize, beatPulse, overallGlow, progress, t, start, end }) {
     ctx.save();
 
+    const gSize = (this.glowSize !== undefined ? this.glowSize : 25);
+    const gDensity = (this.glowDensity !== undefined ? this.glowDensity : 1.0);
+    const activeGlowBlur = gSize === 0 ? 0 : (gSize * gDensity + (this.enableAudioReactive ? overallGlow * 0.7 * gDensity : 0));
+
     // 1. STYLE: Karaoke Progressive Fill (Spotify / Apple Music style)
     if (this.animType === 'karaoke-fill') {
       const fontSize = baseSize * (1.0 + beatPulse * 0.5);
@@ -646,7 +652,10 @@ export class CanvasRenderer {
 
       ctx.fillStyle = this.accentColor;
       ctx.shadowColor = this.accentColor;
-      ctx.shadowBlur = 20 + overallGlow;
+      ctx.shadowBlur = activeGlowBlur;
+      if (gDensity > 1.25 && gSize > 0) {
+        this.wrapAndDrawText(ctx, text, x, y, maxWidth, fontSize * 1.3);
+      }
       this.wrapAndDrawText(ctx, text, x, y, maxWidth, fontSize * 1.3);
       ctx.restore();
       ctx.restore();
@@ -655,7 +664,6 @@ export class CanvasRenderer {
 
     // 2. STYLE: Pop & Beat Scale (Energetic / Phonk / Trap)
     if (this.animType === 'pop-bounce') {
-      // Scale overshoot on entry
       let entryScale = 1.0;
       const timeIn = t - start;
       if (timeIn >= 0 && timeIn < 0.35) {
@@ -669,8 +677,11 @@ export class CanvasRenderer {
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#ffffff';
       ctx.shadowColor = this.accentColor;
-      ctx.shadowBlur = 25 + overallGlow * 1.5;
+      ctx.shadowBlur = activeGlowBlur * 1.2;
 
+      if (gDensity > 1.25 && gSize > 0) {
+        this.wrapAndDrawText(ctx, text, x, y, maxWidth, fontSize * 1.3);
+      }
       this.wrapAndDrawText(ctx, text, x, y, maxWidth, fontSize * 1.3);
       ctx.restore();
       return;
@@ -686,8 +697,11 @@ export class CanvasRenderer {
       ctx.textBaseline = 'middle';
       ctx.fillStyle = this.textColor;
       ctx.shadowColor = this.accentColor;
-      ctx.shadowBlur = 18 + overallGlow;
+      ctx.shadowBlur = activeGlowBlur;
 
+      if (gDensity > 1.25 && gSize > 0) {
+        this.wrapAndDrawText(ctx, text, x, y + waveY, maxWidth, fontSize * 1.3);
+      }
       this.wrapAndDrawText(ctx, text, x, y + waveY, maxWidth, fontSize * 1.3);
       ctx.restore();
       return;
@@ -707,8 +721,11 @@ export class CanvasRenderer {
 
       ctx.fillStyle = '#ffffff';
       ctx.shadowColor = this.accentColor;
-      ctx.shadowBlur = 12 + overallGlow * 0.5;
+      ctx.shadowBlur = activeGlowBlur * 0.7;
 
+      if (gDensity > 1.25 && gSize > 0) {
+        this.wrapAndDrawText(ctx, partialText + cursor, x, y, maxWidth, fontSize * 1.3);
+      }
       this.wrapAndDrawText(ctx, partialText + cursor, x, y, maxWidth, fontSize * 1.3);
       ctx.restore();
       return;
@@ -739,7 +756,10 @@ export class CanvasRenderer {
       // Main white core
       ctx.fillStyle = '#ffffff';
       ctx.shadowColor = this.accentColor;
-      ctx.shadowBlur = 15;
+      ctx.shadowBlur = activeGlowBlur;
+      if (gDensity > 1.25 && gSize > 0) {
+        this.wrapAndDrawText(ctx, text, x, y, maxWidth, fontSize * 1.3);
+      }
       this.wrapAndDrawText(ctx, text, x, y, maxWidth, fontSize * 1.3);
       ctx.restore();
       return;
@@ -759,9 +779,12 @@ export class CanvasRenderer {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor = this.accentColor;
-    ctx.shadowBlur = Math.min(45, 18 + overallGlow);
+    ctx.shadowBlur = activeGlowBlur;
     ctx.fillStyle = '#ffffff';
 
+    if (gDensity > 1.25 && gSize > 0) {
+      this.wrapAndDrawText(ctx, text, x, y + slideY, maxWidth, fontSize * 1.3);
+    }
     this.wrapAndDrawText(ctx, text, x, y + slideY, maxWidth, fontSize * 1.3);
     ctx.restore();
   }

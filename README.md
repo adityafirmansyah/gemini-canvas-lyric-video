@@ -25,6 +25,7 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
   - **Floating Ambient Wave:** Dreamy vertical sine-wave undulating motion.
   - **Typewriter Reveal:** Vintage terminal character-by-character typing with blinking cursor.
   - **Cyber Glitch:** Chromatic aberration RGB channel splitting and digital jitter.
+  - **Glow Size & Density Controls:** Real-time Glow Radius (0px to 60px) and Glow Density (0% to 200%) for dense, multi-pass neon radiance.
 - **🖼️ Custom Artwork Backdrop & Cinematic Motion Engine:**
   - **Upload Any Background:** Drag & drop Midjourney art, anime illustrations, lofi room visuals, or album covers.
   - **Motion Animation Styles:** Ken Burns breathing zoom, Continuous Zoom In, Continuous Zoom Out, Slow Horizontal Pan Drift, Slow Vertical Pan Drift, Gentle Pendulum Sway/Tilt, Beat Bounce Only, or Static.
