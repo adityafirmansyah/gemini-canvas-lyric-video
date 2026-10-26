@@ -26,6 +26,11 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
   - **Typewriter Reveal:** Vintage terminal character-by-character typing with blinking cursor.
   - **Cyber Glitch:** Chromatic aberration RGB channel splitting and digital jitter.
   - **Glow Size & Density Controls:** Real-time Glow Radius (0px to 60px) and Glow Density (0% to 200%) for dense, multi-pass neon radiance.
+- **🏷️ Subtitle & Box Badge Design (Agency / TikTok Viral Styles):**
+  - **Badge Styles:** Solid Highlight Box Banner, Dual-Tone Inverted Badges (alternating Lime Green & Dark boxes like creative agency branding), Individual Word Badges, Active Word Pop-out Badge (karaoke spoken-word pop), and Heavy Comic Outline.
+  - **Customizable Badges:** Box background color, inner text color, quick palette buttons (Volt Lime, Electric Yellow, Cyan, Pink, Red, White, Pitch Black).
+  - **Corner Rounding & Padding:** Sliders for sharp crisp rectangular sticker corners (0px) to rounded pills (24px).
+  - **ALL CAPS Impact:** Toggle for bold high-contrast uppercase lettering.
 - **🖼️ Custom Artwork Backdrop & Cinematic Motion Engine:**
   - **Upload Any Background:** Drag & drop Midjourney art, anime illustrations, lofi room visuals, or album covers.
   - **Motion Animation Styles:** Ken Burns breathing zoom, Continuous Zoom In, Continuous Zoom Out, Slow Horizontal Pan Drift, Slow Vertical Pan Drift, Gentle Pendulum Sway/Tilt, Beat Bounce Only, or Static.

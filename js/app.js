@@ -3,11 +3,11 @@
  * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
  */
 
-import { AudioManager } from './audio-player.js?v=3.1';
-import { AiService } from './ai-service.js?v=3.1';
-import { LrcParser } from './lrc-parser.js?v=3.1';
-import { CanvasRenderer } from './canvas-renderer.js?v=3.1';
-import { VideoRecorder } from './recorder.js?v=3.1';
+import { AudioManager } from './audio-player.js?v=3.2';
+import { AiService } from './ai-service.js?v=3.2';
+import { LrcParser } from './lrc-parser.js?v=3.2';
+import { CanvasRenderer } from './canvas-renderer.js?v=3.2';
+import { VideoRecorder } from './recorder.js?v=3.2';
 
 // DOM Elements
 const canvas = document.getElementById('lyric-canvas');
@@ -56,6 +56,20 @@ const glowSizeInput = document.getElementById('glow-size');
 const glowSizeVal = document.getElementById('glow-size-val');
 const glowDensityInput = document.getElementById('glow-density');
 const glowDensityVal = document.getElementById('glow-density-val');
+
+// Subtitle & Box Badge Controls
+const subStyleSelect = document.getElementById('sub-style');
+const subSettingsPanel = document.getElementById('sub-settings-panel');
+const subBoxColorInput = document.getElementById('sub-box-color');
+const subTextColorInput = document.getElementById('sub-text-color');
+const subCornerRadiusInput = document.getElementById('sub-corner-radius');
+const subCornerRadiusVal = document.getElementById('sub-corner-radius-val');
+const subPaddingInput = document.getElementById('sub-padding');
+const subPaddingVal = document.getElementById('sub-padding-val');
+const subUppercaseInput = document.getElementById('sub-uppercase');
+const btnResetSubtitle = document.getElementById('btn-reset-subtitle');
+const paletteBtns = document.querySelectorAll('.palette-btn');
+
 const overlayTypeSelect = document.getElementById('overlay-type');
 const overlaySettingsPanel = document.getElementById('overlay-settings-panel');
 const overlayDensityInput = document.getElementById('overlay-density');
@@ -612,6 +626,89 @@ if (glowDensityInput) {
     const val = parseInt(e.target.value);
     renderer.glowDensity = val / 100;
     if (glowDensityVal) glowDensityVal.textContent = `${val}%`;
+  });
+}
+
+// Subtitle & Box Badge Design Listeners
+if (subStyleSelect) {
+  subStyleSelect.addEventListener('change', (e) => {
+    const val = e.target.value;
+    renderer.setSubtitleConfig({ style: val });
+    if (subSettingsPanel) {
+      subSettingsPanel.classList.toggle('hidden', val === 'none');
+    }
+  });
+}
+
+if (subBoxColorInput) {
+  subBoxColorInput.addEventListener('input', (e) => {
+    renderer.setSubtitleConfig({ boxColor: e.target.value });
+  });
+}
+
+if (subTextColorInput) {
+  subTextColorInput.addEventListener('input', (e) => {
+    renderer.setSubtitleConfig({ boxTextColor: e.target.value });
+  });
+}
+
+if (subCornerRadiusInput) {
+  subCornerRadiusInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.setSubtitleConfig({ boxRadius: val });
+    if (subCornerRadiusVal) subCornerRadiusVal.textContent = `${val}px`;
+  });
+}
+
+if (subPaddingInput) {
+  subPaddingInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.setSubtitleConfig({ boxPadding: val });
+    if (subPaddingVal) subPaddingVal.textContent = `${val}px`;
+  });
+}
+
+if (subUppercaseInput) {
+  subUppercaseInput.addEventListener('change', (e) => {
+    renderer.setSubtitleConfig({ uppercase: e.target.checked });
+  });
+}
+
+paletteBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const boxColor = btn.getAttribute('data-box');
+    const textColor = btn.getAttribute('data-text');
+    if (boxColor) {
+      if (subBoxColorInput) subBoxColorInput.value = boxColor;
+      renderer.setSubtitleConfig({ boxColor });
+    }
+    if (textColor) {
+      if (subTextColorInput) subTextColorInput.value = textColor;
+      renderer.setSubtitleConfig({ boxTextColor: textColor });
+    }
+  });
+});
+
+if (btnResetSubtitle) {
+  btnResetSubtitle.addEventListener('click', () => {
+    if (subStyleSelect) subStyleSelect.value = 'none';
+    if (subSettingsPanel) subSettingsPanel.classList.add('hidden');
+    if (subBoxColorInput) subBoxColorInput.value = '#c9fa53';
+    if (subTextColorInput) subTextColorInput.value = '#000000';
+    if (subCornerRadiusInput) subCornerRadiusInput.value = 4;
+    if (subCornerRadiusVal) subCornerRadiusVal.textContent = '4px';
+    if (subPaddingInput) subPaddingInput.value = 14;
+    if (subPaddingVal) subPaddingVal.textContent = '14px';
+    if (subUppercaseInput) subUppercaseInput.checked = true;
+
+    renderer.setSubtitleConfig({
+      style: 'none',
+      boxColor: '#c9fa53',
+      boxTextColor: '#000000',
+      boxRadius: 4,
+      boxPadding: 14,
+      uppercase: true
+    });
   });
 }
 

@@ -29,6 +29,17 @@ export class CanvasRenderer {
     this.enableAudioReactive = true;
     this.customParticleImage = null;
 
+    // Subtitle & Box Badge Design configuration
+    this.subtitleConfig = {
+      style: 'none', // 'none', 'boxed-banner', 'alternating-badge', 'word-badges', 'karaoke-word-pop', 'outline-only'
+      boxColor: '#c9fa53',
+      boxTextColor: '#000000',
+      boxRadius: 4,
+      boxPadding: 14,
+      uppercase: true,
+      borderColor: '#000000'
+    };
+
     // Background motion configuration
     this.bgConfig = {
       animType: 'ken-burns', // 'ken-burns', 'zoom-in', 'zoom-out', 'pan-horizontal', 'pan-vertical', 'sway', 'beat-only', 'static'
@@ -143,6 +154,30 @@ export class CanvasRenderer {
 
   setBgConfig(newConfig) {
     this.bgConfig = { ...this.bgConfig, ...newConfig };
+  }
+
+  setSubtitleConfig(newConfig) {
+    this.subtitleConfig = { ...this.subtitleConfig, ...newConfig };
+  }
+
+  drawRoundedRect(ctx, x, y, width, height, radius) {
+    if (!radius || radius <= 0) {
+      ctx.fillRect(x, y, width, height);
+      return;
+    }
+    const r = Math.min(radius, width / 2, height / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + width - r, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+    ctx.lineTo(x + width, y + height - r);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+    ctx.lineTo(x + r, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+    ctx.fill();
   }
 
   setOverlayType(type) {
@@ -783,13 +818,18 @@ export class CanvasRenderer {
     ctx.fillStyle = '#ffffff';
 
     if (gDensity > 1.25 && gSize > 0) {
-      this.wrapAndDrawText(ctx, text, x, y + slideY, maxWidth, fontSize * 1.3);
+      this.wrapAndDrawText(ctx, text, x, y + slideY, maxWidth, fontSize * 1.3, progress);
     }
-    this.wrapAndDrawText(ctx, text, x, y + slideY, maxWidth, fontSize * 1.3);
+    this.wrapAndDrawText(ctx, text, x, y + slideY, maxWidth, fontSize * 1.3, progress);
     ctx.restore();
   }
 
-  wrapAndDrawText(ctx, text, x, y, maxWidth, lineHeight) {
+  wrapAndDrawText(ctx, rawText, x, y, maxWidth, lineHeight, animProgress = 1.0) {
+    const sub = this.subtitleConfig || { style: 'none' };
+    const style = sub.style || 'none';
+    const isUpper = sub.uppercase !== false && style !== 'none';
+    const text = isUpper ? rawText.toUpperCase() : rawText;
+
     const words = text.split(' ');
     const lines = [];
     let currentLine = words[0] || '';
@@ -807,8 +847,140 @@ export class CanvasRenderer {
     lines.push(currentLine);
 
     const startY = y - ((lines.length - 1) * lineHeight) / 2;
-    for (let i = 0; i < lines.length; i++) {
-      ctx.fillText(lines[i], x, startY + i * lineHeight);
+
+    // Mode A: Standard text (no box badge)
+    if (style === 'none') {
+      for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], x, startY + i * lineHeight);
+      }
+      return;
+    }
+
+    // Mode B: Outline-only (Comic / TikTok bold outline)
+    if (style === 'outline-only') {
+      ctx.save();
+      ctx.strokeStyle = sub.borderColor || '#000000';
+      ctx.lineWidth = Math.max(4, lineHeight * 0.12);
+      ctx.lineJoin = 'round';
+      ctx.miterLimit = 2;
+      for (let i = 0; i < lines.length; i++) {
+        ctx.strokeText(lines[i], x, startY + i * lineHeight);
+        ctx.fillText(lines[i], x, startY + i * lineHeight);
+      }
+      ctx.restore();
+      return;
+    }
+
+    const pad = sub.boxPadding !== undefined ? sub.boxPadding : 14;
+    const radius = sub.boxRadius !== undefined ? sub.boxRadius : 4;
+    const boxColor = sub.boxColor || '#c9fa53';
+    const boxTextColor = sub.boxTextColor || '#000000';
+
+    // Mode C: Solid Highlight Box Banner behind full line
+    if (style === 'boxed-banner') {
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const textWidth = ctx.measureText(line).width;
+        const boxW = textWidth + pad * 2.2;
+        const boxH = lineHeight * 0.9 + pad * 0.5;
+        const lineY = startY + i * lineHeight;
+
+        ctx.fillStyle = boxColor;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+        ctx.shadowBlur = 12;
+        this.drawRoundedRect(ctx, x - boxW / 2, lineY - boxH / 2, boxW, boxH, radius);
+
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = boxTextColor;
+        ctx.fillText(line, x, lineY);
+      }
+      ctx.restore();
+      return;
+    }
+
+    // Mode D: Word Badges, Alternating Badges (like user's image), or Active Word Pop
+    if (style === 'word-badges' || style === 'alternating-badge' || style === 'karaoke-word-pop') {
+      ctx.save();
+      ctx.textBaseline = 'middle';
+
+      let totalGlobalWords = 0;
+      for (const l of lines) totalGlobalWords += l.split(' ').length;
+      let wordIndexTracker = 0;
+
+      for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+        const line = lines[lineIdx];
+        const lineWords = line.split(' ');
+        const lineY = startY + lineIdx * lineHeight;
+
+        const badgeGap = 8;
+        const wordMetrics = lineWords.map(w => ({
+          text: w,
+          w: ctx.measureText(w).width + pad * 1.5,
+          h: lineHeight * 0.9 + pad * 0.4
+        }));
+
+        const totalLineWidth = wordMetrics.reduce((sum, m) => sum + m.w, 0) + (lineWords.length - 1) * badgeGap;
+        let curX = x - totalLineWidth / 2;
+
+        for (let wIdx = 0; wIdx < lineWords.length; wIdx++) {
+          const m = wordMetrics[wIdx];
+          const curWordGlobalIdx = wordIndexTracker + wIdx;
+
+          let currentBgColor = boxColor;
+          let currentTextColor = boxTextColor;
+          let wordScale = 1.0;
+
+          if (style === 'alternating-badge') {
+            // Alternates between Lime Green badge & Black badge with Lime text (Reference Image aesthetic)
+            if (curWordGlobalIdx % 2 === 1) {
+              currentBgColor = '#0a0c10';
+              currentTextColor = boxColor;
+            } else {
+              currentBgColor = boxColor;
+              currentTextColor = boxTextColor;
+            }
+          } else if (style === 'karaoke-word-pop') {
+            const activeWIdx = Math.min(totalGlobalWords - 1, Math.floor(animProgress * totalGlobalWords));
+            if (curWordGlobalIdx === activeWIdx) {
+              currentBgColor = boxColor;
+              currentTextColor = boxTextColor;
+              wordScale = 1.12;
+            } else {
+              currentBgColor = 'rgba(10, 12, 16, 0.65)';
+              currentTextColor = '#ffffff';
+            }
+          }
+
+          ctx.save();
+          if (wordScale !== 1.0) {
+            ctx.translate(curX + m.w / 2, lineY);
+            ctx.scale(wordScale, wordScale);
+            ctx.translate(-(curX + m.w / 2), -lineY);
+          }
+
+          ctx.fillStyle = currentBgColor;
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+          ctx.shadowBlur = 10;
+          this.drawRoundedRect(ctx, curX, lineY - m.h / 2, m.w, m.h, radius);
+
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = currentTextColor;
+          ctx.textAlign = 'center';
+          ctx.fillText(m.text, curX + m.w / 2, lineY);
+          ctx.restore();
+
+          curX += m.w + badgeGap;
+        }
+
+        wordIndexTracker += lineWords.length;
+      }
+
+      ctx.restore();
+      return;
     }
   }
 }
