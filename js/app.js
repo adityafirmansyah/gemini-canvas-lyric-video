@@ -3,11 +3,11 @@
  * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
  */
 
-import { AudioManager } from './audio-player.js?v=2.8';
-import { AiService } from './ai-service.js?v=2.8';
-import { LrcParser } from './lrc-parser.js?v=2.8';
-import { CanvasRenderer } from './canvas-renderer.js?v=2.8';
-import { VideoRecorder } from './recorder.js?v=2.8';
+import { AudioManager } from './audio-player.js?v=2.9';
+import { AiService } from './ai-service.js?v=2.9';
+import { LrcParser } from './lrc-parser.js?v=2.9';
+import { CanvasRenderer } from './canvas-renderer.js?v=2.9';
+import { VideoRecorder } from './recorder.js?v=2.9';
 
 // DOM Elements
 const canvas = document.getElementById('lyric-canvas');
@@ -65,6 +65,10 @@ const overlayOpacityInput = document.getElementById('overlay-opacity');
 const overlayOpacityVal = document.getElementById('overlay-opacity-val');
 const overlayColorInput = document.getElementById('overlay-color');
 const btnResetOverlay = document.getElementById('btn-reset-overlay');
+const customParticleInput = document.getElementById('custom-particle-input');
+const particleImgInfo = document.getElementById('particle-img-info');
+const particleImgName = document.getElementById('particle-img-name');
+const btnRemoveParticleImg = document.getElementById('btn-remove-particle-img');
 
 const bgDropZone = document.getElementById('bg-drop-zone');
 const customBgInput = document.getElementById('custom-bg-input');
@@ -619,6 +623,10 @@ if (btnResetOverlay) {
     if (overlayOpacityVal) overlayOpacityVal.textContent = '100%';
     if (overlayColorInput) overlayColorInput.value = '#64ffda';
 
+    renderer.setCustomParticleImage(null);
+    if (customParticleInput) customParticleInput.value = '';
+    if (particleImgInfo) particleImgInfo.classList.add('hidden');
+
     renderer.setOverlayConfig({
       density: 1.0,
       speed: 1.0,
@@ -627,6 +635,34 @@ if (btnResetOverlay) {
       opacity: 1.0,
       color: '#64ffda'
     });
+  });
+}
+
+// Custom Particle Image Handling
+function loadParticleImageFile(file) {
+  if (!file) return;
+  const img = new Image();
+  img.src = URL.createObjectURL(file);
+  img.onload = () => {
+    renderer.setCustomParticleImage(img);
+    if (particleImgName) particleImgName.textContent = file.name;
+    if (particleImgInfo) particleImgInfo.classList.remove('hidden');
+  };
+}
+
+if (customParticleInput) {
+  customParticleInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      loadParticleImageFile(e.target.files[0]);
+    }
+  });
+}
+
+if (btnRemoveParticleImg) {
+  btnRemoveParticleImg.addEventListener('click', () => {
+    renderer.setCustomParticleImage(null);
+    if (customParticleInput) customParticleInput.value = '';
+    if (particleImgInfo) particleImgInfo.classList.add('hidden');
   });
 }
 

@@ -31,10 +31,10 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
   - **Adjustable Dimming Tint:** Slider from 10% to 90% so lyrics maintain perfect contrast against bright artwork.
 - **🌌 Atmospheric Overlay Effects & Real-Time Physics Tuning:**
   - **Layered Effects:** Floating Dust Bokeh, Dreamy Rain on Glass, Starfield Hyperspace, Audio Reactive Waveform, Retro Synthwave 3D Grid.
-  - **Density / Particle Count:** Slider (20% to 250%) to adjust sparse vs dense storms of rain, dust, or stars.
-  - **Speed Multiplier:** Slider (0.2x to 3.0x) for gentle slow-motion floating or rapid high-energy motion.
   - **Flow Direction:** Custom physics direction: Default drift, Downward (rain/snow), Upward (rising embers/floating), Left, or Right.
-  - **Particle Size & Opacity:** Fine-tune the thickness, radius, and glow transparency of the overlay layer.
+  - **Fine-Tuning Sliders:** Real-time Density (20%-250%), Speed (0.2x-3.0x), Size (0.4x-2.5x), and Opacity (10%-100%).
+  - **Custom Particle Image Upload:** Upload transparent PNG graphics (sakura petals, snowflakes, leaves, cash notes, sparks) with automatic realistic tumbling rotation and beat bounce.
+  - **Color Picker & 1-Click Reset:** Custom particle color tinting and instant reset to defaults.
   - **None (Clean):** Display pristine artwork with zero overlay.
 - **✨ 12 Curated Aesthetic Presets (1-Click Styling):**
   - **Lofi Chill:** Lavender & soft blue particles with clean slide typography.

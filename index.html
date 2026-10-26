@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@700;900&family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,600;1,600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=2.8">
+  <link rel="stylesheet" href="css/style.css?v=2.9">
 </head>
 <body>
   <div class="app-container">
@@ -347,6 +347,19 @@
 
             <!-- Overlay Fine-Tuning Controls -->
             <div id="overlay-settings-panel" class="overlay-settings-wrapper">
+              <!-- 1. Flow Direction Full Width -->
+              <div class="input-group">
+                <label for="overlay-direction">Flow Direction</label>
+                <select id="overlay-direction">
+                  <option value="default">Default Drift (Natural)</option>
+                  <option value="down">Downward (Rain / Falling Snow)</option>
+                  <option value="up">Upward (Rising Embers / Floating)</option>
+                  <option value="left">Drifting Left</option>
+                  <option value="right">Drifting Right</option>
+                </select>
+              </div>
+
+              <!-- 2. Four Settings: Density, Speed, Size, Opacity (Max 100%) -->
               <div class="form-row">
                 <div class="input-group">
                   <div class="label-with-link">
@@ -366,36 +379,38 @@
 
               <div class="form-row">
                 <div class="input-group">
-                  <label for="overlay-direction">Flow Direction</label>
-                  <select id="overlay-direction">
-                    <option value="default">Default Drift (Natural)</option>
-                    <option value="down">Downward (Rain / Snow)</option>
-                    <option value="up">Upward (Rising Embers / Float)</option>
-                    <option value="left">Drifting Left</option>
-                    <option value="right">Drifting Right</option>
-                  </select>
-                </div>
-                <div class="input-group">
                   <div class="label-with-link">
                     <label for="overlay-size">Particle Size</label>
                     <span id="overlay-size-val" class="helper-text">1.0x</span>
                   </div>
                   <input type="range" id="overlay-size" min="40" max="250" value="100" step="10">
                 </div>
-              </div>
-
-              <div class="form-row">
-                <div class="input-group">
-                  <label for="overlay-color">Particle Color</label>
-                  <input type="color" id="overlay-color" value="#64ffda">
-                </div>
                 <div class="input-group">
                   <div class="label-with-link">
                     <label for="overlay-opacity">Overlay Opacity</label>
                     <span id="overlay-opacity-val" class="helper-text">100%</span>
                   </div>
-                  <input type="range" id="overlay-opacity" min="20" max="150" value="100" step="5">
+                  <input type="range" id="overlay-opacity" min="10" max="100" value="100" step="5">
                 </div>
+              </div>
+
+              <!-- 3. Particle Color -->
+              <div class="input-group">
+                <label for="overlay-color">Particle Color</label>
+                <input type="color" id="overlay-color" value="#64ffda">
+              </div>
+
+              <!-- 4. Custom Particle Image -->
+              <div class="input-group">
+                <label for="custom-particle-input">Custom Particle Image (Optional)</label>
+                <input type="file" id="custom-particle-input" accept="image/*">
+                <div id="particle-img-info" class="audio-info hidden" style="margin-top: 6px;">
+                  <div class="track-details">
+                    <span id="particle-img-name" class="track-title">particle.png</span>
+                    <button type="button" id="btn-remove-particle-img" class="text-link" style="color: var(--danger); font-weight: 700;">✕ Clear</button>
+                  </div>
+                </div>
+                <small class="helper-text">Upload a transparent PNG (e.g. sakura petal, snowflake, leaf, money note) to replace dots with custom floating graphics.</small>
               </div>
             </div>
           </section>
@@ -472,6 +487,6 @@
   <audio id="audio-player" preload="auto"></audio>
 
   <!-- Modular Scripts -->
-  <script type="module" src="js/app.js?v=2.8"></script>
+  <script type="module" src="js/app.js?v=2.9"></script>
 </body>
 </html>

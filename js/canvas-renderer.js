@@ -25,6 +25,7 @@ export class CanvasRenderer {
     this.customBgImage = null;
     this.bgDim = 0.55; // 0.0 to 0.95 dark tint over custom image
     this.enableAudioReactive = true;
+    this.customParticleImage = null;
 
     // Overlay fine-tuning configuration
     this.overlayConfig = {
@@ -87,7 +88,9 @@ export class CanvasRenderer {
         radius: Math.random() * 2.5 + 1,
         speedX: (Math.random() - 0.5) * 0.4,
         speedY: -Math.random() * 0.6 - 0.2,
-        alpha: Math.random() * 0.6 + 0.2
+        alpha: Math.random() * 0.6 + 0.2,
+        angle: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 2.5
       });
     }
 
@@ -122,6 +125,10 @@ export class CanvasRenderer {
 
   setCustomImage(imgElement) {
     this.customBgImage = imgElement;
+  }
+
+  setCustomParticleImage(imgElement) {
+    this.customParticleImage = imgElement;
   }
 
   setOverlayType(type) {
@@ -297,12 +304,26 @@ export class CanvasRenderer {
 
         const radius = p.radius * size * (1 + beatPulse * 2.2);
         const pAlpha = Math.min(1, p.alpha * opacity);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${pAlpha})`;
-        ctx.shadowBlur = 10 * size;
-        ctx.shadowColor = partColor;
-        ctx.fill();
+
+        if (this.customParticleImage) {
+          p.angle = (p.angle || 0) + (p.rotSpeed || 1) * dt * speed;
+          const imgSize = (p.radius * 9 + 16) * size * (1 + beatPulse * 0.9);
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.angle);
+          ctx.globalAlpha = pAlpha;
+          ctx.shadowBlur = 8 * size;
+          ctx.shadowColor = partColor;
+          ctx.drawImage(this.customParticleImage, -imgSize / 2, -imgSize / 2, imgSize, imgSize);
+          ctx.restore();
+        } else {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${pAlpha})`;
+          ctx.shadowBlur = 10 * size;
+          ctx.shadowColor = partColor;
+          ctx.fill();
+        }
       }
       ctx.restore();
       return;
