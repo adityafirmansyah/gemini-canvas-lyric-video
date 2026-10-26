@@ -3,11 +3,11 @@
  * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
  */
 
-import { AudioManager } from './audio-player.js?v=2.2';
-import { AiService } from './ai-service.js?v=2.2';
-import { LrcParser } from './lrc-parser.js?v=2.2';
-import { CanvasRenderer } from './canvas-renderer.js?v=2.2';
-import { VideoRecorder } from './recorder.js?v=2.2';
+import { AudioManager } from './audio-player.js?v=2.3';
+import { AiService } from './ai-service.js?v=2.3';
+import { LrcParser } from './lrc-parser.js?v=2.3';
+import { CanvasRenderer } from './canvas-renderer.js?v=2.3';
+import { VideoRecorder } from './recorder.js?v=2.3';
 
 // DOM Elements
 const canvas = document.getElementById('lyric-canvas');
@@ -103,9 +103,10 @@ function showAiStatus(message, type = 'info') {
 // 1. Multi-Provider Configuration
 const providerModels = {
   gemini: [
-    { value: 'gemini-2.5-flash', label: 'gemini-2.5-flash (Fast & Multimodal Audio)' },
-    { value: 'gemini-1.5-flash', label: 'gemini-1.5-flash' },
-    { value: 'gemini-1.5-pro', label: 'gemini-1.5-pro (Highest Reasoning)' }
+    { value: 'gemini-3.8-flash', label: 'gemini-3.8-flash (Latest & Fast Multimodal Audio)' },
+    { value: 'gemini-3.8-pro', label: 'gemini-3.8-pro (Highest Reasoning)' },
+    { value: 'gemini-1.5-flash', label: 'gemini-1.5-flash (Legacy)' },
+    { value: 'gemini-1.5-pro', label: 'gemini-1.5-pro (Legacy)' }
   ],
   groq: [
     { value: 'whisper-large-v3-turbo', label: 'whisper-large-v3-turbo (Ultra Fast)' },

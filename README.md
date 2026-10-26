@@ -12,7 +12,7 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
 ## 🚀 Key Features
 
 - **🌐 Multi-AI Audio Detection & Alignment:**
-  - **Google Gemini (2.5-flash / 1.5-flash):** Multimodal audio understanding directly in-browser.
+  - **Google Gemini (gemini-3.8-flash / gemini-3.8-pro):** Native multimodal audio understanding directly in-browser.
   - **Groq Whisper (whisper-large-v3-turbo):** Lightning fast ASR transcription with segment timestamps.
   - **OpenAI Whisper (whisper-1):** Industry standard high-accuracy speech-to-text.
   - **Custom OpenAI-Compatible Endpoint:** Connect to your own local Whisper/Ollama server.
