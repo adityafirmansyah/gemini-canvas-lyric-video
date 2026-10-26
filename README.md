@@ -1,21 +1,27 @@
-# ✨ Gemini Canvas Lyric Video Generator
+# ✨ AI Lyric Canvas Studio (Multi-AI & LRC)
 
-An in-browser, high-performance HTML5 Canvas application that turns uploaded music tracks into animated kinetic typography lyric videos using **Google Gemini Multimodal Audio AI**.
+An in-browser, high-performance HTML5 Canvas application that turns uploaded music tracks into animated kinetic typography lyric videos using **Multi-AI Audio Alignment (Gemini, Groq Whisper, OpenAI Whisper)** or **Direct .LRC / .SRT Subtitle Import (Zero API)**.
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Format](https://img.shields.io/badge/Format-16%3A9%20%7C%209%3A16%20%7C%201%3A1-purple.svg)](#)
 [![Zero Backend](https://img.shields.io/badge/Architecture-100%25%20Client--Side-green.svg)](#)
+[![Sync](https://img.shields.io/badge/Sync-Multi--AI%20%7C%20LRC%20%7C%20SRT-cyan.svg)](#)
 
 ---
 
 ## 🚀 Key Features
 
-- **🤖 Gemini Multimodal Audio Sync:**
-  Upload any MP3/WAV song and let **Gemini 2.5 Flash / 1.5 Flash** transcribe and align each lyric line with exact millisecond timestamps automatically.
+- **🌐 Multi-AI Audio Detection & Alignment:**
+  - **Google Gemini (2.5-flash / 1.5-flash):** Multimodal audio understanding directly in-browser.
+  - **Groq Whisper (whisper-large-v3-turbo):** Lightning fast ASR transcription with segment timestamps.
+  - **OpenAI Whisper (whisper-1):** Industry standard high-accuracy speech-to-text.
+  - **Custom OpenAI-Compatible Endpoint:** Connect to your own local Whisper/Ollama server.
+- **📄 Zero-API .LRC / .SRT Direct Import:**
+  - Already have timed lyrics from Spotify, Musixmatch, or Suno? Drag & drop `.lrc` or `.srt` files and render immediately—no AI calls, no internet connection, zero API keys required.
 - **🎨 60 FPS HTML5 Canvas Animation Engine:**
-  Smooth kinetic typography, glowing active states, multi-line auto-wrapping, and previous/next line context fading.
+  - Smooth kinetic typography, glowing active states, multi-line auto-wrapping, and previous/next line context fading.
 - **🔊 Audio-Reactive Beat Dynamics:**
-  Built-in Web Audio API `AnalyserNode` drives real-time bass/kick pulse and audio-reactive glow that bounces with the music.
+  - Built-in Web Audio API `AnalyserNode` drives real-time bass/kick bounce and audio-reactive glow that syncs to the music rhythm.
 - **📐 Multi-Aspect Ratio Support:**
   - `16:9` Landscape (YouTube Full HD)
   - `9:16` Portrait (YouTube Shorts, TikTok, Instagram Reels)
@@ -26,9 +32,9 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
   - **Minimal Dark:** Classy serif font, dark aesthetic gradient, editorial layout.
   - **Karaoke Glow:** Active lyric line pop and high contrast.
 - **🎬 In-Browser Video Export:**
-  Combines the Canvas render stream and Web Audio destination into a synchronized video export (`.webm` / `.mp4`) directly inside your browser—no backend server, FFmpeg installation, or cloud rendering required.
+  - Combines the Canvas render stream and Web Audio destination into a synchronized video export (`.webm` / `.mp4`) directly inside your browser—no backend server, FFmpeg installation, or cloud rendering required.
 - **🔒 Privacy First:**
-  Your Gemini API key is stored strictly in your browser's `localStorage` and sent only to Google's official Gemini endpoint.
+  - Your API keys are stored strictly in your browser's `localStorage` and sent only to the provider you select.
 
 ---
 
@@ -37,17 +43,27 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
 ```
 [ Upload MP3 / WAV ]
          │
-         ▼
-[ Gemini 2.5/1.5 Audio API ] ──► Auto-Sync Timestamps [ {start, end, text}, ... ]
-         │
-         ▼
-[ Web Audio API Analyser ] ──► Real-time FFT / RMS / Bass extraction
-         │
-         ▼
-[ HTML5 Canvas 60FPS Engine ] ──► Kinetic Typography + Particle / Waveform Visuals
-         │
-         ▼
-[ MediaRecorder API ] ──► Synchronized Video File Export (.webm / .mp4)
+         ├────────────────────────────────────────┐
+         ▼                                        ▼
+[ Mode A: Multi-AI Auto-Sync ]         [ Mode B: Direct .LRC / .SRT ]
+(Gemini / Groq / OpenAI / Custom)       (Zero API / Instant Local Parse)
+         │                                        │
+         └───────────────────┬────────────────────┘
+                             │
+                             ▼
+              [ Timed Lyrics JSON Matrix ]
+                             │
+                             ▼
+                 [ Web Audio API Analyser ]
+               (Real-time FFT & Bass Pulse)
+                             │
+                             ▼
+                [ HTML5 Canvas 60FPS Engine ]
+            (Kinetic Typography + Dynamic Glow)
+                             │
+                             ▼
+                   [ MediaRecorder API ]
+             (Synchronized Video File Export)
 ```
 
 ---
@@ -83,7 +99,7 @@ npx serve .
 1. Go to your GitHub repository **Settings** > **Pages**.
 2. Under **Build and deployment** > **Source**, select `Deploy from a branch`.
 3. Choose the `main` branch and `/ (root)` folder, then click **Save**.
-4. Your lyric video generator will be live at `https://adityafirmansyah.github.io/gemini-canvas-lyric-video/`.
+4. Your lyric video generator is live at `https://adityafirmansyah.github.io/gemini-canvas-lyric-video/`.
 
 ---
 
@@ -91,11 +107,9 @@ npx serve .
 
 1. **Step 1: Upload Music**
    - Drag and drop your audio track (MP3 or WAV) into the drop zone.
-2. **Step 2: Sync with Gemini**
-   - Enter your [Google AI Studio Gemini API Key](https://aistudio.google.com/app/apikey).
-   - (Optional) Paste known lyrics into the reference box if you want Gemini to strictly align existing text.
-   - Click **Analyze & Sync with Gemini**.
-   - Gemini will return structured JSON timestamps that populate into the editor.
+2. **Step 2: Choose Sync Method**
+   - **Method A (AI Auto-Detect):** Choose your provider (Gemini, Groq, or OpenAI), enter your key, and click **Run Audio Detection & Alignment**.
+   - **Method B (LRC/SRT Import):** Drag and drop your `.lrc` or `.srt` file to load timestamps instantly with zero API keys.
 3. **Step 3: Customize Style**
    - Pick an aspect ratio (`16:9` for YouTube or `9:16` for Shorts).
    - Select a visual preset (Lofi, Cyberpunk, Minimal) or tweak fonts and colors.

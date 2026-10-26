@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gemini Canvas Lyric Video Generator</title>
+  <title>AI Lyric Canvas Studio (Multi-AI & LRC)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,600;1,600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -15,8 +15,8 @@
     <header class="app-header">
       <div class="logo">
         <span class="icon">✨</span>
-        <span class="brand-text"><strong>Gemini</strong> Lyric Canvas</span>
-        <span class="badge">PROTOTYPE</span>
+        <span class="brand-text"><strong>Lyric</strong> Canvas Studio</span>
+        <span class="badge">MULTI-AI & LRC</span>
       </div>
       <div class="header-actions">
         <div class="aspect-ratio-selector">
@@ -40,7 +40,7 @@
       <aside class="control-panel">
         <!-- Tab Navigation -->
         <div class="tabs">
-          <button class="tab-btn active" data-tab="tab-audio">1. Audio & AI</button>
+          <button class="tab-btn active" data-tab="tab-audio">1. Audio & Lyrics</button>
           <button class="tab-btn" data-tab="tab-style">2. Visual Style</button>
           <button class="tab-btn" data-tab="tab-export">3. Export</button>
         </div>
@@ -48,7 +48,7 @@
         <div class="tab-content active" id="tab-audio">
           <!-- Audio Upload Section -->
           <section class="card">
-            <h3>🎵 Audio Track</h3>
+            <h3>🎵 1. Audio Track</h3>
             <div class="drop-zone" id="drop-zone">
               <span class="drop-icon">📂</span>
               <p>Drag & drop MP3 / WAV here</p>
@@ -63,49 +63,91 @@
             </div>
           </section>
 
-          <!-- Gemini AI Sync Section -->
+          <!-- Lyrics Source Section -->
           <section class="card">
-            <h3>🤖 Gemini AI Auto-Sync</h3>
-            <div class="input-group">
-              <label for="gemini-key">Gemini API Key</label>
-              <div class="key-input-wrapper">
-                <input type="password" id="gemini-key" placeholder="AIzaSy..." autocomplete="off">
-                <button type="button" id="toggle-key-visibility" class="mini-btn">👁️</button>
+            <h3>⚡ 2. Lyric Sync Method</h3>
+            <div class="sync-method-selector">
+              <label class="radio-label">
+                <input type="radio" name="sync-method" value="ai" checked>
+                <span>🤖 AI Auto-Detect</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="sync-method" value="lrc">
+                <span>📄 Import .LRC / .SRT</span>
+              </label>
+            </div>
+
+            <!-- Panel A: AI Providers -->
+            <div id="method-ai-panel">
+              <div class="input-group">
+                <label for="ai-provider">AI Engine / Provider</label>
+                <select id="ai-provider">
+                  <option value="gemini">Google Gemini (Audio Multimodal)</option>
+                  <option value="groq">Groq Whisper (Ultra Fast)</option>
+                  <option value="openai">OpenAI Whisper (whisper-1)</option>
+                  <option value="custom">Custom OpenAI-Compatible API</option>
+                </select>
               </div>
-              <small class="helper-text">Key is saved only in your browser local storage.</small>
+
+              <!-- Model Selector -->
+              <div class="input-group" id="group-model">
+                <label for="ai-model">Model</label>
+                <select id="ai-model">
+                  <option value="gemini-2.5-flash">gemini-2.5-flash (Fast & Accurate)</option>
+                  <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+                  <option value="gemini-1.5-pro">gemini-1.5-pro (High Reasoning)</option>
+                </select>
+              </div>
+
+              <!-- Custom URL Input -->
+              <div class="input-group hidden" id="group-custom-url">
+                <label for="custom-endpoint-url">Custom Endpoint URL</label>
+                <input type="text" id="custom-endpoint-url" placeholder="http://localhost:8000/v1/audio/transcriptions">
+              </div>
+
+              <!-- API Key Input -->
+              <div class="input-group" id="group-api-key">
+                <label for="api-key" id="label-api-key">Gemini API Key</label>
+                <div class="key-input-wrapper">
+                  <input type="password" id="api-key" placeholder="AIzaSy..." autocomplete="off">
+                  <button type="button" id="toggle-key-visibility" class="mini-btn">👁️</button>
+                </div>
+                <small class="helper-text">Key is saved only in your browser local storage.</small>
+              </div>
+
+              <div class="input-group">
+                <label for="optional-lyrics">Reference Lyrics (Optional)</label>
+                <textarea id="optional-lyrics" rows="2" placeholder="Paste known lyrics here to guide AI alignment, or leave blank to let AI auto-transcribe."></textarea>
+              </div>
+
+              <button id="btn-sync-ai" class="primary-btn" disabled>
+                <span class="btn-icon">⚡</span> Run Audio Detection & Alignment
+              </button>
+              <div id="ai-status" class="status-msg hidden"></div>
             </div>
 
-            <div class="input-group">
-              <label for="gemini-model">Gemini Model</label>
-              <select id="gemini-model">
-                <option value="gemini-2.5-flash">gemini-2.5-flash (Fast & Multimodal Audio)</option>
-                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-                <option value="gemini-1.5-pro">gemini-1.5-pro (Highest Accuracy)</option>
-              </select>
+            <!-- Panel B: LRC File Import -->
+            <div id="method-lrc-panel" class="hidden">
+              <div class="drop-zone lrc-drop-zone" id="lrc-drop-zone">
+                <span class="drop-icon">📜</span>
+                <p>Drag & drop .LRC or .SRT file here</p>
+                <span class="subtext">Zero API key or external network needed</span>
+                <input type="file" id="lrc-input" accept=".lrc,.srt,.txt">
+              </div>
             </div>
-
-            <div class="input-group">
-              <label for="optional-lyrics">Reference Lyrics (Optional)</label>
-              <textarea id="optional-lyrics" rows="3" placeholder="Paste known lyrics here to guide AI alignment, or leave blank to let Gemini auto-transcribe."></textarea>
-            </div>
-
-            <button id="btn-sync-gemini" class="primary-btn" disabled>
-              <span class="btn-icon">⚡</span> Analyze & Sync with Gemini
-            </button>
-            <div id="ai-status" class="status-msg hidden"></div>
           </section>
 
           <!-- Lyric Editor / Preview -->
           <section class="card">
             <div class="section-header">
-              <h3>📝 Timed Lyrics (LRC / JSON)</h3>
+              <h3>📝 Timed Lyrics (JSON / Timestamps)</h3>
               <button id="btn-sample-lyrics" class="text-link">Load Sample</button>
             </div>
-            <textarea id="lyrics-data" rows="8" placeholder='[
+            <textarea id="lyrics-data" rows="7" placeholder='[
   {"start": 0.0, "end": 3.5, "text": "Neon lights reflect the rain"},
   {"start": 3.8, "end": 7.0, "text": "Drifting down the empty street"}
 ]'></textarea>
-            <small class="helper-text">JSON array with start, end (seconds), and text. You can edit timing manually anytime.</small>
+            <small class="helper-text">Format: JSON array of {start, end, text} in seconds. Edit timing manually anytime!</small>
           </section>
         </div>
 
@@ -165,8 +207,8 @@
             <div class="input-group">
               <label for="bg-type">Background Mode</label>
               <select id="bg-type">
-                <option value="gradient">Animated Gradient</option>
                 <option value="particles">Floating Dust Particles</option>
+                <option value="gradient">Animated Gradient</option>
                 <option value="waveform">Audio Reactive Waveform</option>
                 <option value="custom-img">Custom Image Background</option>
               </select>

@@ -1,10 +1,11 @@
 /**
  * app.js
- * Main Controller coordinating Audio, Gemini AI, Canvas Rendering, and Video Export.
+ * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
  */
 
 import { AudioManager } from './audio-player.js';
-import { GeminiService } from './gemini.js';
+import { AiService } from './ai-service.js';
+import { LrcParser } from './lrc-parser.js';
 import { CanvasRenderer } from './canvas-renderer.js';
 import { VideoRecorder } from './recorder.js';
 
@@ -17,13 +18,27 @@ const audioInfo = document.getElementById('audio-info');
 const trackNameEl = document.getElementById('track-name');
 const trackDurationEl = document.getElementById('track-duration');
 
-// Gemini Controls
-const geminiKeyInput = document.getElementById('gemini-key');
+// Sync Method Selector (AI vs LRC)
+const syncMethodRadios = document.querySelectorAll('input[name="sync-method"]');
+const methodAiPanel = document.getElementById('method-ai-panel');
+const methodLrcPanel = document.getElementById('method-lrc-panel');
+const lrcInput = document.getElementById('lrc-input');
+const lrcDropZone = document.getElementById('lrc-drop-zone');
+
+// AI Provider Controls
+const aiProviderSelect = document.getElementById('ai-provider');
+const aiModelSelect = document.getElementById('ai-model');
+const groupCustomUrl = document.getElementById('group-custom-url');
+const customEndpointUrl = document.getElementById('custom-endpoint-url');
+const groupApiKey = document.getElementById('group-api-key');
+const labelApiKey = document.getElementById('label-api-key');
+const apiKeyInput = document.getElementById('api-key');
 const toggleKeyBtn = document.getElementById('toggle-key-visibility');
-const geminiModelSelect = document.getElementById('gemini-model');
 const optionalLyricsInput = document.getElementById('optional-lyrics');
-const btnSyncGemini = document.getElementById('btn-sync-gemini');
+const btnSyncAi = document.getElementById('btn-sync-ai');
 const aiStatus = document.getElementById('ai-status');
+
+// Lyrics Editor
 const lyricsDataInput = document.getElementById('lyrics-data');
 const btnSampleLyrics = document.getElementById('btn-sample-lyrics');
 
@@ -62,13 +77,12 @@ const tabContents = document.querySelectorAll('.tab-content');
 
 // Instances
 const audioManager = new AudioManager(audioPlayer);
-const geminiService = new GeminiService();
+const aiService = new AiService();
 const renderer = new CanvasRenderer(canvas);
 let recorder = null;
-
 let currentAudioFile = null;
 
-// Helpers
+// Helper: Format Seconds to mm:ss
 function formatTime(seconds) {
   if (isNaN(seconds)) return '0:00';
   const m = Math.floor(seconds / 60);
@@ -82,17 +96,118 @@ function showAiStatus(message, type = 'info') {
   aiStatus.classList.remove('hidden');
 }
 
-// 1. Initialize API Key from storage
-geminiKeyInput.value = geminiService.getSavedApiKey();
-geminiKeyInput.addEventListener('input', (e) => {
-  geminiService.saveApiKey(e.target.value);
-});
+// 1. Multi-Provider Configuration
+const providerModels = {
+  gemini: [
+    { value: 'gemini-2.5-flash', label: 'gemini-2.5-flash (Fast & Multimodal Audio)' },
+    { value: 'gemini-1.5-flash', label: 'gemini-1.5-flash' },
+    { value: 'gemini-1.5-pro', label: 'gemini-1.5-pro (Highest Reasoning)' }
+  ],
+  groq: [
+    { value: 'whisper-large-v3-turbo', label: 'whisper-large-v3-turbo (Ultra Fast)' },
+    { value: 'whisper-large-v3', label: 'whisper-large-v3 (Maximum Accuracy)' }
+  ],
+  openai: [
+    { value: 'whisper-1', label: 'whisper-1 (Industry Standard ASR)' }
+  ],
+  custom: [
+    { value: 'whisper-1', label: 'whisper-1 / Custom Model' }
+  ]
+};
 
+function updateProviderUI() {
+  const provider = aiProviderSelect.value;
+
+  // Populate models
+  aiModelSelect.innerHTML = '';
+  const models = providerModels[provider] || [];
+  models.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.value;
+    opt.textContent = m.label;
+    aiModelSelect.appendChild(opt);
+  });
+
+  // Custom Endpoint input
+  groupCustomUrl.classList.toggle('hidden', provider !== 'custom');
+
+  // Key label & value
+  if (provider === 'gemini') {
+    labelApiKey.textContent = 'Google Gemini API Key';
+    apiKeyInput.placeholder = 'AIzaSy...';
+  } else if (provider === 'groq') {
+    labelApiKey.textContent = 'Groq API Key';
+    apiKeyInput.placeholder = 'gsk_...';
+  } else if (provider === 'openai') {
+    labelApiKey.textContent = 'OpenAI API Key';
+    apiKeyInput.placeholder = 'sk-...';
+  } else {
+    labelApiKey.textContent = 'Authorization Key (Optional)';
+    apiKeyInput.placeholder = 'Bearer token or empty';
+  }
+
+  apiKeyInput.value = aiService.getSavedApiKey(provider);
+}
+
+aiProviderSelect.addEventListener('change', updateProviderUI);
+apiKeyInput.addEventListener('input', (e) => {
+  aiService.saveApiKey(aiProviderSelect.value, e.target.value);
+});
 toggleKeyBtn.addEventListener('click', () => {
-  geminiKeyInput.type = geminiKeyInput.type === 'password' ? 'text' : 'password';
+  apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
+});
+updateProviderUI();
+
+// 2. Sync Method Switcher (AI vs LRC)
+syncMethodRadios.forEach(radio => {
+  radio.addEventListener('change', (e) => {
+    const isAi = e.target.value === 'ai';
+    methodAiPanel.classList.toggle('hidden', !isAi);
+    methodLrcPanel.classList.toggle('hidden', isAi);
+  });
 });
 
-// 2. Tab Navigation
+// LRC / SRT Drop handling
+function handleLrcFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const content = e.target.result;
+    let parsedLyrics = [];
+
+    if (file.name.endsWith('.srt')) {
+      parsedLyrics = LrcParser.parseSRT(content);
+    } else {
+      parsedLyrics = LrcParser.parseLRC(content);
+    }
+
+    if (parsedLyrics.length > 0) {
+      lyricsDataInput.value = JSON.stringify(parsedLyrics, null, 2);
+      renderer.setLyrics(parsedLyrics);
+      showAiStatus(`Imported ${parsedLyrics.length} lines from ${file.name}!`, 'success');
+    } else {
+      showAiStatus('Could not find timestamps in this file. Ensure it is valid LRC or SRT format.', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+lrcInput.addEventListener('change', (e) => {
+  if (e.target.files.length > 0) handleLrcFile(e.target.files[0]);
+});
+
+lrcDropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  lrcDropZone.classList.add('dragover');
+});
+lrcDropZone.addEventListener('dragleave', () => lrcDropZone.classList.remove('dragover'));
+lrcDropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  lrcDropZone.classList.remove('dragover');
+  if (e.dataTransfer.files.length > 0) handleLrcFile(e.dataTransfer.files[0]);
+});
+
+// 3. Tab Navigation
 tabButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     tabButtons.forEach(b => b.classList.remove('active'));
@@ -103,7 +218,7 @@ tabButtons.forEach(btn => {
   });
 });
 
-// 3. Audio File Handling
+// 4. Audio File Handling
 function handleAudioFile(file) {
   if (!file) return;
   currentAudioFile = file;
@@ -118,56 +233,52 @@ function handleAudioFile(file) {
     seekSlider.max = audioPlayer.duration;
     seekSlider.disabled = false;
     btnPlayPause.disabled = false;
-    btnSyncGemini.disabled = false;
+    btnSyncAi.disabled = false;
     btnStartRecord.disabled = false;
   };
 }
 
 audioInput.addEventListener('change', (e) => {
-  if (e.target.files.length > 0) {
-    handleAudioFile(e.target.files[0]);
-  }
+  if (e.target.files.length > 0) handleAudioFile(e.target.files[0]);
 });
 
 dropZone.addEventListener('dragover', (e) => {
   e.preventDefault();
   dropZone.classList.add('dragover');
 });
-
-dropZone.addEventListener('dragleave', () => {
-  dropZone.classList.remove('dragover');
-});
-
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
 dropZone.addEventListener('drop', (e) => {
   e.preventDefault();
   dropZone.classList.remove('dragover');
-  if (e.dataTransfer.files.length > 0) {
-    handleAudioFile(e.dataTransfer.files[0]);
-  }
+  if (e.dataTransfer.files.length > 0) handleAudioFile(e.dataTransfer.files[0]);
 });
 
-// 4. Gemini Auto-Sync
-btnSyncGemini.addEventListener('click', async () => {
-  const apiKey = geminiKeyInput.value.trim();
-  const model = geminiModelSelect.value;
+// 5. AI Audio Sync Dispatcher
+btnSyncAi.addEventListener('click', async () => {
+  const provider = aiProviderSelect.value;
+  const apiKey = apiKeyInput.value.trim();
+  const model = aiModelSelect.value;
+  const customUrl = customEndpointUrl.value.trim();
   const refLyrics = optionalLyricsInput.value;
 
-  if (!apiKey) {
-    showAiStatus('Please provide a Gemini API key first.', 'error');
+  if (!apiKey && provider !== 'custom') {
+    showAiStatus(`Please enter your ${provider.toUpperCase()} API key first.`, 'error');
     return;
   }
   if (!currentAudioFile) {
-    showAiStatus('Please upload an audio file first.', 'error');
+    showAiStatus('Please upload an audio track first.', 'error');
     return;
   }
 
   try {
-    btnSyncGemini.disabled = true;
-    showAiStatus('Analyzing audio with Gemini Multimodal AI...', 'info');
+    btnSyncAi.disabled = true;
+    showAiStatus(`Detecting audio and aligning lyrics using ${provider.toUpperCase()} (${model})...`, 'info');
 
-    const syncedLyrics = await geminiService.syncLyrics({
+    const syncedLyrics = await aiService.syncLyrics({
+      provider,
       apiKey,
       model,
+      customUrl,
       audioFile: currentAudioFile,
       referenceLyrics: refLyrics,
       onProgress: (status) => showAiStatus(status, 'info')
@@ -175,16 +286,16 @@ btnSyncGemini.addEventListener('click', async () => {
 
     lyricsDataInput.value = JSON.stringify(syncedLyrics, null, 2);
     renderer.setLyrics(syncedLyrics);
-    showAiStatus(`Synced ${syncedLyrics.length} lines successfully!`, 'success');
+    showAiStatus(`Successfully aligned ${syncedLyrics.length} lyric lines!`, 'success');
   } catch (err) {
     console.error(err);
     showAiStatus(err.message, 'error');
   } finally {
-    btnSyncGemini.disabled = false;
+    btnSyncAi.disabled = false;
   }
 });
 
-// 5. Lyrics Input & Parser
+// 6. Lyrics Input & Parser
 function parseAndApplyLyrics() {
   try {
     const raw = lyricsDataInput.value.trim();
@@ -197,7 +308,7 @@ function parseAndApplyLyrics() {
       renderer.setLyrics(parsed);
     }
   } catch (err) {
-    // If typing incomplete JSON, don't crash
+    // Typing incomplete JSON
   }
 }
 lyricsDataInput.addEventListener('input', parseAndApplyLyrics);
@@ -214,7 +325,7 @@ btnSampleLyrics.addEventListener('click', () => {
   parseAndApplyLyrics();
 });
 
-// 6. Visual Style Controls & Presets
+// 7. Visual Style Controls & Presets
 const presets = {
   lofi: {
     font: "'Outfit', sans-serif",
@@ -309,7 +420,7 @@ exportResSelect.addEventListener('change', () => {
   renderer.setAspectRatio(ratio, exportResSelect.value);
 });
 
-// 7. Playback Controls
+// 8. Playback Controls
 btnPlayPause.addEventListener('click', () => {
   if (audioManager.isPlaying) {
     audioManager.pause();
@@ -342,14 +453,13 @@ audioPlayer.addEventListener('ended', () => {
   }
 });
 
-// 8. Recording / Export Engine
+// 9. Recording / Video Export
 btnStartRecord.addEventListener('click', () => {
   if (!currentAudioFile) return;
 
   const audioStream = audioManager.getAudioStream();
   recorder = new VideoRecorder({ canvas, audioStream });
 
-  // Reset to start of track
   audioManager.seek(0);
   audioManager.play();
   btnPlayPause.textContent = '⏸';
@@ -377,7 +487,7 @@ btnStopRecord.addEventListener('click', () => {
   }
 });
 
-// 9. Main Animation Loop (60 FPS)
+// 10. Main Animation Loop (60 FPS)
 let lastTimestamp = performance.now();
 function animate(now) {
   const dt = (now - lastTimestamp) / 1000;
@@ -391,7 +501,6 @@ function animate(now) {
 
   renderer.render(dt);
 
-  // Update recording progress if active
   if (recorder && recorder.isRecording && audioPlayer.duration) {
     const pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
     progressFill.style.width = `${pct}%`;
@@ -401,6 +510,6 @@ function animate(now) {
   requestAnimationFrame(animate);
 }
 
-// Initial sample lyrics setup
+// Initialize sample lyrics
 btnSampleLyrics.click();
 requestAnimationFrame(animate);
