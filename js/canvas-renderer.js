@@ -32,7 +32,8 @@ export class CanvasRenderer {
       speed: 1.0,           // Multiplier: 0.2 to 3.0
       direction: 'default', // 'default', 'down', 'up', 'left', 'right'
       size: 1.0,            // Multiplier: 0.4 to 2.5
-      opacity: 1.0          // Multiplier: 0.2 to 1.5
+      opacity: 1.0,         // Multiplier: 0.2 to 1.5
+      color: '#64ffda'      // Particle / overlay color
     };
 
     // Visual elements state
@@ -205,6 +206,19 @@ export class CanvasRenderer {
     ctx.fillRect(0, 0, W, H);
   }
 
+  parseColorRgb(colorStr, defaultRgb = [100, 255, 218]) {
+    if (!colorStr) return defaultRgb;
+    if (colorStr.startsWith('#')) {
+      let c = colorStr.replace('#', '');
+      if (c.length === 3) c = c.split('').map(x => x + x).join('');
+      const num = parseInt(c, 16);
+      if (!isNaN(num)) {
+        return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+      }
+    }
+    return defaultRgb;
+  }
+
   drawOverlayEffect(ctx, W, H, beatPulse, dt) {
     const effect = this.overlayType || this.bgType || 'particles';
     if (effect === 'none') return;
@@ -213,18 +227,21 @@ export class CanvasRenderer {
       speed: 1.0,
       direction: 'default',
       size: 1.0,
-      opacity: 1.0
+      opacity: 1.0,
+      color: '#64ffda'
     };
     const speed = cfg.speed;
     const size = cfg.size;
     const opacity = cfg.opacity;
     const dir = cfg.direction;
+    const partColor = cfg.color || this.accentColor || '#64ffda';
+    const rgb = this.parseColorRgb(partColor, [100, 255, 218]);
 
     // 1. Rain on Glass Overlay
     if (effect === 'rain') {
       ctx.save();
-      const alpha = Math.min(1, 0.42 * opacity);
-      ctx.strokeStyle = `rgba(186, 230, 253, ${alpha})`;
+      const alpha = Math.min(1, 0.45 * opacity);
+      ctx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
       ctx.lineWidth = 1.6 * size;
       ctx.beginPath();
 
@@ -282,9 +299,9 @@ export class CanvasRenderer {
         const pAlpha = Math.min(1, p.alpha * opacity);
         ctx.beginPath();
         ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(100, 255, 218, ${pAlpha})`;
+        ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${pAlpha})`;
         ctx.shadowBlur = 10 * size;
-        ctx.shadowColor = this.accentColor;
+        ctx.shadowColor = partColor;
         ctx.fill();
       }
       ctx.restore();
@@ -325,7 +342,9 @@ export class CanvasRenderer {
           const sAlpha = Math.min(1, (1 - s.z / W) * 1.5) * opacity;
           ctx.beginPath();
           ctx.arc(px, py, sSize, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${sAlpha})`;
+          ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${sAlpha})`;
+          ctx.shadowBlur = 6 * size;
+          ctx.shadowColor = partColor;
           ctx.fill();
         }
       }
@@ -344,14 +363,14 @@ export class CanvasRenderer {
         sunGrad.addColorStop(0.5, '#fb5607');
         sunGrad.addColorStop(1, '#ff006e');
         ctx.fillStyle = sunGrad;
-        ctx.shadowColor = '#ff007f';
+        ctx.shadowColor = partColor;
         ctx.shadowBlur = (30 + beatPulse * 40) * size;
         ctx.beginPath();
         ctx.arc(W / 2, sunY, sunR, Math.PI, 0, false);
         ctx.fill();
       }
 
-      ctx.strokeStyle = `rgba(0, 240, 255, ${Math.min(1, 0.45 * opacity)})`;
+      ctx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${Math.min(1, 0.45 * opacity)})`;
       ctx.lineWidth = 1.5 * size;
       this.gridOffset = (this.gridOffset + (40 + beatPulse * 80) * dt * speed) % 35;
 
@@ -380,12 +399,12 @@ export class CanvasRenderer {
 
     // 5. Audio Reactive Equalizer Bars Overlay
     if (effect === 'waveform') {
-      this.drawWaveform(ctx, W, H, beatPulse);
+      this.drawWaveform(ctx, W, H, beatPulse, rgb, partColor);
       return;
     }
   }
 
-  drawWaveform(ctx, W, H, beatPulse) {
+  drawWaveform(ctx, W, H, beatPulse, rgb = [34, 211, 238], partColor = '#22d3ee') {
     const rawFreq = this.audioMetrics.rawFreq;
     if (!rawFreq || rawFreq.length === 0) return;
 
@@ -400,9 +419,9 @@ export class CanvasRenderer {
       const val = rawFreq[freqIndex] / 255.0;
       const barHeight = Math.max(4, val * (H * 0.14) * (1 + beatPulse * 0.5));
 
-      ctx.fillStyle = `rgba(34, 211, 238, ${0.25 + val * 0.65})`;
+      ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${0.25 + val * 0.65})`;
       ctx.shadowBlur = 8;
-      ctx.shadowColor = this.accentColor;
+      ctx.shadowColor = partColor;
 
       const x = startX + i * barWidth;
       ctx.fillRect(x + 2, baseY - barHeight / 2, barWidth - 4, barHeight);

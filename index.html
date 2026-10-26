@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@700;900&family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,600;1,600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=2.7">
+  <link rel="stylesheet" href="css/style.css?v=2.8">
 </head>
 <body>
   <div class="app-container">
@@ -329,7 +329,10 @@
 
           <!-- Atmospheric Overlay Effect Section -->
           <section class="card">
-            <h3>🌌 Atmospheric Overlay Effect</h3>
+            <div class="section-header">
+              <h3>🌌 Atmospheric Overlay Effect</h3>
+              <button type="button" id="btn-reset-overlay" class="text-link" title="Reset all overlay sliders to defaults">↺ Reset Overlay</button>
+            </div>
             <div class="input-group">
               <label for="overlay-type">Overlay Style (Layers on top of Background)</label>
               <select id="overlay-type">
@@ -381,12 +384,18 @@
                 </div>
               </div>
 
-              <div class="input-group">
-                <div class="label-with-link">
-                  <label for="overlay-opacity">Overlay Opacity</label>
-                  <span id="overlay-opacity-val" class="helper-text">100%</span>
+              <div class="form-row">
+                <div class="input-group">
+                  <label for="overlay-color">Particle Color</label>
+                  <input type="color" id="overlay-color" value="#64ffda">
                 </div>
-                <input type="range" id="overlay-opacity" min="20" max="150" value="100" step="5">
+                <div class="input-group">
+                  <div class="label-with-link">
+                    <label for="overlay-opacity">Overlay Opacity</label>
+                    <span id="overlay-opacity-val" class="helper-text">100%</span>
+                  </div>
+                  <input type="range" id="overlay-opacity" min="20" max="150" value="100" step="5">
+                </div>
               </div>
             </div>
           </section>
@@ -463,6 +472,6 @@
   <audio id="audio-player" preload="auto"></audio>
 
   <!-- Modular Scripts -->
-  <script type="module" src="js/app.js?v=2.7"></script>
+  <script type="module" src="js/app.js?v=2.8"></script>
 </body>
 </html>

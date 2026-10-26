@@ -3,11 +3,11 @@
  * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
  */
 
-import { AudioManager } from './audio-player.js?v=2.7';
-import { AiService } from './ai-service.js?v=2.7';
-import { LrcParser } from './lrc-parser.js?v=2.7';
-import { CanvasRenderer } from './canvas-renderer.js?v=2.7';
-import { VideoRecorder } from './recorder.js?v=2.7';
+import { AudioManager } from './audio-player.js?v=2.8';
+import { AiService } from './ai-service.js?v=2.8';
+import { LrcParser } from './lrc-parser.js?v=2.8';
+import { CanvasRenderer } from './canvas-renderer.js?v=2.8';
+import { VideoRecorder } from './recorder.js?v=2.8';
 
 // DOM Elements
 const canvas = document.getElementById('lyric-canvas');
@@ -63,6 +63,8 @@ const overlaySizeInput = document.getElementById('overlay-size');
 const overlaySizeVal = document.getElementById('overlay-size-val');
 const overlayOpacityInput = document.getElementById('overlay-opacity');
 const overlayOpacityVal = document.getElementById('overlay-opacity-val');
+const overlayColorInput = document.getElementById('overlay-color');
+const btnResetOverlay = document.getElementById('btn-reset-overlay');
 
 const bgDropZone = document.getElementById('bg-drop-zone');
 const customBgInput = document.getElementById('custom-bg-input');
@@ -529,6 +531,10 @@ presetCards.forEach(card => {
       fontSizeRange.value = p.fontSize;
       textColorInput.value = p.textColor;
       accentColorInput.value = p.accentColor;
+      const partColor = p.particleColor || p.accentColor || '#64ffda';
+      renderer.setOverlayConfig({ color: partColor });
+      if (overlayColorInput) overlayColorInput.value = partColor;
+
       if (overlayTypeSelect) {
         overlayTypeSelect.value = p.overlayType;
         if (overlaySettingsPanel) {
@@ -591,6 +597,36 @@ if (overlayOpacityInput) {
     const val = parseInt(e.target.value);
     renderer.setOverlayConfig({ opacity: val / 100 });
     if (overlayOpacityVal) overlayOpacityVal.textContent = `${val}%`;
+  });
+}
+
+if (overlayColorInput) {
+  overlayColorInput.addEventListener('input', (e) => {
+    renderer.setOverlayConfig({ color: e.target.value });
+  });
+}
+
+if (btnResetOverlay) {
+  btnResetOverlay.addEventListener('click', () => {
+    if (overlayDensityInput) overlayDensityInput.value = 100;
+    if (overlayDensityVal) overlayDensityVal.textContent = '100%';
+    if (overlaySpeedInput) overlaySpeedInput.value = 100;
+    if (overlaySpeedVal) overlaySpeedVal.textContent = '1.0x';
+    if (overlayDirectionSelect) overlayDirectionSelect.value = 'default';
+    if (overlaySizeInput) overlaySizeInput.value = 100;
+    if (overlaySizeVal) overlaySizeVal.textContent = '1.0x';
+    if (overlayOpacityInput) overlayOpacityInput.value = 100;
+    if (overlayOpacityVal) overlayOpacityVal.textContent = '100%';
+    if (overlayColorInput) overlayColorInput.value = '#64ffda';
+
+    renderer.setOverlayConfig({
+      density: 1.0,
+      speed: 1.0,
+      direction: 'default',
+      size: 1.0,
+      opacity: 1.0,
+      color: '#64ffda'
+    });
   });
 }
 
