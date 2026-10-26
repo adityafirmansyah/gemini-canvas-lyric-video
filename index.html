@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@700;900&family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,600;1,600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=2.9">
+  <link rel="stylesheet" href="css/style.css?v=3.0">
 </head>
 <body>
   <div class="app-container">
@@ -302,7 +302,10 @@
 
           <!-- Custom Background Image Section -->
           <section class="card">
-            <h3>🖼️ Custom Background Image</h3>
+            <div class="section-header">
+              <h3>🖼️ Custom Background Image</h3>
+              <button type="button" id="btn-reset-bg-motion" class="text-link" title="Reset background motion settings to defaults">↺ Reset Motion</button>
+            </div>
             <div class="drop-zone" id="bg-drop-zone">
               <span class="drop-icon">🌄</span>
               <p>Drag & drop background artwork / photo</p>
@@ -324,6 +327,49 @@
               </div>
               <input type="range" id="bg-dim" min="10" max="90" value="55" step="5">
               <small class="helper-text">Darkens the background image so lyrics pop with optimal contrast.</small>
+            </div>
+
+            <!-- Background Motion & Animation Settings -->
+            <div class="overlay-settings-wrapper" id="bg-motion-panel">
+              <div class="input-group">
+                <label for="bg-anim-type">Background Motion Style</label>
+                <select id="bg-anim-type">
+                  <option value="ken-burns">Ken Burns (Slow Breathing Zoom In & Out)</option>
+                  <option value="zoom-in">Continuous Zoom In (Slow Push)</option>
+                  <option value="zoom-out">Continuous Zoom Out (Slow Pull)</option>
+                  <option value="pan-horizontal">Slow Horizontal Pan (Left-Right Drift)</option>
+                  <option value="pan-vertical">Slow Vertical Pan (Up-Down Drift)</option>
+                  <option value="sway">Gentle Pendulum Sway / Tilt</option>
+                  <option value="beat-only">Beat Bounce Only (Reactive Kick Pulse)</option>
+                  <option value="static">Static (Completely Still)</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <div class="input-group">
+                  <div class="label-with-link">
+                    <label for="bg-anim-speed">Motion Speed</label>
+                    <span id="bg-anim-speed-val" class="helper-text">1.0x</span>
+                  </div>
+                  <input type="range" id="bg-anim-speed" min="20" max="300" value="100" step="10">
+                </div>
+                <div class="input-group">
+                  <div class="label-with-link">
+                    <label for="bg-anim-intensity">Motion Intensity</label>
+                    <span id="bg-anim-intensity-val" class="helper-text">100%</span>
+                  </div>
+                  <input type="range" id="bg-anim-intensity" min="0" max="250" value="100" step="10">
+                </div>
+              </div>
+
+              <div class="input-group">
+                <div class="label-with-link">
+                  <label for="bg-beat-bounce">Audio Beat Bounce Intensity</label>
+                  <span id="bg-beat-bounce-val" class="helper-text">100%</span>
+                </div>
+                <input type="range" id="bg-beat-bounce" min="0" max="250" value="100" step="10">
+                <small class="helper-text">Pulsing zoom scale on heavy sub-bass / kick drum hits.</small>
+              </div>
             </div>
           </section>
 
@@ -487,6 +533,6 @@
   <audio id="audio-player" preload="auto"></audio>
 
   <!-- Modular Scripts -->
-  <script type="module" src="js/app.js?v=2.9"></script>
+  <script type="module" src="js/app.js?v=3.0"></script>
 </body>
 </html>

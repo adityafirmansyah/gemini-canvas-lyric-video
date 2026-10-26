@@ -25,10 +25,11 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
   - **Floating Ambient Wave:** Dreamy vertical sine-wave undulating motion.
   - **Typewriter Reveal:** Vintage terminal character-by-character typing with blinking cursor.
   - **Cyber Glitch:** Chromatic aberration RGB channel splitting and digital jitter.
-- **🖼️ Custom Artwork Backdrop with Layered Overlay Effects:**
+- **🖼️ Custom Artwork Backdrop & Cinematic Motion Engine:**
   - **Upload Any Background:** Drag & drop Midjourney art, anime illustrations, lofi room visuals, or album covers.
-  - **Audio-Reactive Ken Burns Zoom:** Subtle cinematic zoom that pulses with the music bass.
-  - **Adjustable Dimming Tint:** Slider from 10% to 90% so lyrics maintain perfect contrast against bright artwork.
+  - **Motion Animation Styles:** Ken Burns breathing zoom, Continuous Zoom In, Continuous Zoom Out, Slow Horizontal Pan Drift, Slow Vertical Pan Drift, Gentle Pendulum Sway/Tilt, Beat Bounce Only, or Static.
+  - **Motion Controls:** Motion Speed (0.2x-3.0x), Motion Intensity (0%-250%), and Audio Beat Bounce Intensity (0%-250%).
+  - **Adjustable Dimming Tint:** Slider from 10% to 90% with 1-click Reset Motion button.
 - **🌌 Atmospheric Overlay Effects & Real-Time Physics Tuning:**
   - **Layered Effects:** Floating Dust Bokeh, Dreamy Rain on Glass, Starfield Hyperspace, Audio Reactive Waveform, Retro Synthwave 3D Grid.
   - **Flow Direction:** Custom physics direction: Default drift, Downward (rain/snow), Upward (rising embers/floating), Left, or Right.

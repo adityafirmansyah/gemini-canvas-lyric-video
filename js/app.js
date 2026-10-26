@@ -3,11 +3,11 @@
  * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
  */
 
-import { AudioManager } from './audio-player.js?v=2.9';
-import { AiService } from './ai-service.js?v=2.9';
-import { LrcParser } from './lrc-parser.js?v=2.9';
-import { CanvasRenderer } from './canvas-renderer.js?v=2.9';
-import { VideoRecorder } from './recorder.js?v=2.9';
+import { AudioManager } from './audio-player.js?v=3.0';
+import { AiService } from './ai-service.js?v=3.0';
+import { LrcParser } from './lrc-parser.js?v=3.0';
+import { CanvasRenderer } from './canvas-renderer.js?v=3.0';
+import { VideoRecorder } from './recorder.js?v=3.0';
 
 // DOM Elements
 const canvas = document.getElementById('lyric-canvas');
@@ -77,6 +77,14 @@ const bgImgName = document.getElementById('bg-img-name');
 const btnRemoveBgImg = document.getElementById('btn-remove-bg-img');
 const bgDimSlider = document.getElementById('bg-dim');
 const bgDimVal = document.getElementById('bg-dim-val');
+const btnResetBgMotion = document.getElementById('btn-reset-bg-motion');
+const bgAnimTypeSelect = document.getElementById('bg-anim-type');
+const bgAnimSpeedInput = document.getElementById('bg-anim-speed');
+const bgAnimSpeedVal = document.getElementById('bg-anim-speed-val');
+const bgAnimIntensityInput = document.getElementById('bg-anim-intensity');
+const bgAnimIntensityVal = document.getElementById('bg-anim-intensity-val');
+const bgBeatBounceInput = document.getElementById('bg-beat-bounce');
+const bgBeatBounceVal = document.getElementById('bg-beat-bounce-val');
 const toggleAudioReactive = document.getElementById('toggle-audio-reactive');
 
 // Header Ratio Buttons
@@ -716,6 +724,56 @@ if (bgDimSlider) {
     const val = parseInt(e.target.value);
     renderer.bgDim = val / 100;
     if (bgDimVal) bgDimVal.textContent = `${val}%`;
+  });
+}
+
+// Background Motion Listeners
+if (bgAnimTypeSelect) {
+  bgAnimTypeSelect.addEventListener('change', (e) => {
+    renderer.setBgConfig({ animType: e.target.value });
+  });
+}
+
+if (bgAnimSpeedInput) {
+  bgAnimSpeedInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.setBgConfig({ speed: val / 100 });
+    if (bgAnimSpeedVal) bgAnimSpeedVal.textContent = `${(val / 100).toFixed(1)}x`;
+  });
+}
+
+if (bgAnimIntensityInput) {
+  bgAnimIntensityInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.setBgConfig({ intensity: val / 100 });
+    if (bgAnimIntensityVal) bgAnimIntensityVal.textContent = `${val}%`;
+  });
+}
+
+if (bgBeatBounceInput) {
+  bgBeatBounceInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.setBgConfig({ beatBounce: val / 100 });
+    if (bgBeatBounceVal) bgBeatBounceVal.textContent = `${val}%`;
+  });
+}
+
+if (btnResetBgMotion) {
+  btnResetBgMotion.addEventListener('click', () => {
+    if (bgAnimTypeSelect) bgAnimTypeSelect.value = 'ken-burns';
+    if (bgAnimSpeedInput) bgAnimSpeedInput.value = 100;
+    if (bgAnimSpeedVal) bgAnimSpeedVal.textContent = '1.0x';
+    if (bgAnimIntensityInput) bgAnimIntensityInput.value = 100;
+    if (bgAnimIntensityVal) bgAnimIntensityVal.textContent = '100%';
+    if (bgBeatBounceInput) bgBeatBounceInput.value = 100;
+    if (bgBeatBounceVal) bgBeatBounceVal.textContent = '100%';
+
+    renderer.setBgConfig({
+      animType: 'ken-burns',
+      speed: 1.0,
+      intensity: 1.0,
+      beatBounce: 1.0
+    });
   });
 }
 

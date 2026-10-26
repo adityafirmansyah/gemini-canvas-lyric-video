@@ -27,6 +27,14 @@ export class CanvasRenderer {
     this.enableAudioReactive = true;
     this.customParticleImage = null;
 
+    // Background motion configuration
+    this.bgConfig = {
+      animType: 'ken-burns', // 'ken-burns', 'zoom-in', 'zoom-out', 'pan-horizontal', 'pan-vertical', 'sway', 'beat-only', 'static'
+      speed: 1.0,           // 0.2 to 3.0
+      intensity: 1.0,       // 0.0 to 2.5
+      beatBounce: 1.0       // 0.0 to 2.5
+    };
+
     // Overlay fine-tuning configuration
     this.overlayConfig = {
       density: 1.0,         // Multiplier: 0.2 to 2.5
@@ -131,6 +139,10 @@ export class CanvasRenderer {
     this.customParticleImage = imgElement;
   }
 
+  setBgConfig(newConfig) {
+    this.bgConfig = { ...this.bgConfig, ...newConfig };
+  }
+
   setOverlayType(type) {
     this.overlayType = type;
     this.bgType = type;
@@ -171,11 +183,52 @@ export class CanvasRenderer {
   }
 
   drawBaseBackdrop(ctx, W, H, beatPulse) {
+    const cfg = this.bgConfig || {
+      animType: 'ken-burns',
+      speed: 1.0,
+      intensity: 1.0,
+      beatBounce: 1.0
+    };
+
+    const anim = cfg.animType || 'ken-burns';
+    const spd = (cfg.speed !== undefined ? cfg.speed : 1.0) * 0.22;
+    const intensity = (cfg.intensity !== undefined ? cfg.intensity : 1.0);
+    const beatMult = (cfg.beatBounce !== undefined ? cfg.beatBounce : 1.0);
+    const beatEffect = anim === 'static' ? 0 : (beatPulse * 0.05 * beatMult);
+
+    let scale = 1.0;
+    let panX = 0;
+    let panY = 0;
+    let rotation = 0;
+
+    if (anim === 'static') {
+      scale = 1.0;
+    } else if (anim === 'beat-only') {
+      scale = 1.0 + beatEffect;
+    } else if (anim === 'ken-burns') {
+      const tScale = Math.sin(this.animTime * spd) * 0.038 * intensity;
+      scale = 1.05 + tScale + beatEffect;
+    } else if (anim === 'zoom-in') {
+      const p = (this.animTime * spd * 0.25) % 1;
+      scale = 1.02 + (p * 0.1 * intensity) + beatEffect;
+    } else if (anim === 'zoom-out') {
+      const p = (this.animTime * spd * 0.25) % 1;
+      scale = 1.12 - (p * 0.1 * intensity) + beatEffect;
+    } else if (anim === 'pan-horizontal') {
+      scale = 1.07 + beatEffect;
+      panX = Math.sin(this.animTime * spd) * (W * 0.035 * intensity);
+    } else if (anim === 'pan-vertical') {
+      scale = 1.07 + beatEffect;
+      panY = Math.sin(this.animTime * spd) * (H * 0.035 * intensity);
+    } else if (anim === 'sway') {
+      scale = 1.07 + beatEffect;
+      rotation = Math.sin(this.animTime * spd) * (0.025 * intensity);
+    }
+
     if (this.customBgImage) {
-      // Subtle Ken-Burns cinematic scale with beat bounce
-      const scale = 1.0 + (Math.sin(this.animTime * 0.2) * 0.025) + beatPulse * 0.04;
       ctx.save();
-      ctx.translate(W / 2, H / 2);
+      ctx.translate(W / 2 + panX, H / 2 + panY);
+      ctx.rotate(rotation);
       ctx.scale(scale, scale);
 
       const imgW = this.customBgImage.naturalWidth || this.customBgImage.width || W;
@@ -202,15 +255,18 @@ export class CanvasRenderer {
     }
 
     // Default when no custom image: Deep breathing radial gradient
+    ctx.save();
+    ctx.translate(panX * 0.4, panY * 0.4);
     const grad = ctx.createRadialGradient(
       W * 0.5, H * 0.5, 50,
-      W * 0.5, H * 0.5, Math.max(W, H) * (0.8 + beatPulse * 0.25)
+      W * 0.5, H * 0.5, Math.max(W, H) * (0.8 * scale + beatEffect * 2.5)
     );
     grad.addColorStop(0, '#151928');
     grad.addColorStop(0.5, '#0b0d18');
     grad.addColorStop(1, '#05060a');
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
+    ctx.fillRect(-W * 0.1, -H * 0.1, W * 1.2, H * 1.2);
+    ctx.restore();
   }
 
   parseColorRgb(colorStr, defaultRgb = [100, 255, 218]) {
