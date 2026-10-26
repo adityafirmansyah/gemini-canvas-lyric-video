@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@700;900&family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,600;1,600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=2.5">
+  <link rel="stylesheet" href="css/style.css?v=2.6">
 </head>
 <body>
   <div class="app-container">
@@ -292,29 +292,54 @@
               </div>
             </div>
 
-            <div class="input-group">
-              <label for="bg-type">Background Mode</label>
-              <select id="bg-type">
-                <option value="particles">Floating Dust Bokeh</option>
-                <option value="rain">Dreamy Rainy Window</option>
-                <option value="starfield">Starfield Hyperspace</option>
-                <option value="synthwave-grid">Retro Synthwave Grid</option>
-                <option value="waveform">Audio Reactive Waveform</option>
-                <option value="gradient">Breathing Gradient</option>
-                <option value="custom-img">Custom Image Background</option>
-              </select>
-            </div>
-
-            <div class="input-group hidden" id="custom-img-group">
-              <label for="custom-bg-input">Upload Background Image</label>
-              <input type="file" id="custom-bg-input" accept="image/*">
-            </div>
-
             <div class="toggle-group">
               <label class="switch-label">
                 <input type="checkbox" id="toggle-audio-reactive" checked>
                 <span>Audio-reactive Beat Pulse (RMS / Kick)</span>
               </label>
+            </div>
+          </section>
+
+          <!-- Custom Background Image Section -->
+          <section class="card">
+            <h3>🖼️ Custom Background Image</h3>
+            <div class="drop-zone" id="bg-drop-zone">
+              <span class="drop-icon">🌄</span>
+              <p>Drag & drop background artwork / photo</p>
+              <span class="subtext">JPG, PNG, WebP (Midjourney, anime, lofi art)</span>
+              <input type="file" id="custom-bg-input" accept="image/*">
+            </div>
+
+            <div id="bg-img-info" class="audio-info hidden">
+              <div class="track-details">
+                <span id="bg-img-name" class="track-title">artwork.png</span>
+                <button type="button" id="btn-remove-bg-img" class="text-link" style="color: var(--danger); font-weight: 700;">✕ Clear</button>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <div class="label-with-link">
+                <label for="bg-dim">Background Dimming / Tint</label>
+                <span id="bg-dim-val" class="helper-text">55%</span>
+              </div>
+              <input type="range" id="bg-dim" min="10" max="90" value="55" step="5">
+              <small class="helper-text">Darkens the background image so lyrics pop with optimal contrast.</small>
+            </div>
+          </section>
+
+          <!-- Atmospheric Overlay Effect Section -->
+          <section class="card">
+            <h3>🌌 Atmospheric Overlay Effect</h3>
+            <div class="input-group">
+              <label for="overlay-type">Overlay Style (Layers on top of Background)</label>
+              <select id="overlay-type">
+                <option value="particles">Floating Dust Bokeh (Lofi Sparks)</option>
+                <option value="rain">Dreamy Rainy Window (Rain on Glass)</option>
+                <option value="starfield">Starfield Hyperspace (3D Stars)</option>
+                <option value="waveform">Audio-Reactive Equalizer Waveform</option>
+                <option value="synthwave-grid">Retro Synthwave 3D Grid</option>
+                <option value="none">None (Clean Background Only)</option>
+              </select>
             </div>
           </section>
         </div>
@@ -390,6 +415,6 @@
   <audio id="audio-player" preload="auto"></audio>
 
   <!-- Modular Scripts -->
-  <script type="module" src="js/app.js?v=2.5"></script>
+  <script type="module" src="js/app.js?v=2.6"></script>
 </body>
 </html>

@@ -3,11 +3,11 @@
  * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
  */
 
-import { AudioManager } from './audio-player.js?v=2.5';
-import { AiService } from './ai-service.js?v=2.5';
-import { LrcParser } from './lrc-parser.js?v=2.5';
-import { CanvasRenderer } from './canvas-renderer.js?v=2.5';
-import { VideoRecorder } from './recorder.js?v=2.5';
+import { AudioManager } from './audio-player.js?v=2.6';
+import { AiService } from './ai-service.js?v=2.6';
+import { LrcParser } from './lrc-parser.js?v=2.6';
+import { CanvasRenderer } from './canvas-renderer.js?v=2.6';
+import { VideoRecorder } from './recorder.js?v=2.6';
 
 // DOM Elements
 const canvas = document.getElementById('lyric-canvas');
@@ -52,9 +52,14 @@ const fontFamilySelect = document.getElementById('font-family');
 const fontSizeRange = document.getElementById('font-size');
 const textColorInput = document.getElementById('text-color');
 const accentColorInput = document.getElementById('accent-color');
-const bgTypeSelect = document.getElementById('bg-type');
-const customImgGroup = document.getElementById('custom-img-group');
+const overlayTypeSelect = document.getElementById('overlay-type');
+const bgDropZone = document.getElementById('bg-drop-zone');
 const customBgInput = document.getElementById('custom-bg-input');
+const bgImgInfo = document.getElementById('bg-img-info');
+const bgImgName = document.getElementById('bg-img-name');
+const btnRemoveBgImg = document.getElementById('btn-remove-bg-img');
+const bgDimSlider = document.getElementById('bg-dim');
+const bgDimVal = document.getElementById('bg-dim-val');
 const toggleAudioReactive = document.getElementById('toggle-audio-reactive');
 
 // Header Ratio Buttons
@@ -401,7 +406,7 @@ const presets = {
     fontSize: 52,
     textColor: '#ffffff',
     accentColor: '#93c5fd',
-    bgType: 'particles',
+    overlayType: 'particles',
     animType: 'smooth-slide'
   },
   cyberpunk: {
@@ -409,7 +414,7 @@ const presets = {
     fontSize: 56,
     textColor: '#ffffff',
     accentColor: '#ff007f',
-    bgType: 'waveform',
+    overlayType: 'waveform',
     animType: 'cyber-glitch'
   },
   synthwave: {
@@ -417,7 +422,7 @@ const presets = {
     fontSize: 54,
     textColor: '#ffffff',
     accentColor: '#ffbe0b',
-    bgType: 'synthwave-grid',
+    overlayType: 'synthwave-grid',
     animType: 'pop-bounce'
   },
   rainy: {
@@ -425,7 +430,7 @@ const presets = {
     fontSize: 50,
     textColor: '#e2e8f0',
     accentColor: '#38bdf8',
-    bgType: 'rain',
+    overlayType: 'rain',
     animType: 'floating-wave'
   },
   minimal: {
@@ -433,7 +438,7 @@ const presets = {
     fontSize: 48,
     textColor: '#f8fafc',
     accentColor: '#ffffff',
-    bgType: 'gradient',
+    overlayType: 'none',
     animType: 'smooth-slide'
   },
   karaoke: {
@@ -441,7 +446,7 @@ const presets = {
     fontSize: 58,
     textColor: '#ffffff',
     accentColor: '#22d3ee',
-    bgType: 'gradient',
+    overlayType: 'none',
     animType: 'karaoke-fill'
   },
   phonk: {
@@ -449,7 +454,7 @@ const presets = {
     fontSize: 58,
     textColor: '#ffffff',
     accentColor: '#ef4444',
-    bgType: 'waveform',
+    overlayType: 'waveform',
     animType: 'pop-bounce'
   },
   sakura: {
@@ -457,7 +462,7 @@ const presets = {
     fontSize: 52,
     textColor: '#fff1f2',
     accentColor: '#f472b6',
-    bgType: 'particles',
+    overlayType: 'particles',
     animType: 'floating-wave'
   },
   academia: {
@@ -465,7 +470,7 @@ const presets = {
     fontSize: 48,
     textColor: '#fef3c7',
     accentColor: '#d97706',
-    bgType: 'gradient',
+    overlayType: 'none',
     animType: 'typewriter'
   },
   cosmic: {
@@ -473,7 +478,7 @@ const presets = {
     fontSize: 52,
     textColor: '#f8fafc',
     accentColor: '#c084fc',
-    bgType: 'starfield',
+    overlayType: 'starfield',
     animType: 'floating-wave'
   },
   retro: {
@@ -481,7 +486,7 @@ const presets = {
     fontSize: 46,
     textColor: '#fef08a',
     accentColor: '#f97316',
-    bgType: 'particles',
+    overlayType: 'particles',
     animType: 'typewriter'
   },
   acid: {
@@ -489,7 +494,7 @@ const presets = {
     fontSize: 56,
     textColor: '#ffffff',
     accentColor: '#84cc16',
-    bgType: 'waveform',
+    overlayType: 'waveform',
     animType: 'cyber-glitch'
   }
 };
@@ -505,7 +510,7 @@ presetCards.forEach(card => {
       renderer.baseFontSize = p.fontSize;
       renderer.textColor = p.textColor;
       renderer.accentColor = p.accentColor;
-      renderer.bgType = p.bgType;
+      renderer.overlayType = p.overlayType;
       renderer.animType = p.animType;
 
       // Sync form inputs
@@ -513,9 +518,8 @@ presetCards.forEach(card => {
       fontSizeRange.value = p.fontSize;
       textColorInput.value = p.textColor;
       accentColorInput.value = p.accentColor;
-      bgTypeSelect.value = p.bgType;
+      if (overlayTypeSelect) overlayTypeSelect.value = p.overlayType;
       animTypeSelect.value = p.animType;
-      customImgGroup.classList.toggle('hidden', p.bgType !== 'custom-img');
     }
   });
 });
@@ -526,19 +530,64 @@ fontSizeRange.addEventListener('input', (e) => renderer.baseFontSize = parseInt(
 textColorInput.addEventListener('input', (e) => renderer.textColor = e.target.value);
 accentColorInput.addEventListener('input', (e) => renderer.accentColor = e.target.value);
 
-bgTypeSelect.addEventListener('change', (e) => {
-  renderer.bgType = e.target.value;
-  customImgGroup.classList.toggle('hidden', e.target.value !== 'custom-img');
-});
+if (overlayTypeSelect) {
+  overlayTypeSelect.addEventListener('change', (e) => {
+    renderer.overlayType = e.target.value;
+  });
+}
 
-customBgInput.addEventListener('change', (e) => {
-  if (e.target.files.length > 0) {
-    const file = e.target.files[0];
-    const img = new Image();
-    img.src = URL.createObjectURL(file);
-    img.onload = () => renderer.setCustomImage(img);
-  }
-});
+// Custom Background Image Handling
+function loadBgImageFile(file) {
+  if (!file) return;
+  const img = new Image();
+  img.src = URL.createObjectURL(file);
+  img.onload = () => {
+    renderer.setCustomImage(img);
+    if (bgImgName) bgImgName.textContent = file.name;
+    if (bgImgInfo) bgImgInfo.classList.remove('hidden');
+  };
+}
+
+if (customBgInput) {
+  customBgInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      loadBgImageFile(e.target.files[0]);
+    }
+  });
+}
+
+if (bgDropZone) {
+  bgDropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    bgDropZone.classList.add('dragover');
+  });
+  bgDropZone.addEventListener('dragleave', () => {
+    bgDropZone.classList.remove('dragover');
+  });
+  bgDropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    bgDropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) {
+      loadBgImageFile(e.dataTransfer.files[0]);
+    }
+  });
+}
+
+if (btnRemoveBgImg) {
+  btnRemoveBgImg.addEventListener('click', () => {
+    renderer.setCustomImage(null);
+    if (customBgInput) customBgInput.value = '';
+    if (bgImgInfo) bgImgInfo.classList.add('hidden');
+  });
+}
+
+if (bgDimSlider) {
+  bgDimSlider.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.bgDim = val / 100;
+    if (bgDimVal) bgDimVal.textContent = `${val}%`;
+  });
+}
 
 toggleAudioReactive.addEventListener('change', (e) => {
   renderer.enableAudioReactive = e.target.checked;

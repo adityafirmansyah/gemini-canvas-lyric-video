@@ -25,13 +25,17 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
   - **Floating Ambient Wave:** Dreamy vertical sine-wave undulating motion.
   - **Typewriter Reveal:** Vintage terminal character-by-character typing with blinking cursor.
   - **Cyber Glitch:** Chromatic aberration RGB channel splitting and digital jitter.
-- **🌌 Dynamic Background Engines:**
-  - **Floating Dust Bokeh:** Relaxed particles for lofi/chillout.
-  - **Dreamy Rainy Window:** Vertical falling rain streaks on glass.
-  - **Starfield Hyperspace:** 3D flying stars warping toward camera.
-  - **Retro Synthwave Grid:** 80s neon perspective wireframe rolling grid & horizon sun.
-  - **Audio Reactive Waveform:** Symmetrical equalizer bars bouncing with bass.
-  - **Breathing Gradient & Custom Image:** Support for custom image backgrounds with audio-reactive Ken Burns zoom.
+- **🖼️ Custom Artwork Backdrop with Layered Overlay Effects:**
+  - **Upload Any Background:** Drag & drop Midjourney art, anime illustrations, lofi room visuals, or album covers.
+  - **Audio-Reactive Ken Burns Zoom:** Subtle cinematic zoom that pulses with the music bass.
+  - **Adjustable Dimming Tint:** Slider from 10% to 90% so lyrics maintain perfect contrast against bright artwork.
+- **🌌 Atmospheric Overlay Effects (Layered on top of your background):**
+  - **Floating Dust Bokeh:** Relaxed bokeh sparks floating over your artwork.
+  - **Dreamy Rain on Glass:** Real-time vertical rain streaks on window glass layered on top of the image.
+  - **Starfield Hyperspace:** 3D flying stars warping toward the viewer.
+  - **Audio Reactive Waveform:** Equalizer bars jumping with the song rhythm.
+  - **Retro Synthwave 3D Grid:** Rolling perspective wireframe neon grid.
+  - **None (Clean):** Display the pristine artwork with no overlay.
 - **✨ 12 Curated Aesthetic Presets (1-Click Styling):**
   - **Lofi Chill:** Lavender & soft blue particles with clean slide typography.
   - **Cyberpunk:** Neon magenta/cyan chromatic glitch and frequency visualizer.

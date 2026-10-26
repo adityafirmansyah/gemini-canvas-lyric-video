@@ -19,9 +19,11 @@ export class CanvasRenderer {
     this.baseFontSize = 52;
     this.textColor = '#ffffff';
     this.accentColor = '#22d3ee';
+    this.overlayType = 'particles';
     this.bgType = 'particles';
     this.animType = 'smooth-slide';
     this.customBgImage = null;
+    this.bgDim = 0.55; // 0.0 to 0.95 dark tint over custom image
     this.enableAudioReactive = true;
 
     // Visual elements state
@@ -123,41 +125,68 @@ export class CanvasRenderer {
     const beatPulse = this.enableAudioReactive ? (this.audioMetrics.bass * 0.14) : 0;
     const overallGlow = this.enableAudioReactive ? (this.audioMetrics.overall * 25) : 10;
 
-    // 1. Draw Background
-    this.drawBackground(ctx, W, H, beatPulse, dt);
+    // 1. Draw Base Backdrop (Custom Image or Ambient Gradient)
+    this.drawBaseBackdrop(ctx, W, H, beatPulse);
 
-    // 2. Draw Audio Reactive Waveform if enabled or chosen
-    if (this.bgType === 'waveform') {
-      this.drawWaveform(ctx, W, H, beatPulse);
-    }
+    // 2. Draw Atmospheric Overlay Effect (Rain, Dust Particles, Stars, Waveform, Grid)
+    this.drawOverlayEffect(ctx, W, H, beatPulse, dt);
 
     // 3. Draw Lyrics with selected animation
     this.drawLyrics(ctx, W, H, beatPulse, overallGlow);
   }
 
-  drawBackground(ctx, W, H, beatPulse, dt) {
-    // Custom Image Background
-    if (this.bgType === 'custom-img' && this.customBgImage) {
-      const scale = 1.0 + (Math.sin(this.animTime * 0.2) * 0.03) + beatPulse * 0.06;
+  drawBaseBackdrop(ctx, W, H, beatPulse) {
+    if (this.customBgImage) {
+      // Subtle Ken-Burns cinematic scale with beat bounce
+      const scale = 1.0 + (Math.sin(this.animTime * 0.2) * 0.025) + beatPulse * 0.04;
       ctx.save();
       ctx.translate(W / 2, H / 2);
       ctx.scale(scale, scale);
-      ctx.drawImage(this.customBgImage, -W / 2, -H / 2, W, H);
+
+      const imgW = this.customBgImage.naturalWidth || this.customBgImage.width || W;
+      const imgH = this.customBgImage.naturalHeight || this.customBgImage.height || H;
+      const imgRatio = imgW / imgH;
+      const canvasRatio = W / H;
+      let drawW, drawH;
+
+      if (canvasRatio > imgRatio) {
+        drawW = W;
+        drawH = W / imgRatio;
+      } else {
+        drawH = H;
+        drawW = H * imgRatio;
+      }
+
+      ctx.drawImage(this.customBgImage, -drawW / 2, -drawH / 2, drawW, drawH);
       ctx.restore();
 
-      ctx.fillStyle = 'rgba(10, 12, 16, 0.68)';
+      // Darkening tint overlay for lyric readability
+      ctx.fillStyle = `rgba(10, 12, 16, ${this.bgDim})`;
       ctx.fillRect(0, 0, W, H);
       return;
     }
 
-    // Rain Background
-    if (this.bgType === 'rain') {
-      ctx.fillStyle = '#090d16';
-      ctx.fillRect(0, 0, W, H);
+    // Default when no custom image: Deep breathing radial gradient
+    const grad = ctx.createRadialGradient(
+      W * 0.5, H * 0.5, 50,
+      W * 0.5, H * 0.5, Math.max(W, H) * (0.8 + beatPulse * 0.25)
+    );
+    grad.addColorStop(0, '#151928');
+    grad.addColorStop(0.5, '#0b0d18');
+    grad.addColorStop(1, '#05060a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+  }
 
+  drawOverlayEffect(ctx, W, H, beatPulse, dt) {
+    const effect = this.overlayType || this.bgType || 'particles';
+    if (effect === 'none') return;
+
+    // 1. Rain on Glass Overlay
+    if (effect === 'rain') {
       ctx.save();
-      ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = 'rgba(186, 230, 253, 0.42)';
+      ctx.lineWidth = 1.6;
       ctx.beginPath();
       for (const r of this.rainDrops) {
         r.y += r.speed * (1 + beatPulse);
@@ -173,11 +202,29 @@ export class CanvasRenderer {
       return;
     }
 
-    // Starfield Hyperspace Background
-    if (this.bgType === 'starfield') {
-      ctx.fillStyle = '#050608';
-      ctx.fillRect(0, 0, W, H);
+    // 2. Floating Dust Bokeh Particles Overlay
+    if (effect === 'particles') {
+      ctx.save();
+      for (const p of this.particles) {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if (p.y < 0) p.y = H;
+        if (p.x < 0) p.x = W;
+        if (p.x > W) p.x = 0;
 
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius * (1 + beatPulse * 2.2), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(100, 255, 218, ${p.alpha})`;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = this.accentColor;
+        ctx.fill();
+      }
+      ctx.restore();
+      return;
+    }
+
+    // 3. Starfield Hyperspace Overlay
+    if (effect === 'starfield') {
       ctx.save();
       ctx.translate(W / 2, H / 2);
       const starSpeed = (600 + beatPulse * 900) * dt;
@@ -207,40 +254,31 @@ export class CanvasRenderer {
       return;
     }
 
-    // Retro Synthwave Grid Background
-    if (this.bgType === 'synthwave-grid') {
-      const grad = ctx.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0, '#0a0017');
-      grad.addColorStop(0.5, '#240046');
-      grad.addColorStop(1, '#ff007f');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
-
-      // Neon Horizon Sun
-      const sunY = H * 0.52;
-      const sunR = Math.min(W, H) * 0.22;
-      const sunGrad = ctx.createLinearGradient(0, sunY - sunR, 0, sunY + sunR);
-      sunGrad.addColorStop(0, '#ffbe0b');
-      sunGrad.addColorStop(0.5, '#fb5607');
-      sunGrad.addColorStop(1, '#ff006e');
-
+    // 4. Retro Synthwave Grid Overlay
+    if (effect === 'synthwave-grid') {
       ctx.save();
-      ctx.fillStyle = sunGrad;
-      ctx.shadowColor = '#ff007f';
-      ctx.shadowBlur = 30 + beatPulse * 40;
-      ctx.beginPath();
-      ctx.arc(W / 2, sunY, sunR, Math.PI, 0, false);
-      ctx.fill();
-      ctx.restore();
+      if (!this.customBgImage) {
+        // Draw synthwave sunset horizon only if there's no custom photo
+        const sunY = H * 0.52;
+        const sunR = Math.min(W, H) * 0.22;
+        const sunGrad = ctx.createLinearGradient(0, sunY - sunR, 0, sunY + sunR);
+        sunGrad.addColorStop(0, '#ffbe0b');
+        sunGrad.addColorStop(0.5, '#fb5607');
+        sunGrad.addColorStop(1, '#ff006e');
+        ctx.fillStyle = sunGrad;
+        ctx.shadowColor = '#ff007f';
+        ctx.shadowBlur = 30 + beatPulse * 40;
+        ctx.beginPath();
+        ctx.arc(W / 2, sunY, sunR, Math.PI, 0, false);
+        ctx.fill();
+      }
 
-      // Horizon grid
-      ctx.save();
+      // Rolling perspective grid along the lower half
       ctx.strokeStyle = 'rgba(0, 240, 255, 0.45)';
       ctx.lineWidth = 1.5;
       this.gridOffset = (this.gridOffset + (40 + beatPulse * 80) * dt) % 35;
 
-      const horizonY = H * 0.52;
-      // Perspective vertical lines
+      const horizonY = H * 0.56;
       const fovCenter = W / 2;
       for (let x = -W * 0.8; x <= W * 1.8; x += 70) {
         ctx.beginPath();
@@ -249,7 +287,6 @@ export class CanvasRenderer {
         ctx.stroke();
       }
 
-      // Horizontal rolling lines
       for (let y = horizonY; y < H; y += 12) {
         const norm = (y - horizonY) / (H - horizonY);
         const actualY = horizonY + Math.pow(norm, 2.2) * (H - horizonY) + (this.gridOffset * norm);
@@ -264,40 +301,11 @@ export class CanvasRenderer {
       return;
     }
 
-    // Floating Dust Bokeh Particles
-    if (this.bgType === 'particles') {
-      ctx.fillStyle = '#0a0d14';
-      ctx.fillRect(0, 0, W, H);
-
-      ctx.save();
-      for (const p of this.particles) {
-        p.x += p.speedX;
-        p.y += p.speedY;
-        if (p.y < 0) p.y = H;
-        if (p.x < 0) p.x = W;
-        if (p.x > W) p.x = 0;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius * (1 + beatPulse * 2.2), 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(100, 255, 218, ${p.alpha})`;
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = this.accentColor;
-        ctx.fill();
-      }
-      ctx.restore();
+    // 5. Audio Reactive Equalizer Bars Overlay
+    if (effect === 'waveform') {
+      this.drawWaveform(ctx, W, H, beatPulse);
       return;
     }
-
-    // Default: Breathing Radial Gradient
-    const grad = ctx.createRadialGradient(
-      W * 0.5, H * 0.5, 50,
-      W * 0.5, H * 0.5, Math.max(W, H) * (0.8 + beatPulse * 0.25)
-    );
-    grad.addColorStop(0, '#151928');
-    grad.addColorStop(0.5, '#0b0d18');
-    grad.addColorStop(1, '#05060a');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
   }
 
   drawWaveform(ctx, W, H, beatPulse) {
