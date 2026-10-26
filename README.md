@@ -122,7 +122,7 @@ npx serve .
 1. **Step 1: Upload Music**
    - Drag and drop your audio track (MP3 or WAV) into the drop zone.
 2. **Step 2: Choose Sync Method**
-   - **Method A (AI Auto-Detect):** Choose your provider (Gemini, Groq, or OpenAI), enter your key, and click **Run Audio Detection & Alignment**.
+   - **Method A (AI Auto-Detect):** Select your preferred AI provider, click the link to get your key if needed ([Google AI Studio](https://aistudio.google.com/app/apikey), [Groq Console](https://console.groq.com/keys), or [OpenAI Platform](https://platform.openai.com/api-keys)), enter your key, and click **Run Audio Detection & Alignment**.
    - **Method B (LRC/SRT Import):** Drag and drop your `.lrc` or `.srt` file to load timestamps instantly with zero API keys.
 3. **Step 3: Customize Style**
    - Pick an aspect ratio (`16:9` for YouTube or `9:16` for Shorts).

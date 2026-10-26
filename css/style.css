@@ -288,6 +288,28 @@ body {
   gap: 6px;
 }
 
+.label-with-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.get-key-link {
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: opacity 0.2s;
+}
+
+.get-key-link:hover {
+  text-decoration: underline;
+  opacity: 0.85;
+}
+
 .input-group label {
   font-size: 0.75rem;
   color: var(--text-muted);

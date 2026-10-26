@@ -32,6 +32,7 @@ const groupCustomUrl = document.getElementById('group-custom-url');
 const customEndpointUrl = document.getElementById('custom-endpoint-url');
 const groupApiKey = document.getElementById('group-api-key');
 const labelApiKey = document.getElementById('label-api-key');
+const apiKeyLink = document.getElementById('api-key-link');
 const apiKeyInput = document.getElementById('api-key');
 const toggleKeyBtn = document.getElementById('toggle-key-visibility');
 const optionalLyricsInput = document.getElementById('optional-lyrics');
@@ -132,19 +133,37 @@ function updateProviderUI() {
   // Custom Endpoint input
   groupCustomUrl.classList.toggle('hidden', provider !== 'custom');
 
-  // Key label & value
+  // Key label, link & placeholder
   if (provider === 'gemini') {
     labelApiKey.textContent = 'Google Gemini API Key';
     apiKeyInput.placeholder = 'AIzaSy...';
+    if (apiKeyLink) {
+      apiKeyLink.href = 'https://aistudio.google.com/app/apikey';
+      apiKeyLink.textContent = 'Get Free Gemini Key ↗';
+      apiKeyLink.classList.remove('hidden');
+    }
   } else if (provider === 'groq') {
     labelApiKey.textContent = 'Groq API Key';
     apiKeyInput.placeholder = 'gsk_...';
+    if (apiKeyLink) {
+      apiKeyLink.href = 'https://console.groq.com/keys';
+      apiKeyLink.textContent = 'Get Free Groq Key ↗';
+      apiKeyLink.classList.remove('hidden');
+    }
   } else if (provider === 'openai') {
     labelApiKey.textContent = 'OpenAI API Key';
     apiKeyInput.placeholder = 'sk-...';
+    if (apiKeyLink) {
+      apiKeyLink.href = 'https://platform.openai.com/api-keys';
+      apiKeyLink.textContent = 'Get OpenAI Key ↗';
+      apiKeyLink.classList.remove('hidden');
+    }
   } else {
     labelApiKey.textContent = 'Authorization Key (Optional)';
     apiKeyInput.placeholder = 'Bearer token or empty';
+    if (apiKeyLink) {
+      apiKeyLink.classList.add('hidden');
+    }
   }
 
   apiKeyInput.value = aiService.getSavedApiKey(provider);
