@@ -22,6 +22,7 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
   - **Smooth Slide-Up:** Cinematic cubic ease-out glide upward.
   - **Karaoke Progressive Fill:** Spotify/Apple Music style progressive left-to-right highlight wipe.
   - **Beat Pop & Scale:** Punchy spring bounce timed to vocal onsets and kick drum bass.
+  - **Progressive Word Stacking (Highway Drive / Viral POV):** Accumulates words progressively on beat as they are sung into a massive, multi-line typography stack (exact viral road POV format).
   - **Floating Ambient Wave:** Dreamy vertical sine-wave undulating motion.
   - **Typewriter Reveal:** Vintage terminal character-by-character typing with blinking cursor.
   - **Cyber Glitch:** Chromatic aberration RGB channel splitting and digital jitter.
@@ -56,6 +57,7 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
   - **Cosmic Space:** Starfield hyperspace warp with electric violet aura.
   - **Vintage Soul:** 70s warm terracotta & gold tones with Courier typewriter typography.
   - **Acid Rave:** High-voltage neon lime green with reactive equalizer bars and cyber glitch.
+  - **Highway POV (Viral Road Track):** Tall ultra-bold Bebas Neue typography, progressive word-by-word cumulative stacking, deep asphalt drop shadow, 3D vanishing perspective tilt, and subtle road vibration.
 - **🎬 In-Browser Video Export:**
   - Combines the Canvas render stream and Web Audio destination into a synchronized video export (`.webm` / `.mp4`) directly inside your browser—no backend server, FFmpeg installation, or cloud rendering required.
 - **🔒 Privacy First:**

@@ -535,6 +535,8 @@ textarea:focus {
 .font-serif { font-family: 'Playfair Display', serif; font-style: italic; }
 .font-cinzel { font-family: 'Cinzel', serif; letter-spacing: 0.12em; }
 .font-courier { font-family: 'Courier Prime', monospace; }
+.font-bebas { font-family: 'Bebas Neue', sans-serif; font-size: 0.85rem; letter-spacing: 0.12em; }
+.font-anton { font-family: 'Anton', sans-serif; font-size: 0.82rem; }
 
 /* Thumbnail Text Glowing Styles */
 .cyber-glow { color: #fff; text-shadow: 0 0 8px #ff007f, 0 0 14px #00f0ff; }
@@ -546,6 +548,7 @@ textarea:focus {
 .cosmic-glow { color: #fff; text-shadow: 0 0 10px #c084fc, 0 0 20px #06b6d4; }
 .retro-glow { color: #fef08a; text-shadow: 0 0 6px #ea580c; }
 .acid-glow { color: #fff; text-shadow: 0 0 8px #84cc16, 0 0 16px #00ff88; }
+.highway-glow { color: #fff; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95); }
 .karaoke-text {
   background: linear-gradient(90deg, #22d3ee 50%, rgba(255, 255, 255, 0.45) 50%);
   -webkit-background-clip: text;
@@ -644,6 +647,10 @@ textarea:focus {
 
 .acid-bg {
   background: linear-gradient(135deg, #022c22, #14532d, #84cc16, #00ff88);
+}
+
+.highway-bg {
+  background: linear-gradient(135deg, #030712, #111827, #374151);
 }
 
 .overlay-settings-wrapper {

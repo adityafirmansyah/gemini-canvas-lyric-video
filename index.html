@@ -6,8 +6,8 @@
   <title>AI Lyric Canvas Studio (Multi-AI & LRC)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@700;900&family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,600;1,600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=3.2">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@700;900&family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,600;1,600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=3.3">
 </head>
 <body>
   <div class="app-container">
@@ -242,6 +242,12 @@
                 </div>
                 <span>Acid Rave</span>
               </button>
+              <button class="preset-card" data-preset="highway">
+                <div class="preset-preview highway-bg">
+                  <span class="thumb-tag font-bebas highway-glow">POV DRIVE</span>
+                </div>
+                <span>Highway POV</span>
+              </button>
             </div>
           </section>
 
@@ -250,6 +256,7 @@
             <div class="input-group">
               <label for="anim-type">Animation Style</label>
               <select id="anim-type">
+                <option value="word-stack">Progressive Word Stacking (Highway Drive / Viral Stacker)</option>
                 <option value="smooth-slide">Smooth Slide-Up (Cinematic & Clean)</option>
                 <option value="karaoke-fill">Karaoke Progressive Fill (Left-to-Right)</option>
                 <option value="pop-bounce">Beat Pop & Scale (Energetic / Phonk)</option>
@@ -266,6 +273,8 @@
               <div class="input-group">
                 <label for="font-family">Font Family</label>
                 <select id="font-family">
+                  <option value="'Bebas Neue', sans-serif">Bebas Neue (Highway Bold / Viral POV)</option>
+                  <option value="'Anton', sans-serif">Anton (Heavy Impact)</option>
                   <option value="'Outfit', sans-serif">Outfit (Modern Clean)</option>
                   <option value="'Space Grotesk', sans-serif">Space Grotesk (Tech / Cyber)</option>
                   <option value="'Playfair Display', serif">Playfair Display (Classy Serif)</option>
@@ -328,6 +337,7 @@
               <label for="sub-style">Subtitle Badge Style</label>
               <select id="sub-style">
                 <option value="none">Standard Glowing Text (No Box)</option>
+                <option value="highway-3d">Highway 3D Perspective (Deep Asphalt Shadow & Driver Vanishing Tilt)</option>
                 <option value="boxed-banner">Solid Highlight Box Banner (Like Reference Image)</option>
                 <option value="alternating-badge">Dual-Tone Inverted Badges (Lime & Dark)</option>
                 <option value="word-badges">Individual Box Badge per Word</option>
@@ -396,9 +406,9 @@
             </div>
             <div class="drop-zone" id="bg-drop-zone">
               <span class="drop-icon">🌄</span>
-              <p>Drag & drop background artwork / photo</p>
-              <span class="subtext">JPG, PNG, WebP (Midjourney, anime, lofi art)</span>
-              <input type="file" id="custom-bg-input" accept="image/*">
+              <p>Drag & drop background artwork or video</p>
+              <span class="subtext">JPG, PNG, WebP or MP4/WebM driving POV clips</span>
+              <input type="file" id="custom-bg-input" accept="image/*,video/*">
             </div>
 
             <div id="bg-img-info" class="audio-info hidden">
@@ -621,6 +631,6 @@
   <audio id="audio-player" preload="auto"></audio>
 
   <!-- Modular Scripts -->
-  <script type="module" src="js/app.js?v=3.2"></script>
+  <script type="module" src="js/app.js?v=3.3"></script>
 </body>
 </html>

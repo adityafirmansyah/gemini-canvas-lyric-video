@@ -28,6 +28,7 @@ export class CanvasRenderer {
     this.bgDim = 0.55; // 0.0 to 0.95 dark tint over custom image
     this.enableAudioReactive = true;
     this.customParticleImage = null;
+    this.customBgVideo = null;
 
     // Subtitle & Box Badge Design configuration
     this.subtitleConfig = {
@@ -148,6 +149,10 @@ export class CanvasRenderer {
     this.customBgImage = imgElement;
   }
 
+  setCustomVideo(videoElement) {
+    this.customBgVideo = videoElement;
+  }
+
   setCustomParticleImage(imgElement) {
     this.customParticleImage = imgElement;
   }
@@ -262,15 +267,17 @@ export class CanvasRenderer {
       rotation = Math.sin(this.animTime * spd) * (0.025 * intensity);
     }
 
-    if (this.customBgImage) {
+    const bgMedia = this.customBgVideo || this.customBgImage;
+    if (bgMedia) {
+      const isVideo = !!this.customBgVideo;
       ctx.save();
       ctx.translate(W / 2 + panX, H / 2 + panY);
       ctx.rotate(rotation);
       ctx.scale(scale, scale);
 
-      const imgW = this.customBgImage.naturalWidth || this.customBgImage.width || W;
-      const imgH = this.customBgImage.naturalHeight || this.customBgImage.height || H;
-      const imgRatio = imgW / imgH;
+      const mediaW = isVideo ? (bgMedia.videoWidth || W) : (bgMedia.naturalWidth || bgMedia.width || W);
+      const mediaH = isVideo ? (bgMedia.videoHeight || H) : (bgMedia.naturalHeight || bgMedia.height || H);
+      const imgRatio = (mediaW && mediaH) ? (mediaW / mediaH) : (W / H);
       const canvasRatio = W / H;
       let drawW, drawH;
 
@@ -282,7 +289,7 @@ export class CanvasRenderer {
         drawW = H * imgRatio;
       }
 
-      ctx.drawImage(this.customBgImage, -drawW / 2, -drawH / 2, drawW, drawH);
+      ctx.drawImage(bgMedia, -drawW / 2, -drawH / 2, drawW, drawH);
       ctx.restore();
 
       // Darkening tint overlay for lyric readability
@@ -800,7 +807,30 @@ export class CanvasRenderer {
       return;
     }
 
-    // 6. DEFAULT: Smooth Slide-Up with Ease-Out
+    // 6. STYLE: Progressive Word Stacking (Highway Drive / Viral Stacker)
+    if (this.animType === 'word-stack') {
+      const allWords = text.split(' ');
+      const N = allWords.length;
+      const visibleCount = Math.min(N, Math.max(1, Math.floor(progress * N) + 1));
+      const partialText = allWords.slice(0, visibleCount).join(' ');
+
+      const wordProgress = (progress * N) % 1;
+      const punchBounce = (wordProgress < 0.35) ? (1.0 + Math.sin((wordProgress / 0.35) * Math.PI) * 0.08) : 1.0;
+
+      const fontSize = baseSize * 1.15 * punchBounce * (1.0 + beatPulse * 0.35);
+      ctx.font = `900 ${fontSize}px ${this.fontFamily}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = this.textColor || '#ffffff';
+      ctx.shadowColor = this.accentColor;
+      ctx.shadowBlur = activeGlowBlur;
+
+      this.wrapAndDrawText(ctx, partialText, x, y, maxWidth, fontSize * 1.15, progress);
+      ctx.restore();
+      return;
+    }
+
+    // 7. DEFAULT: Smooth Slide-Up with Ease-Out
     const timeIn = t - start;
     let slideY = 0;
     if (timeIn >= 0 && timeIn < 0.45) {
@@ -866,6 +896,32 @@ export class CanvasRenderer {
       for (let i = 0; i < lines.length; i++) {
         ctx.strokeText(lines[i], x, startY + i * lineHeight);
         ctx.fillText(lines[i], x, startY + i * lineHeight);
+      }
+      ctx.restore();
+      return;
+    }
+
+    // Mode Highway 3D: Perspective tilt with deep asphalt ambient shadow & windshield road vibration
+    if (style === 'highway-3d') {
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const roadShakeX = (Math.sin(this.animTime * 28) + Math.cos(this.animTime * 42)) * 1.2;
+      const roadShakeY = (Math.cos(this.animTime * 32) + Math.sin(this.animTime * 51)) * 1.2;
+
+      ctx.translate(x + roadShakeX, y + roadShakeY);
+      ctx.transform(1, -0.042, 0.015, 1, 0, 0);
+
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+      ctx.shadowBlur = 18;
+      ctx.shadowOffsetX = 3;
+      ctx.shadowOffsetY = 7;
+      ctx.fillStyle = this.textColor || '#ffffff';
+
+      const lineStartY = -((lines.length - 1) * lineHeight) / 2;
+      for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], 0, lineStartY + i * lineHeight);
       }
       ctx.restore();
       return;

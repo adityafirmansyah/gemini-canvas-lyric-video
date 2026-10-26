@@ -3,11 +3,11 @@
  * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
  */
 
-import { AudioManager } from './audio-player.js?v=3.2';
-import { AiService } from './ai-service.js?v=3.2';
-import { LrcParser } from './lrc-parser.js?v=3.2';
-import { CanvasRenderer } from './canvas-renderer.js?v=3.2';
-import { VideoRecorder } from './recorder.js?v=3.2';
+import { AudioManager } from './audio-player.js?v=3.3';
+import { AiService } from './ai-service.js?v=3.3';
+import { LrcParser } from './lrc-parser.js?v=3.3';
+import { CanvasRenderer } from './canvas-renderer.js?v=3.3';
+import { VideoRecorder } from './recorder.js?v=3.3';
 
 // DOM Elements
 const canvas = document.getElementById('lyric-canvas');
@@ -563,6 +563,21 @@ const presets = {
     glowDensity: 1.5,
     overlayType: 'waveform',
     animType: 'cyber-glitch'
+  },
+  highway: {
+    font: "'Bebas Neue', sans-serif",
+    fontSize: 68,
+    textColor: '#ffffff',
+    accentColor: '#facc15',
+    glowSize: 10,
+    glowDensity: 0.4,
+    overlayType: 'none',
+    animType: 'word-stack',
+    subtitleStyle: 'highway-3d',
+    bgAnimType: 'zoom-in',
+    bgSpeed: 1.2,
+    bgIntensity: 1.2,
+    bgBounce: 0.8
   }
 };
 
@@ -603,6 +618,24 @@ presetCards.forEach(card => {
         }
       }
       animTypeSelect.value = p.animType;
+
+      if (p.subtitleStyle !== undefined) {
+        renderer.setSubtitleConfig({ style: p.subtitleStyle });
+        if (subStyleSelect) subStyleSelect.value = p.subtitleStyle;
+        if (subSettingsPanel) {
+          subSettingsPanel.classList.toggle('hidden', p.subtitleStyle === 'none' || p.subtitleStyle === 'highway-3d');
+        }
+      }
+
+      if (p.bgAnimType !== undefined) {
+        renderer.setBgConfig({
+          animType: p.bgAnimType,
+          speed: p.bgSpeed || 1.0,
+          intensity: p.bgIntensity || 1.0,
+          beatBounce: p.bgBounce || 1.0
+        });
+        if (bgAnimTypeSelect) bgAnimTypeSelect.value = p.bgAnimType;
+      }
     }
   });
 });
@@ -822,16 +855,34 @@ if (btnRemoveParticleImg) {
   });
 }
 
-// Custom Background Image Handling
+// Custom Background Media Handling (Images & Video)
 function loadBgImageFile(file) {
   if (!file) return;
-  const img = new Image();
-  img.src = URL.createObjectURL(file);
-  img.onload = () => {
-    renderer.setCustomImage(img);
-    if (bgImgName) bgImgName.textContent = file.name;
-    if (bgImgInfo) bgImgInfo.classList.remove('hidden');
-  };
+  const isVideo = file.type.startsWith('video/') || file.name.endsWith('.mp4') || file.name.endsWith('.webm');
+  if (isVideo) {
+    const video = document.createElement('video');
+    video.src = URL.createObjectURL(file);
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.autoplay = true;
+    video.onloadeddata = () => {
+      renderer.setCustomImage(null);
+      renderer.setCustomVideo(video);
+      if (audioManager.isPlaying) video.play().catch(() => {});
+      if (bgImgName) bgImgName.textContent = `🎬 ${file.name}`;
+      if (bgImgInfo) bgImgInfo.classList.remove('hidden');
+    };
+  } else {
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    img.onload = () => {
+      renderer.setCustomVideo(null);
+      renderer.setCustomImage(img);
+      if (bgImgName) bgImgName.textContent = `🖼️ ${file.name}`;
+      if (bgImgInfo) bgImgInfo.classList.remove('hidden');
+    };
+  }
 }
 
 if (customBgInput) {
@@ -862,6 +913,7 @@ if (bgDropZone) {
 if (btnRemoveBgImg) {
   btnRemoveBgImg.addEventListener('click', () => {
     renderer.setCustomImage(null);
+    renderer.setCustomVideo(null);
     if (customBgInput) customBgInput.value = '';
     if (bgImgInfo) bgImgInfo.classList.add('hidden');
   });
@@ -949,9 +1001,11 @@ exportResSelect.addEventListener('change', () => {
 btnPlayPause.addEventListener('click', () => {
   if (audioManager.isPlaying) {
     audioManager.pause();
+    if (renderer.customBgVideo) renderer.customBgVideo.pause();
     btnPlayPause.textContent = '▶';
   } else {
     audioManager.play();
+    if (renderer.customBgVideo) renderer.customBgVideo.play().catch(() => {});
     btnPlayPause.textContent = '⏸';
   }
 });
@@ -959,6 +1013,9 @@ btnPlayPause.addEventListener('click', () => {
 seekSlider.addEventListener('input', (e) => {
   const time = parseFloat(e.target.value);
   audioManager.seek(time);
+  if (renderer.customBgVideo && renderer.customBgVideo.duration) {
+    renderer.customBgVideo.currentTime = time % renderer.customBgVideo.duration;
+  }
   currentTimeDisplay.textContent = formatTime(time);
 });
 
@@ -973,6 +1030,10 @@ audioPlayer.addEventListener('timeupdate', () => {
 
 audioPlayer.addEventListener('ended', () => {
   btnPlayPause.textContent = '▶';
+  if (renderer.customBgVideo) {
+    renderer.customBgVideo.pause();
+    renderer.customBgVideo.currentTime = 0;
+  }
   if (recorder && recorder.isRecording) {
     recorder.stop();
   }
