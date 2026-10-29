@@ -7,8 +7,8 @@
  * - 100% Canvas Compositing for 60FPS Video Export and PNG Thumbnail Snapshot
  */
 
-import { ThreeBackground } from './three-background.js?v=5.2';
-import { LrcParser } from './lrc-parser.js?v=5.2';
+import { ThreeBackground } from './three-background.js?v=5.3';
+import { LrcParser } from './lrc-parser.js?v=5.3';
 
 export class CanvasRenderer {
   constructor(canvas) {
@@ -34,7 +34,7 @@ export class CanvasRenderer {
     this.motionStyle = 'poster-collage'; // 'poster-collage', 'hero-morph', 'liquid-spring', 'vocal-pop'
     this.wordDisplayMode = 'progressive-poster'; // 'progressive-poster', 'solo-flash', 'static-all'
     this.canvasTheme = 'poster-light'; // 'poster-light' (white background like image) or 'dark-studio'
-    this.heroScale = 2.2;
+    this.heroScale = 2.6;
     this.allowVerticalRotation = true;
     this.containerStyle = 'clean-glow'; // 'clean-glow', 'pill-badge', 'contrast-box', 'ambient-scrim'
 
@@ -520,22 +520,22 @@ export class CanvasRenderer {
     const heroWord = words[heroIdx];
     const isLight = this.canvasTheme === 'poster-light';
 
-    // 3. Size and Measure Hero Word
-    let heroFontSize = Math.round(baseSize * (this.heroScale || 2.2));
+    // 3. Size and Measure Hero Word (significantly bigger & dominant)
+    let heroFontSize = Math.round(baseSize * (this.heroScale || 2.6));
     ctx.font = `900 ${heroFontSize}px ${this.fontFamily}`;
     let heroWidth = ctx.measureText(heroWord).width;
 
-    // Clamp hero width to 82% of maxWidth so it never clips
-    const heroMaxW = maxWidth * 0.82;
+    // Clamp hero width to 85% of maxWidth so it never clips
+    const heroMaxW = maxWidth * 0.85;
     if (heroWidth > heroMaxW) {
-      heroFontSize = Math.max(48, Math.floor(heroFontSize * (heroMaxW / heroWidth)));
+      heroFontSize = Math.max(52, Math.floor(heroFontSize * (heroMaxW / heroWidth)));
       ctx.font = `900 ${heroFontSize}px ${this.fontFamily}`;
       heroWidth = ctx.measureText(heroWord).width;
     }
-    const heroHeight = heroFontSize * 0.85;
+    const heroHeight = heroFontSize * 0.88;
 
-    // 4. Size for Supporting Words
-    const supFontSize = Math.max(26, Math.round(heroFontSize * 0.38));
+    // 4. Strict ceiling: Side vertical words must NEVER be taller or bigger than center hero word!
+    const targetMaxSideHeight = heroHeight * 0.90;
 
     // 5. Assign Roles to Other Words
     const otherIndices = [];
@@ -553,31 +553,48 @@ export class CanvasRenderer {
 
     for (let k = 0; k < otherIndices.length; k++) {
       const idx = otherIndices[k];
+      const wordStr = words[idx];
       const role = roleCycle[k % roleCycle.length];
-      let x = centerX, y = centerY, angle = 0, sz = supFontSize;
+      let x = centerX, y = centerY, angle = 0, sz = Math.round(heroFontSize * 0.35);
 
-      if (role === 'hero') {
-        x = centerX; y = centerY; angle = 0; sz = heroFontSize;
+      if (role === 'left_vert' || role === 'right_vert') {
+        // Enforce that side words are noticeably smaller than center word
+        sz = Math.min(sz, 36);
+        ctx.font = `900 ${sz}px ${this.fontFamily}`;
+        let sideLen = ctx.measureText(wordStr).width;
+        if (sideLen > targetMaxSideHeight) {
+          sz = Math.max(16, Math.floor(sz * (targetMaxSideHeight / sideLen)));
+          ctx.font = `900 ${sz}px ${this.fontFamily}`;
+          sideLen = ctx.measureText(wordStr).width;
+        }
+
+        angle = (role === 'left_vert' ? -Math.PI / 2 : Math.PI / 2);
+        x = (role === 'left_vert')
+          ? centerX - heroWidth / 2 - (sz * 0.75) - 20
+          : centerX + heroWidth / 2 + (sz * 0.75) + 20;
+        y = centerY;
+
       } else if (role === 'top') {
-        x = centerX - heroWidth * 0.15 + (k * 20);
-        y = centerY - heroHeight * 0.62 - (supFontSize * 0.55);
+        sz = Math.min(Math.round(heroFontSize * 0.40), 48);
+        ctx.font = `900 ${sz}px ${this.fontFamily}`;
+        let topW = ctx.measureText(wordStr).width;
+        if (topW > heroWidth * 0.88) {
+          sz = Math.max(20, Math.floor(sz * ((heroWidth * 0.88) / topW)));
+        }
+        x = centerX - heroWidth * 0.12 + (k * 15);
+        y = centerY - heroHeight * 0.62 - (sz * 0.55);
         angle = 0;
-        sz = Math.round(supFontSize * 1.08);
+
       } else if (role === 'bottom') {
-        x = centerX + heroWidth * 0.12 - (k * 20);
-        y = centerY + heroHeight * 0.62 + (supFontSize * 0.55);
+        sz = Math.min(Math.round(heroFontSize * 0.40), 48);
+        ctx.font = `900 ${sz}px ${this.fontFamily}`;
+        let botW = ctx.measureText(wordStr).width;
+        if (botW > heroWidth * 0.88) {
+          sz = Math.max(20, Math.floor(sz * ((heroWidth * 0.88) / botW)));
+        }
+        x = centerX + heroWidth * 0.12 - (k * 15);
+        y = centerY + heroHeight * 0.62 + (sz * 0.55);
         angle = 0;
-        sz = Math.round(supFontSize * 1.08);
-      } else if (role === 'left_vert') {
-        x = centerX - heroWidth / 2 - (supFontSize * 0.7) - 16;
-        y = centerY;
-        angle = -Math.PI / 2; // rotated -90 deg
-        sz = supFontSize;
-      } else if (role === 'right_vert') {
-        x = centerX + heroWidth / 2 + (supFontSize * 0.7) + 16;
-        y = centerY;
-        angle = Math.PI / 2; // rotated 90 deg
-        sz = supFontSize;
       }
 
       slots[idx] = { role, x, y, angle, fontSize: sz };
@@ -630,42 +647,32 @@ export class CanvasRenderer {
 
       if (p < 1.0) {
         const bounce = Math.sin(p * Math.PI) * 0.16;
-        enterScale = 0.75 + (p * 0.25) + bounce;
-        enterY = (1.0 - p) * 18;
+        enterScale = 0.82 + (p * 0.18) + bounce;
+        enterY = (1.0 - p) * 16;
         enterAlpha = p;
       }
 
       // Organic micro-floating breathing wave
-      const waveFloatY = Math.sin(this.animTime * 2.2 + i * 1.3) * (3.0 * (1 + beatPulse * 0.4));
-      const waveRot = Math.cos(this.animTime * 1.8 + i * 0.9) * 0.012;
+      const waveFloatY = Math.sin(this.animTime * 2.2 + i * 1.3) * (2.5 * (1 + beatPulse * 0.35));
+      const waveRot = Math.cos(this.animTime * 1.8 + i * 0.9) * 0.010;
 
-      // Color and Scale styling
+      // Color and Scale styling (Center hero in accent color, supporting words in clean white/black with NO active highlight)
       let finalScale = enterScale;
       let color = this.textColor;
       let shadowBlur = 0;
       let shadowColor = 'transparent';
 
       if (slot.role === 'hero') {
-        // Hero word is prominent in Solar Yellow!
+        // Hero word is ALWAYS the prominent solar yellow center!
         color = this.accentColor;
-        if (isActive) {
-          finalScale *= (1.12 + beatPulse * 0.14);
-          shadowBlur = isLight ? 10 : 24;
-          shadowColor = isLight ? 'rgba(245, 176, 16, 0.45)' : this.accentColor;
-        } else {
-          finalScale *= (1.0 + beatPulse * 0.05);
-        }
+        shadowBlur = isLight ? 0 : 20;
+        shadowColor = isLight ? 'transparent' : this.accentColor;
+        finalScale *= (1.0 + beatPulse * 0.04);
       } else {
-        // Supporting words: Pop in Solar Yellow when sung, settle in Solid Black/White!
-        if (isActive) {
-          finalScale *= (1.18 + beatPulse * 0.12);
-          color = this.accentColor; // Spotlight active word in yellow!
-          shadowBlur = isLight ? 8 : 20;
-          shadowColor = isLight ? 'rgba(245, 176, 16, 0.4)' : this.accentColor;
-        } else {
-          // Settles into solid crisp black (#111111) like reference image
-          color = isLight ? '#111111' : '#FFFFFF';
-        }
+        // Supporting words are ALWAYS clean solid black on light or clean white on dark (NO yellow highlight override!)
+        color = isLight ? '#121212' : '#FFFFFF';
+        shadowBlur = 0;
+        shadowColor = 'transparent';
       }
 
       ctx.save();
@@ -685,12 +692,6 @@ export class CanvasRenderer {
 
       // Draw word
       ctx.fillText(wordText, 0, 0);
-
-      // If active and glow density high, multi-pass
-      if (isActive && this.glowDensity > 1.25 && isLight === false) {
-        ctx.fillText(wordText, 0, 0);
-      }
-
       ctx.restore();
     }
   }

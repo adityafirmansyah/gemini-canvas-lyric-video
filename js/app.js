@@ -1,13 +1,13 @@
 /**
- * app.js (v5.2 Progressive Reveal & Poster Cloud Edition)
+ * app.js (v5.3 Proportional Poster & Unhighlighted Sides)
  * Main Controller coordinating Audio, Three.js 3D Background, Fluid Kinetic Lyrics, and Video Recording.
  */
 
-import { AudioManager } from './audio-player.js?v=5.2';
-import { AiService } from './ai-service.js?v=5.2';
-import { LrcParser } from './lrc-parser.js?v=5.2';
-import { CanvasRenderer } from './canvas-renderer.js?v=5.2';
-import { VideoRecorder } from './recorder.js?v=5.2';
+import { AudioManager } from './audio-player.js?v=5.3';
+import { AiService } from './ai-service.js?v=5.3';
+import { LrcParser } from './lrc-parser.js?v=5.3';
+import { CanvasRenderer } from './canvas-renderer.js?v=5.3';
+import { VideoRecorder } from './recorder.js?v=5.3';
 
 // Canvas & Audio
 const canvas = document.getElementById('lyric-canvas');
@@ -610,8 +610,8 @@ if (btnResetLyrics) {
     if (fontFamilySelect) fontFamilySelect.value = "'Montserrat', sans-serif";
     if (fontSizeRange) fontSizeRange.value = 56;
     if (fontSizeVal) fontSizeVal.textContent = '56px';
-    if (heroScaleRange) heroScaleRange.value = 22;
-    if (heroScaleVal) heroScaleVal.textContent = '2.2x';
+    if (heroScaleRange) heroScaleRange.value = 26;
+    if (heroScaleVal) heroScaleVal.textContent = '2.6x';
     if (maxWordsRange) maxWordsRange.value = 4;
     if (maxWordsVal) maxWordsVal.textContent = '4 words';
     if (textColorInput) textColorInput.value = '#121212';
@@ -624,7 +624,7 @@ if (btnResetLyrics) {
     renderer.setTheme('poster-light');
     renderer.fontFamily = "'Montserrat', sans-serif";
     renderer.baseFontSize = 56;
-    renderer.heroScale = 2.2;
+    renderer.heroScale = 2.6;
     renderer.allowVerticalRotation = true;
     renderer.setMaxWords(4);
     renderer.textColor = '#121212';

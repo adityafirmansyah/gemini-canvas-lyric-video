@@ -25,10 +25,13 @@ No static backgrounds or boring repetitive video loops. The environment is proce
 Inspired by bold graphic poster typography and word-cloud branding (interlocking horizontal & vertical layouts):
 - **★ Progressive Word-by-Word Reveal (Default):**
   - Kata-kata **TIDAK langsung muncul sekaligus satu kalimat penuh**, melainkan **muncul satu per satu mengikuti timestamp vokal penyanyi** (misal: detik pertama hanya muncul *"Membasu"*, detik berikutnya masuk *"peri"*, lalu *"di"*, lalu *"hatimu"*).
-  - Setiap kata yang baru masuk tiba dengan *elastic spring bounce* & sorotan warna **Solar Golden Yellow (`#F5B010`)**.
-  - Kata-kata yang sudah dinyanyikan **tetap berada di layar** mengunci dalam warna **Solid Black (`#121212`)**.
-  - Di akhir kalimat, seluruh kata telah berkumpul lengkap membentuk poster utuh (*"Membasu peri di hatimu"*) sebelum berpindah bersih ke kalimat berikutnya!
-- **★ Solo Single-Word Flash:** Opsi untuk hanya menampilkan 1 kata tunggal saja bergantian di panggung.
+  - Kata-kata yang sudah dinyanyikan **tetap berada di layar** mengunci dalam posisinya hingga di akhir kalimat terbentuk poster utuh sebelum berganti ke kalimat berikutnya.
+- **👑 Giant Dominant Center Hero Word:**
+  - Kata utama di tengah (*Hero Word*) berukuran masif dan mendominasi panggung dalam warna **Solar Golden Yellow (`#F5B010`)**.
+- **📐 Proportional Side Words (Strict Height Clamping):**
+  - Kata-kata vertikal di samping kiri dan kanan (seperti *"TURUN"* & *"DERAS"*) secara otomatis diskalakan lebih kecil dan **dibatasi agar tingginya tidak pernah melebihi tinggi kata tengah**, membingkai kata tengah dengan elegan dan rapi.
+- **✨ Clean & Uncluttered Styling (No Active Highlight Overrides):**
+  - Kata pendukung di atas, bawah, kiri, dan kanan **tetap bersih dalam warna Solid Black (pada tema terang) atau Solid White (pada tema gelap)** tanpa highlight warna kuning yang mengganggu saat aktif dinyanyikan.
 - **1-Click Theme Switch:** Toggle antara **Poster Gallery Light** (kanvas putih bersih seperti gambar referensi) dan **Obsidian Stage Dark** (hitam pekat bercahaya).
 
 ### 3. 🎯 Strict &le; 5 Words Pacing (Viral Reading Cadence)
