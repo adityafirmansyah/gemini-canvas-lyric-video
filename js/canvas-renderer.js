@@ -7,8 +7,8 @@
  * - 100% Canvas Compositing for 60FPS Video Export and PNG Thumbnail Snapshot
  */
 
-import { ThreeBackground } from './three-background.js?v=5.1';
-import { LrcParser } from './lrc-parser.js?v=5.1';
+import { ThreeBackground } from './three-background.js?v=5.2';
+import { LrcParser } from './lrc-parser.js?v=5.2';
 
 export class CanvasRenderer {
   constructor(canvas) {
@@ -32,7 +32,7 @@ export class CanvasRenderer {
     this.glowDensity = 1.0;
     this.maxWordsPerChunk = 4; // Strictly <= 5 words!
     this.motionStyle = 'poster-collage'; // 'poster-collage', 'hero-morph', 'liquid-spring', 'vocal-pop'
-    this.wordDisplayMode = 'solo-one-by-one'; // 'solo-one-by-one', 'progressive-build', 'full-collage'
+    this.wordDisplayMode = 'progressive-poster'; // 'progressive-poster', 'solo-flash', 'static-all'
     this.canvasTheme = 'poster-light'; // 'poster-light' (white background like image) or 'dark-studio'
     this.heroScale = 2.2;
     this.allowVerticalRotation = true;
@@ -253,7 +253,7 @@ export class CanvasRenderer {
     ctx.save();
     ctx.globalAlpha = alpha;
 
-    const isSolo = (this.wordDisplayMode === 'solo-one-by-one');
+    const isSolo = (this.wordDisplayMode === 'solo-flash');
     const useCollage = (this.motionStyle === 'poster-collage' || this.motionStyle === 'hero-morph');
 
     if (isSolo) {
@@ -583,18 +583,46 @@ export class CanvasRenderer {
       slots[idx] = { role, x, y, angle, fontSize: sz };
     }
 
-    // 6. Draw each word in its collage slot
+    // Precalculate word start and end times
+    const wordStartTimes = [];
+    const wordEndTimes = [];
+    if (hasWordTimestamps) {
+      for (let j = 0; j < totalWords; j++) {
+        wordStartTimes.push(chunkWords[j].start);
+        wordEndTimes.push(chunkWords[j].end);
+      }
+    } else {
+      const wordWeights = words.map(w => Math.max(1, w.length));
+      const totalWeight = wordWeights.reduce((a, b) => a + b, 0) || 1;
+      let elapsedWeight = 0;
+      for (let j = 0; j < totalWords; j++) {
+        const wStart = chunkStart + chunkDuration * (elapsedWeight / totalWeight);
+        const wEnd = wStart + chunkDuration * (wordWeights[j] / totalWeight);
+        wordStartTimes.push(wStart);
+        wordEndTimes.push(wEnd);
+        elapsedWeight += wordWeights[j];
+      }
+    }
+
+    // 6. Draw each word in its collage slot (Progressive reveal: words appear ONE BY ONE as sung!)
     for (let i = 0; i < totalWords; i++) {
+      const wStart = wordStartTimes[i];
+      const wEnd = wordEndTimes[i];
+
+      // Key: If word has not started yet, do not draw it! (Only revealed one by one following timing)
+      if (this.wordDisplayMode === 'progressive-poster' && !isPausedAtStart && currentTime < wStart) {
+        continue;
+      }
+
       const wordText = words[i];
       const slot = slots[i];
-      const isActive = (i === activeWordIdx);
-      const isPast = hasWordTimestamps ? (currentTime > chunkWords[i].end) : (i < activeWordIdx);
+      const isActive = (currentTime >= wStart && currentTime <= wEnd);
+      const isPast = (currentTime > wEnd);
 
-      // Staggered liquid entrance animation
-      const STAGGER = 0.08;
-      const wordInTime = Math.max(0, inTime - i * STAGGER);
-      const enterDur = 0.38;
-      const p = Math.min(1, wordInTime / enterDur);
+      // Staggered liquid entrance animation calculated from when THIS word starts!
+      const wordInTime = isPausedAtStart ? 1.0 : Math.max(0, currentTime - wStart);
+      const enterDur = 0.26;
+      const p = Math.min(1.0, wordInTime / enterDur);
 
       let enterScale = 1.0;
       let enterY = 0;
@@ -603,7 +631,7 @@ export class CanvasRenderer {
       if (p < 1.0) {
         const bounce = Math.sin(p * Math.PI) * 0.16;
         enterScale = 0.75 + (p * 0.25) + bounce;
-        enterY = (1.0 - p) * 22;
+        enterY = (1.0 - p) * 18;
         enterAlpha = p;
       }
 
@@ -618,25 +646,24 @@ export class CanvasRenderer {
       let shadowColor = 'transparent';
 
       if (slot.role === 'hero') {
-        // Hero word is ALWAYS prominent!
+        // Hero word is prominent in Solar Yellow!
+        color = this.accentColor;
         if (isActive) {
-          finalScale *= (1.1 + beatPulse * 0.14);
-          color = this.accentColor; // Vivid Golden Yellow (#F5B010)
+          finalScale *= (1.12 + beatPulse * 0.14);
           shadowBlur = isLight ? 10 : 24;
           shadowColor = isLight ? 'rgba(245, 176, 16, 0.45)' : this.accentColor;
         } else {
-          color = this.accentColor; // Yellow hero even when resting (Like image)
           finalScale *= (1.0 + beatPulse * 0.05);
         }
       } else {
-        // Supporting words (Collage elements)
+        // Supporting words: Pop in Solar Yellow when sung, settle in Solid Black/White!
         if (isActive) {
           finalScale *= (1.18 + beatPulse * 0.12);
           color = this.accentColor; // Spotlight active word in yellow!
           shadowBlur = isLight ? 8 : 20;
           shadowColor = isLight ? 'rgba(245, 176, 16, 0.4)' : this.accentColor;
         } else {
-          // Solid crisp black (#111111) like reference image
+          // Settles into solid crisp black (#111111) like reference image
           color = isLight ? '#111111' : '#FFFFFF';
         }
       }
@@ -737,15 +764,44 @@ export class CanvasRenderer {
       }
     }
 
+    // Precalculate word start and end times
+    const wordStartTimes = [];
+    const wordEndTimes = [];
+    if (hasWordTimestamps) {
+      for (let j = 0; j < totalWords; j++) {
+        wordStartTimes.push(chunkWords[j].start);
+        wordEndTimes.push(chunkWords[j].end);
+      }
+    } else {
+      const wordWeights = words.map(w => Math.max(1, w.length));
+      const totalWeight = wordWeights.reduce((a, b) => a + b, 0) || 1;
+      let elapsedWeight = 0;
+      for (let j = 0; j < totalWords; j++) {
+        const wStart = chunkStart + chunkDuration * (elapsedWeight / totalWeight);
+        const wEnd = wStart + chunkDuration * (wordWeights[j] / totalWeight);
+        wordStartTimes.push(wStart);
+        wordEndTimes.push(wEnd);
+        elapsedWeight += wordWeights[j];
+      }
+    }
+
     for (let i = 0; i < totalWords; i++) {
       const m = wordMetrics[i];
+      const wStart = wordStartTimes[i];
+      const wEnd = wordEndTimes[i];
+
+      // Progressive reveal in line mode: word only appears once its sung timestamp arrives!
+      if (this.wordDisplayMode === 'progressive-poster' && !isPausedAtStart && currentTime < wStart) {
+        curX += m.width + spaceW;
+        continue;
+      }
+
       const wordCenterX = curX + m.width / 2;
 
-      // 1. Organic Staggered Liquid-Spring Entrance
-      const STAGGER = 0.08;
-      const wordInTime = Math.max(0, inTime - i * STAGGER);
-      const enterDur = 0.38;
-      const p = Math.min(1, wordInTime / enterDur);
+      // 1. Organic Staggered Liquid-Spring Entrance from when THIS word was sung!
+      const wordInTime = isPausedAtStart ? 1.0 : Math.max(0, currentTime - wStart);
+      const enterDur = 0.26;
+      const p = Math.min(1.0, wordInTime / enterDur);
 
       let enterScale = 1.0;
       let enterY = 0;
@@ -755,7 +811,7 @@ export class CanvasRenderer {
         // Liquid spring curve with overshoot bounce (Damping ~0.78)
         const bounce = Math.sin(p * Math.PI) * 0.16;
         enterScale = 0.8 + (p * 0.2) + bounce;
-        enterY = (1.0 - p) * 20;
+        enterY = (1.0 - p) * 18;
         enterAlpha = p;
       }
 

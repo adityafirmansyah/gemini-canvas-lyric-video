@@ -1,13 +1,13 @@
 /**
- * app.js (v5.1 Solo Word & Typographic Poster Edition)
+ * app.js (v5.2 Progressive Reveal & Poster Cloud Edition)
  * Main Controller coordinating Audio, Three.js 3D Background, Fluid Kinetic Lyrics, and Video Recording.
  */
 
-import { AudioManager } from './audio-player.js?v=5.1';
-import { AiService } from './ai-service.js?v=5.1';
-import { LrcParser } from './lrc-parser.js?v=5.1';
-import { CanvasRenderer } from './canvas-renderer.js?v=5.1';
-import { VideoRecorder } from './recorder.js?v=5.1';
+import { AudioManager } from './audio-player.js?v=5.2';
+import { AiService } from './ai-service.js?v=5.2';
+import { LrcParser } from './lrc-parser.js?v=5.2';
+import { CanvasRenderer } from './canvas-renderer.js?v=5.2';
+import { VideoRecorder } from './recorder.js?v=5.2';
 
 // Canvas & Audio
 const canvas = document.getElementById('lyric-canvas');
@@ -604,7 +604,7 @@ if (toggleUppercase) {
 }
 if (btnResetLyrics) {
   btnResetLyrics.addEventListener('click', () => {
-    if (wordDisplayModeSelect) wordDisplayModeSelect.value = 'solo-one-by-one';
+    if (wordDisplayModeSelect) wordDisplayModeSelect.value = 'progressive-poster';
     if (lyricMotionStyleSelect) lyricMotionStyleSelect.value = 'poster-collage';
     if (canvasThemeSelect) canvasThemeSelect.value = 'poster-light';
     if (fontFamilySelect) fontFamilySelect.value = "'Montserrat', sans-serif";
@@ -619,7 +619,7 @@ if (btnResetLyrics) {
     if (toggleVerticalRot) toggleVerticalRot.checked = true;
     if (toggleUppercase) toggleUppercase.checked = true;
 
-    renderer.wordDisplayMode = 'solo-one-by-one';
+    renderer.wordDisplayMode = 'progressive-poster';
     renderer.motionStyle = 'poster-collage';
     renderer.setTheme('poster-light');
     renderer.fontFamily = "'Montserrat', sans-serif";

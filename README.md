@@ -21,18 +21,15 @@ No static backgrounds or boring repetitive video loops. The environment is proce
 - **Audio-Reactive Physics:** Sub-bass kicks and rhythm frequencies physically ripple and elevate the 3D surface in real time.
 - **Customizable:** Wave Speed (0.2x–3.0x), Wave Height/Amplitude (10px–100px), Particle Colors, and Deep Space Base Colors.
 
-### 2. ✍️ Typographic Poster Engine (Single Word One-by-One & Poster Collage)
+### 2. ✍️ Typographic Poster Engine (Progressive Word-by-Word Build)
 Inspired by bold graphic poster typography and word-cloud branding (interlocking horizontal & vertical layouts):
-- **★ Solo Word One-by-One (Single Word Massive Focus — Default):**
-  - Displays exactly **ONE single word at a time** on screen as it is sung!
-  - Eliminates visual clutter and monotony: each word lands with a massive poster impact (160–240px font size).
-  - Dynamically alternates between **Solar Golden Yellow (`#F5B010`)** and **Solid Black (`#121212`)**.
-  - Words dynamically tilt horizontally or vertically (&plusmn;90&deg;) from word to word to keep the eye engaged.
-- **Hero Centerpiece Word & Word-Cloud:**
-  - Option to switch to *Typographic Poster Cloud* or *Progressive Poster Build* (words drop in one-by-one).
-- **Vocal Spotlight Transitions:** As each word hits its timestamp, it arrives with a punchy elastic spring bounce.
-- **Organic Liquid Undulation:** Subtle phase-shifted sine-wave floating breathes natural motion into every word.
-- **1-Click Theme Switch:** Toggle between **Poster Gallery Light** (clean white canvas like the reference image) and **Obsidian Stage Dark** (deep black with glowing gold & white).
+- **★ Progressive Word-by-Word Reveal (Default):**
+  - Kata-kata **TIDAK langsung muncul sekaligus satu kalimat penuh**, melainkan **muncul satu per satu mengikuti timestamp vokal penyanyi** (misal: detik pertama hanya muncul *"Membasu"*, detik berikutnya masuk *"peri"*, lalu *"di"*, lalu *"hatimu"*).
+  - Setiap kata yang baru masuk tiba dengan *elastic spring bounce* & sorotan warna **Solar Golden Yellow (`#F5B010`)**.
+  - Kata-kata yang sudah dinyanyikan **tetap berada di layar** mengunci dalam warna **Solid Black (`#121212`)**.
+  - Di akhir kalimat, seluruh kata telah berkumpul lengkap membentuk poster utuh (*"Membasu peri di hatimu"*) sebelum berpindah bersih ke kalimat berikutnya!
+- **★ Solo Single-Word Flash:** Opsi untuk hanya menampilkan 1 kata tunggal saja bergantian di panggung.
+- **1-Click Theme Switch:** Toggle antara **Poster Gallery Light** (kanvas putih bersih seperti gambar referensi) dan **Obsidian Stage Dark** (hitam pekat bercahaya).
 
 ### 3. 🎯 Strict &le; 5 Words Pacing (Viral Reading Cadence)
 - Wall-of-text lyrics kill viewer retention.
