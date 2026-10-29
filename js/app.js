@@ -3,11 +3,11 @@
  * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
  */
 
-import { AudioManager } from './audio-player.js?v=3.4';
-import { AiService } from './ai-service.js?v=3.4';
-import { LrcParser } from './lrc-parser.js?v=3.4';
-import { CanvasRenderer } from './canvas-renderer.js?v=3.4';
-import { VideoRecorder } from './recorder.js?v=3.4';
+import { AudioManager } from './audio-player.js?v=3.5';
+import { AiService } from './ai-service.js?v=3.5';
+import { LrcParser } from './lrc-parser.js?v=3.5';
+import { CanvasRenderer } from './canvas-renderer.js?v=3.5';
+import { VideoRecorder } from './recorder.js?v=3.5';
 
 // DOM Elements
 const canvas = document.getElementById('lyric-canvas');
@@ -451,138 +451,235 @@ btnSampleLyrics.addEventListener('click', () => {
   parseAndApplyLyrics();
 });
 
-// 7. Visual Style Controls & Presets
+// 7. Visual Style Controls & Presets (Official HyperFrames Frame.md Tokens)
 const presets = {
-  lofi: {
-    font: "'Outfit', sans-serif",
-    fontSize: 52,
-    textColor: '#ffffff',
-    accentColor: '#93c5fd',
-    glowSize: 22,
-    glowDensity: 1.0,
-    overlayType: 'particles',
-    animType: 'smooth-slide'
-  },
-  cyberpunk: {
-    font: "'Space Grotesk', sans-serif",
-    fontSize: 56,
-    textColor: '#ffffff',
-    accentColor: '#ff007f',
-    glowSize: 38,
-    glowDensity: 1.5,
-    overlayType: 'waveform',
-    animType: 'cyber-glitch'
-  },
-  synthwave: {
-    font: "'Montserrat', sans-serif",
+  'biennale-yellow': {
+    font: "'Instrument Serif', serif",
     fontSize: 54,
-    textColor: '#ffffff',
-    accentColor: '#ffbe0b',
-    glowSize: 32,
-    glowDensity: 1.3,
-    overlayType: 'synthwave-grid',
-    animType: 'pop-bounce'
-  },
-  rainy: {
-    font: "'Playfair Display', serif",
-    fontSize: 50,
-    textColor: '#e2e8f0',
-    accentColor: '#38bdf8',
-    glowSize: 20,
-    glowDensity: 0.9,
-    overlayType: 'rain',
-    animType: 'floating-wave'
-  },
-  minimal: {
-    font: "'Cinzel', serif",
-    fontSize: 48,
-    textColor: '#f8fafc',
-    accentColor: '#ffffff',
+    textColor: '#1B2566', // deep indigo ink
+    accentColor: '#F1EE2E', // solar yellow
     glowSize: 0,
     glowDensity: 0,
     overlayType: 'none',
-    animType: 'smooth-slide'
+    animType: 'smooth-slide',
+    subtitleStyle: 'none',
+    bgAnimType: 'ken-burns',
+    bgSpeed: 0.8
   },
-  karaoke: {
-    font: "'Outfit', sans-serif",
-    fontSize: 58,
-    textColor: '#ffffff',
-    accentColor: '#22d3ee',
-    glowSize: 25,
-    glowDensity: 1.0,
+  'blockframe': {
+    font: "'Inter', sans-serif",
+    fontSize: 50,
+    textColor: '#000000',
+    accentColor: '#FE90E8',
+    glowSize: 0,
+    glowDensity: 0,
     overlayType: 'none',
-    animType: 'karaoke-fill'
+    animType: 'pop-bounce',
+    subtitleStyle: 'word-badges',
+    subBoxColor: '#FE90E8',
+    subTextColor: '#000000',
+    subRadius: 0,
+    subPadding: 16,
+    subUppercase: true,
+    bgAnimType: 'beat-only'
   },
-  phonk: {
+  'blue-professional': {
     font: "'Space Grotesk', sans-serif",
-    fontSize: 58,
-    textColor: '#ffffff',
-    accentColor: '#ef4444',
-    glowSize: 42,
-    glowDensity: 1.6,
-    overlayType: 'waveform',
-    animType: 'pop-bounce'
-  },
-  sakura: {
-    font: "'Outfit', sans-serif",
-    fontSize: 52,
-    textColor: '#fff1f2',
-    accentColor: '#f472b6',
-    glowSize: 24,
-    glowDensity: 1.0,
-    overlayType: 'particles',
-    animType: 'floating-wave'
-  },
-  academia: {
-    font: "'Cinzel', serif",
-    fontSize: 48,
-    textColor: '#fef3c7',
-    accentColor: '#d97706',
-    glowSize: 12,
+    fontSize: 50,
+    textColor: '#111111',
+    accentColor: '#1E2BFA',
+    glowSize: 14,
     glowDensity: 0.6,
     overlayType: 'none',
-    animType: 'typewriter'
+    animType: 'smooth-slide',
+    subtitleStyle: 'boxed-banner',
+    subBoxColor: 'rgba(30, 43, 250, 0.12)',
+    subTextColor: '#1E2BFA',
+    subRadius: 12,
+    subPadding: 16,
+    subUppercase: false,
+    bgAnimType: 'ken-burns'
   },
-  cosmic: {
-    font: "'Space Grotesk', sans-serif",
+  'bold-poster': {
+    font: "'Shrikhand', cursive",
     fontSize: 52,
-    textColor: '#f8fafc',
-    accentColor: '#c084fc',
-    glowSize: 35,
-    glowDensity: 1.3,
-    overlayType: 'starfield',
-    animType: 'floating-wave'
+    textColor: '#1C1410',
+    accentColor: '#D8000F',
+    glowSize: 0,
+    glowDensity: 0,
+    overlayType: 'none',
+    animType: 'word-stack',
+    subtitleStyle: 'boxed-banner',
+    subBoxColor: '#D8000F',
+    subTextColor: '#FFFFFF',
+    subRadius: 2,
+    subPadding: 14,
+    subUppercase: true,
+    bgAnimType: 'zoom-in'
   },
-  retro: {
-    font: "'Courier Prime', monospace",
-    fontSize: 46,
-    textColor: '#fef08a',
-    accentColor: '#f97316',
-    glowSize: 10,
+  'broadside': {
+    font: "'Barlow', sans-serif",
+    fontSize: 58,
+    textColor: '#F0ECE5',
+    accentColor: '#E85D26',
+    glowSize: 0,
+    glowDensity: 0,
+    overlayType: 'none',
+    animType: 'word-stack',
+    subtitleStyle: 'alternating-badge',
+    subBoxColor: '#E85D26',
+    subTextColor: '#111111',
+    subRadius: 0,
+    subPadding: 16,
+    subUppercase: false,
+    bgAnimType: 'zoom-in'
+  },
+  'capsule': {
+    font: "'Bodoni Moda', serif",
+    fontSize: 50,
+    textColor: '#1A1A1A',
+    accentColor: '#E85D4E',
+    glowSize: 12,
     glowDensity: 0.5,
     overlayType: 'particles',
-    animType: 'typewriter'
+    particleColor: '#E85D4E',
+    animType: 'floating-wave',
+    subtitleStyle: 'word-badges',
+    subBoxColor: '#E85D4E',
+    subTextColor: '#FFFFFF',
+    subRadius: 24, // pill geometry
+    subPadding: 18,
+    subUppercase: false,
+    bgAnimType: 'sway'
   },
-  acid: {
-    font: "'Montserrat', sans-serif",
-    fontSize: 56,
-    textColor: '#ffffff',
-    accentColor: '#84cc16',
-    glowSize: 40,
-    glowDensity: 1.5,
+  'cartesian': {
+    font: "'Playfair Display', serif",
+    fontSize: 48,
+    textColor: '#1A1A1A',
+    accentColor: '#8A8178',
+    glowSize: 0,
+    glowDensity: 0,
+    overlayType: 'none',
+    animType: 'smooth-slide',
+    subtitleStyle: 'none',
+    bgAnimType: 'ken-burns',
+    bgSpeed: 0.7
+  },
+  'cobalt-grid': {
+    font: "'Newsreader', serif",
+    fontSize: 52,
+    textColor: '#1F2BE0',
+    accentColor: '#5560E5',
+    glowSize: 10,
+    glowDensity: 0.6,
     overlayType: 'waveform',
-    animType: 'cyber-glitch'
+    particleColor: '#1F2BE0',
+    animType: 'typewriter',
+    subtitleStyle: 'outline-only',
+    bgAnimType: 'pan-horizontal'
   },
-  highway: {
+  'code-editorial': {
+    font: "'EB Garamond', serif",
+    fontSize: 52,
+    textColor: '#FAF9F5',
+    accentColor: '#CC785C',
+    glowSize: 12,
+    glowDensity: 0.5,
+    overlayType: 'none',
+    animType: 'typewriter',
+    subtitleStyle: 'boxed-banner',
+    subBoxColor: '#252320',
+    subTextColor: '#FAF9F5',
+    subRadius: 4,
+    subPadding: 14,
+    subUppercase: false,
+    bgAnimType: 'static'
+  },
+  'coral': {
+    font: "'Bebas Neue', sans-serif",
+    fontSize: 64,
+    textColor: '#FFFFFF',
+    accentColor: '#E85D5D',
+    glowSize: 0,
+    glowDensity: 0,
+    overlayType: 'none',
+    animType: 'word-stack',
+    subtitleStyle: 'boxed-banner',
+    subBoxColor: '#E85D5D',
+    subTextColor: '#FFFFFF',
+    subRadius: 0,
+    subPadding: 16,
+    subUppercase: true,
+    bgAnimType: 'zoom-in'
+  },
+  'creative-mode': {
+    font: "'Archivo Black', sans-serif",
+    fontSize: 48,
+    textColor: '#0F0F0F',
+    accentColor: '#1F8A4C',
+    glowSize: 0,
+    glowDensity: 0,
+    overlayType: 'none',
+    animType: 'pop-bounce',
+    subtitleStyle: 'word-badges',
+    subBoxColor: '#1F8A4C',
+    subTextColor: '#FFFFFF',
+    subRadius: 0,
+    subPadding: 14,
+    subUppercase: true,
+    bgAnimType: 'beat-only'
+  },
+  'daisy-days': {
+    font: "'Fredoka', sans-serif",
+    fontSize: 52,
+    textColor: '#2D2D2D',
+    accentColor: '#7ECDC0',
+    glowSize: 0,
+    glowDensity: 0,
+    overlayType: 'particles',
+    particleColor: '#FDE68A',
+    animType: 'pop-bounce',
+    subtitleStyle: 'word-badges',
+    subBoxColor: '#7ECDC0',
+    subTextColor: '#2D2D2D',
+    subRadius: 16,
+    subPadding: 14,
+    subUppercase: false,
+    bgAnimType: 'sway'
+  },
+  'editorial-forest': {
+    font: "'Source Serif 4', serif",
+    fontSize: 52,
+    textColor: '#EFE7D4',
+    accentColor: '#E89CB1',
+    glowSize: 12,
+    glowDensity: 0.6,
+    overlayType: 'particles',
+    particleColor: '#E89CB1',
+    animType: 'floating-wave',
+    subtitleStyle: 'boxed-banner',
+    subBoxColor: '#2E4A2A',
+    subTextColor: '#EFE7D4',
+    subRadius: 6,
+    subPadding: 14,
+    subUppercase: false,
+    bgAnimType: 'ken-burns'
+  },
+  'highway': {
     font: "'Bebas Neue', sans-serif",
     fontSize: 68,
-    textColor: '#ffffff',
-    accentColor: '#facc15',
+    textColor: '#FFFFFF',
+    accentColor: '#FACC15',
     glowSize: 10,
     glowDensity: 0.4,
     overlayType: 'none',
     animType: 'word-stack',
     subtitleStyle: 'highway-3d',
+    subBoxColor: '#0A0C10',
+    subTextColor: '#FFFFFF',
+    subRadius: 4,
+    subPadding: 14,
+    subUppercase: true,
     bgAnimType: 'zoom-in',
     bgSpeed: 1.2,
     bgIntensity: 1.2,
@@ -595,8 +692,10 @@ presetCards.forEach(card => {
     presetCards.forEach(c => c.classList.remove('active'));
     card.classList.add('active');
 
-    const p = presets[card.getAttribute('data-preset')];
+    const presetKey = card.getAttribute('data-preset');
+    const p = presets[presetKey];
     if (p) {
+      renderer.groundTheme = presetKey;
       renderer.fontFamily = p.font;
       renderer.baseFontSize = p.fontSize;
       renderer.textColor = p.textColor;
@@ -629,8 +728,29 @@ presetCards.forEach(card => {
       animTypeSelect.value = p.animType;
 
       if (p.subtitleStyle !== undefined) {
-        renderer.setSubtitleConfig({ style: p.subtitleStyle });
+        const subConf = {
+          style: p.subtitleStyle,
+          boxColor: p.subBoxColor || '#c9fa53',
+          boxTextColor: p.subTextColor || '#000000',
+          boxRadius: p.subRadius !== undefined ? p.subRadius : 4,
+          boxPadding: p.subPadding !== undefined ? p.subPadding : 14,
+          uppercase: p.subUppercase !== undefined ? p.subUppercase : true
+        };
+        renderer.setSubtitleConfig(subConf);
+
         if (subStyleSelect) subStyleSelect.value = p.subtitleStyle;
+        if (subBoxColorInput && p.subBoxColor) subBoxColorInput.value = p.subBoxColor.startsWith('#') ? p.subBoxColor : '#c9fa53';
+        if (subTextColorInput && p.subTextColor) subTextColorInput.value = p.subTextColor.startsWith('#') ? p.subTextColor : '#000000';
+        if (subCornerRadiusInput && p.subRadius !== undefined) {
+          subCornerRadiusInput.value = p.subRadius;
+          if (subCornerRadiusVal) subCornerRadiusVal.textContent = `${p.subRadius}px`;
+        }
+        if (subPaddingInput && p.subPadding !== undefined) {
+          subPaddingInput.value = p.subPadding;
+          if (subPaddingVal) subPaddingVal.textContent = `${p.subPadding}px`;
+        }
+        if (subUppercaseInput && p.subUppercase !== undefined) subUppercaseInput.checked = p.subUppercase;
+
         if (subSettingsPanel) {
           subSettingsPanel.classList.toggle('hidden', p.subtitleStyle === 'none' || p.subtitleStyle === 'highway-3d');
         }

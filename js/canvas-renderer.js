@@ -63,6 +63,7 @@ export class CanvasRenderer {
     this.autoFitFont = true;        // Auto-shrink font so wrapped lines never overflow hero zone
     this.showSafeGuides = false;    // Preview-only YouTube / Shorts UI safe-area overlay
     this.fgCutoutImage = null;      // Foreground subject layer (Text Behind Subject depth layering)
+    this.groundTheme = 'biennale-yellow'; // HyperFrames Frame.md ground preset
     this._fitCache = new Map();     // Fit scale cache keyed by font|ratio|width|text
 
     // Visual elements state
@@ -457,18 +458,202 @@ export class CanvasRenderer {
       return;
     }
 
-    // Default when no custom image: Deep breathing radial gradient
+    // Default when no custom media: Render HyperFrames official Frame.md ground layers
     ctx.save();
     ctx.translate(panX * 0.4, panY * 0.4);
-    const grad = ctx.createRadialGradient(
-      W * 0.5, H * 0.5, 50,
-      W * 0.5, H * 0.5, Math.max(W, H) * (0.8 * scale + beatEffect * 2.5)
-    );
-    grad.addColorStop(0, '#151928');
-    grad.addColorStop(0.5, '#0b0d18');
-    grad.addColorStop(1, '#05060a');
-    ctx.fillStyle = grad;
-    ctx.fillRect(-W * 0.1, -H * 0.1, W * 1.2, H * 1.2);
+
+    const theme = this.groundTheme || 'biennale-yellow';
+
+    if (theme === 'biennale-yellow') {
+      // Warm parchment ground (#E9E5DB)
+      ctx.fillStyle = '#E9E5DB';
+      ctx.fillRect(0, 0, W, H);
+
+      // Signature Solar Yellow Sun Bloom (42-70% of frame)
+      const sunX = W * 0.48 + panX * 0.3;
+      const sunY = H * 0.45 + panY * 0.3;
+      const sunR = Math.min(W, H) * (0.42 * scale + beatEffect * 1.5);
+      const sunBloom = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunR);
+      sunBloom.addColorStop(0, 'rgba(241, 238, 46, 0.82)'); // #F1EE2E
+      sunBloom.addColorStop(0.35, 'rgba(248, 243, 155, 0.55)');
+      sunBloom.addColorStop(0.7, 'rgba(240, 218, 124, 0.22)');
+      sunBloom.addColorStop(1, 'rgba(233, 229, 219, 0)');
+      ctx.fillStyle = sunBloom;
+      ctx.fillRect(0, 0, W, H);
+
+      // Subordinate Ember counter-bloom in opposite corner
+      const embBloom = ctx.createRadialGradient(W * 0.88, H * 0.82, 0, W * 0.88, H * 0.82, Math.min(W, H) * 0.35);
+      embBloom.addColorStop(0, 'rgba(226, 107, 74, 0.18)'); // #E26B4A
+      embBloom.addColorStop(1, 'rgba(233, 229, 219, 0)');
+      ctx.fillStyle = embBloom;
+      ctx.fillRect(0, 0, W, H);
+
+      // 1px Hairline structural margins
+      ctx.strokeStyle = 'rgba(27, 37, 102, 0.18)';
+      ctx.lineWidth = 1;
+      const m = W * 0.04;
+      ctx.strokeRect(m, m, W - m * 2, H - m * 2);
+
+    } else if (theme === 'blockframe') {
+      // Crisp off-white ground (#FFFDF5)
+      ctx.fillStyle = '#FFFDF5';
+      ctx.fillRect(0, 0, W, H);
+
+      // 4px Black border
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(20, 20, W - 40, H - 40);
+
+      // Accent pastel block tile
+      ctx.fillStyle = 'rgba(254, 144, 232, 0.18)';
+      ctx.fillRect(W * 0.65, 40, W * 0.3, H * 0.45);
+
+    } else if (theme === 'blue-professional') {
+      // Warm cream canvas (#FDFCEB) + cobalt accent
+      ctx.fillStyle = '#FDFCEB';
+      ctx.fillRect(0, 0, W, H);
+
+      const grad = ctx.createRadialGradient(W * 0.5, H * 0.5, 50, W * 0.5, H * 0.5, Math.max(W, H) * 0.65);
+      grad.addColorStop(0, 'rgba(30, 43, 250, 0.08)');
+      grad.addColorStop(1, 'rgba(253, 252, 235, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.strokeStyle = 'rgba(30, 43, 250, 0.18)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(30, 30, W - 60, H - 60);
+
+    } else if (theme === 'bold-poster') {
+      // Stark white (#FFFFFF) with tomato red poster double border
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.strokeStyle = '#D8000F';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(24, 24, W - 48, H - 48);
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(32, 32, W - 64, H - 64);
+
+    } else if (theme === 'broadside') {
+      // Ink-black ground (#111111) with fire-orange plane (#E85D26)
+      ctx.fillStyle = '#111111';
+      ctx.fillRect(0, 0, W, H);
+
+      const fireBloom = ctx.createRadialGradient(W * 0.3, H * 0.7, 0, W * 0.3, H * 0.7, Math.max(W, H) * 0.55);
+      fireBloom.addColorStop(0, 'rgba(232, 93, 38, 0.28)');
+      fireBloom.addColorStop(1, 'rgba(17, 17, 17, 0)');
+      ctx.fillStyle = fireBloom;
+      ctx.fillRect(0, 0, W, H);
+
+    } else if (theme === 'capsule') {
+      // Sun-bleached cream (#F5F5F0) with candy coral glow
+      ctx.fillStyle = '#F5F5F0';
+      ctx.fillRect(0, 0, W, H);
+
+      const cBloom = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, Math.min(W, H) * 0.5);
+      cBloom.addColorStop(0, 'rgba(232, 93, 78, 0.15)');
+      cBloom.addColorStop(0.5, 'rgba(197, 181, 224, 0.12)');
+      cBloom.addColorStop(1, 'rgba(245, 245, 240, 0)');
+      ctx.fillStyle = cBloom;
+      ctx.fillRect(0, 0, W, H);
+
+    } else if (theme === 'cartesian') {
+      // Warm stone (#EDE8E0) with 1px taupe hairline grid
+      ctx.fillStyle = '#EDE8E0';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.strokeStyle = 'rgba(138, 129, 120, 0.2)';
+      ctx.lineWidth = 1;
+      const step = 80;
+      for (let x = 0; x < W; x += step) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      }
+      for (let y = 0; y < H; y += step) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      }
+
+    } else if (theme === 'cobalt-grid') {
+      // Cream paper (#F0EBDE) with risograph cobalt grid (#1F2BE0)
+      ctx.fillStyle = '#F0EBDE';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.strokeStyle = 'rgba(31, 43, 224, 0.14)';
+      ctx.lineWidth = 1;
+      const rStep = 45;
+      for (let x = 0; x < W; x += rStep) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      }
+      for (let y = 0; y < H; y += rStep) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      }
+
+    } else if (theme === 'code-editorial') {
+      // Deep warm-navy surface (#181715)
+      ctx.fillStyle = '#181715';
+      ctx.fillRect(0, 0, W, H);
+
+      const coralGrad = ctx.createRadialGradient(W * 0.7, H * 0.3, 0, W * 0.7, H * 0.3, Math.min(W, H) * 0.6);
+      coralGrad.addColorStop(0, 'rgba(204, 120, 92, 0.22)');
+      coralGrad.addColorStop(1, 'rgba(24, 23, 21, 0)');
+      ctx.fillStyle = coralGrad;
+      ctx.fillRect(0, 0, W, H);
+
+    } else if (theme === 'coral') {
+      // Bold coral magazine (#E85D5D) with ink black split
+      ctx.fillStyle = '#E85D5D';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.fillStyle = '#1A1A1A';
+      ctx.beginPath();
+      ctx.moveTo(W * 0.62, 0);
+      ctx.lineTo(W, 0);
+      ctx.lineTo(W, H);
+      ctx.lineTo(W * 0.48, H);
+      ctx.closePath();
+      ctx.fill();
+
+    } else if (theme === 'creative-mode') {
+      // Warm cream (#EFE9D9) with 4px ink borders
+      ctx.fillStyle = '#EFE9D9';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.strokeStyle = '#0F0F0F';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(25, 25, W - 50, H - 50);
+
+    } else if (theme === 'daisy-days') {
+      // Sunny pastel garden (#F5F0E6)
+      const dGrad = ctx.createLinearGradient(0, 0, W, H);
+      dGrad.addColorStop(0, '#F5F0E6');
+      dGrad.addColorStop(0.5, '#FDE68A');
+      dGrad.addColorStop(1, '#A8E6CF');
+      ctx.fillStyle = dGrad;
+      ctx.fillRect(0, 0, W, H);
+
+    } else if (theme === 'editorial-forest') {
+      // Deep botanical forest green (#2E4A2A) with blush pink atmosphere
+      ctx.fillStyle = '#243A21';
+      ctx.fillRect(0, 0, W, H);
+
+      const fBloom = ctx.createRadialGradient(W * 0.5, H * 0.5, 50, W * 0.5, H * 0.5, Math.max(W, H) * 0.65);
+      fBloom.addColorStop(0, 'rgba(232, 156, 177, 0.18)');
+      fBloom.addColorStop(1, 'rgba(36, 58, 33, 0)');
+      ctx.fillStyle = fBloom;
+      ctx.fillRect(0, 0, W, H);
+
+    } else {
+      // Highway POV / Default deep breathing asphalt gradient
+      const grad = ctx.createRadialGradient(
+        W * 0.5, H * 0.5, 50,
+        W * 0.5, H * 0.5, Math.max(W, H) * (0.8 * scale + beatEffect * 2.5)
+      );
+      grad.addColorStop(0, '#151928');
+      grad.addColorStop(0.5, '#0b0d18');
+      grad.addColorStop(1, '#05060a');
+      ctx.fillStyle = grad;
+      ctx.fillRect(-W * 0.1, -H * 0.1, W * 1.2, H * 1.2);
+    }
+
     ctx.restore();
   }
 

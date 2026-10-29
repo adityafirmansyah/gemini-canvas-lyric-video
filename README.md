@@ -44,20 +44,21 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
   - **Custom Particle Image Upload:** Upload transparent PNG graphics (sakura petals, snowflakes, leaves, cash notes, sparks) with automatic realistic tumbling rotation and beat bounce.
   - **Color Picker & 1-Click Reset:** Custom particle color tinting and instant reset to defaults.
   - **None (Clean):** Display pristine artwork with zero overlay.
-- **✨ 12 Curated Aesthetic Presets (1-Click Styling):**
-  - **Lofi Chill:** Lavender & soft blue particles with clean slide typography.
-  - **Cyberpunk:** Neon magenta/cyan chromatic glitch and frequency visualizer.
-  - **Synthwave:** Sunset orange/magenta glow, rolling 3D wireframe grid, and beat pop.
-  - **Rainy Dream:** Atmospheric moody rain window with floating wave text.
-  - **Minimal Dark:** Luxury serif typography on deep monochrome backdrop.
-  - **Karaoke Glow:** Electric cyan progressive wipe fill on high-contrast stage.
-  - **Phonk Drift:** Blood crimson aura, aggressive beat bounce, and high-energy punch.
-  - **Sakura Pastel:** Japanese lofi aesthetic with cherry blossom blush & floating wave text.
-  - **Dark Academia:** Warm candlelit amber, espresso background, and retro typewriter reveal.
-  - **Cosmic Space:** Starfield hyperspace warp with electric violet aura.
-  - **Vintage Soul:** 70s warm terracotta & gold tones with Courier typewriter typography.
-  - **Acid Rave:** High-voltage neon lime green with reactive equalizer bars and cyber glitch.
-  - **Highway POV (Viral Road Track):** Tall ultra-bold Bebas Neue typography, progressive word-by-word cumulative stacking, deep asphalt drop shadow, 3D vanishing perspective tilt, and subtle road vibration.
+- **🎨 14 Curated HyperFrames Design Presets (Official Frame.md Tokens):**
+  - **Biennale Yellow:** Art-biennale museum catalogue: warm parchment ground (`#E9E5DB`), deep indigo ink (`#1B2566`), solar yellow sun-bloom (`#F1EE2E`), Instrument Serif display, 1px hairlines.
+  - **BlockFrame:** Loud neobrutalist: 4px black borders, hard offset shadows, candy pastels (`#FE90E8`), Inter 900 caps, spring pop bounce.
+  - **Blue Professional:** Consulting restraint: warm cream canvas (`#FDFCEB`), single saturated cobalt accent (`#1E2BFA`), Space Grotesk, soft tinted cards.
+  - **Bold Poster:** Vintage editorial poster: stark white ground, brown-black ink (`#1C1410`), tomato red (`#D8000F`), Shrikhand tilted display, double borders.
+  - **Broadside:** Protest poster: ink-black (`#111111`) & fire-orange planes (`#E85D26`), giant lowercase Barlow 900, dual-tone badges.
+  - **Capsule:** Friendly editorial: sun-bleached cream canvas (`#F5F5F0`), candy coral (`#E85D4E`), pill geometry (`boxRadius: 24px`), Bodoni Moda.
+  - **Cartesian:** Quiet mathematical catalogue: warm-stone palette (`#EDE8E0`), taupe hairline grid, Playfair Display 400.
+  - **Cobalt Grid:** Two-colour risograph: cream paper (`#F0EBDE`), cobalt ink (`#1F2BE0`), permanent graph grid, Newsreader serif.
+  - **Code Editorial:** Developer brand book: deep warm-navy surface (`#181715`), terracotta coral voltage (`#CC785C`), EB Garamond display.
+  - **Coral Magazine:** Bold magazine: coral fire (`#E85D5D`), ink black (`#1A1A1A`) hard color split, Bebas Neue tracked uppercase.
+  - **Creative Mode:** Sparse neobrutalist: warm cream (`#EFE9D9`), 4px ink borders, Archivo Black caps, emerald green accent (`#1F8A4C`).
+  - **Daisy Days:** Sunny picture book: garden pastels (`#7ECDC0`), charcoal outlines (`#2D2D2D`), Fredoka One playful bounce.
+  - **Editorial Forest:** Literary botanical: deep forest green (`#2E4A2A`), blush pink (`#E89CB1`), warm cream, Source Serif 4 display.
+  - **Highway POV:** Viral road POV: Bebas Neue, progressive word stacking, deep asphalt drop shadow, 3D vanishing tilt, road shake.
 - **🧠 HyperFrames Layout Engine & Motion Craft:**
   - **Dynamic Auto-Fit Font Size (`fitTextFontSize`):** Dynamically scales candidate font sizes so lines always claim 60%–90% of the screen width with zero clipping, even on extreme multi-word lyrics or 9:16 portrait viewports.
   - **9:16 Shorts / Reels Safe Area Guides:** Non-destructive preview overlay with 14.3% side margins, YouTube Shorts / TikTok UI danger zones, and title-safe hero bands. Automatically hides during video export.

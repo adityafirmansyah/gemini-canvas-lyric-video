@@ -6,8 +6,8 @@
   <title>AI Lyric Canvas Studio (Multi-AI & LRC)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@700;900&family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,600;1,600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=3.4">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,700;0,900;1,700&family=Bebas+Neue&family=Bodoni+Moda:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Fredoka:wght@400;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Newsreader:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,600;1,600&family=Shrikhand&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=3.5">
 </head>
 <body>
   <div class="app-container">
@@ -160,87 +160,92 @@
         <!-- Tab 2: Visual Style -->
         <div class="tab-content" id="tab-style">
           <section class="card">
-            <h3>🎨 Aesthetic Presets</h3>
+            <div class="section-header">
+              <h3>🎨 HyperFrames Design Presets</h3>
+              <span class="helper-text">Official Frame.md Tokens</span>
+            </div>
             <div class="preset-grid">
-              <button class="preset-card active" data-preset="lofi">
-                <div class="preset-preview lofi-bg">
-                  <div class="thumb-fx lofi-fx"></div>
-                  <span class="thumb-tag font-outfit">LO-FI</span>
+              <button class="preset-card active" data-preset="biennale-yellow">
+                <div class="preset-preview biennale-bg">
+                  <div class="thumb-fx biennale-bloom"></div>
+                  <span class="thumb-tag font-instrument">BIENNALE</span>
                 </div>
-                <span>Lofi Chill</span>
+                <span>Biennale Yellow</span>
               </button>
-              <button class="preset-card" data-preset="cyberpunk">
-                <div class="preset-preview cyberpunk-bg">
-                  <div class="thumb-fx cyber-fx"></div>
-                  <span class="thumb-tag font-space cyber-glow">CYBER</span>
+              <button class="preset-card" data-preset="blockframe">
+                <div class="preset-preview blockframe-bg">
+                  <div class="thumb-fx blockframe-fx"></div>
+                  <span class="thumb-tag font-inter blockframe-text">BLOCK</span>
                 </div>
-                <span>Cyberpunk</span>
+                <span>BlockFrame</span>
               </button>
-              <button class="preset-card" data-preset="synthwave">
-                <div class="preset-preview synthwave-bg">
-                  <div class="thumb-fx synth-fx"></div>
-                  <span class="thumb-tag font-mont synth-glow">1984</span>
+              <button class="preset-card" data-preset="blue-professional">
+                <div class="preset-preview blue-prof-bg">
+                  <span class="thumb-tag font-space blue-prof-text">COBALT</span>
                 </div>
-                <span>Synthwave</span>
+                <span>Blue Professional</span>
               </button>
-              <button class="preset-card" data-preset="rainy">
-                <div class="preset-preview rainy-bg">
-                  <div class="thumb-fx rain-fx"></div>
-                  <span class="thumb-tag font-serif rain-glow">RAIN</span>
+              <button class="preset-card" data-preset="bold-poster">
+                <div class="preset-preview bold-poster-bg">
+                  <span class="thumb-tag font-shrikhand bold-poster-text">POSTER</span>
                 </div>
-                <span>Rainy Dream</span>
+                <span>Bold Poster</span>
               </button>
-              <button class="preset-card" data-preset="minimal">
-                <div class="preset-preview minimal-bg">
-                  <div class="thumb-fx minimal-fx"></div>
-                  <span class="thumb-tag font-cinzel">NOIR</span>
+              <button class="preset-card" data-preset="broadside">
+                <div class="preset-preview broadside-bg">
+                  <span class="thumb-tag font-barlow broadside-text">BROADSIDE</span>
                 </div>
-                <span>Minimal Dark</span>
+                <span>Broadside</span>
               </button>
-              <button class="preset-card" data-preset="karaoke">
-                <div class="preset-preview karaoke-bg">
-                  <span class="thumb-tag font-outfit karaoke-text">LYRIC</span>
+              <button class="preset-card" data-preset="capsule">
+                <div class="preset-preview capsule-bg">
+                  <span class="thumb-tag font-bodoni capsule-pill">PILL</span>
                 </div>
-                <span>Karaoke Glow</span>
+                <span>Capsule</span>
               </button>
-              <button class="preset-card" data-preset="phonk">
-                <div class="preset-preview phonk-bg">
-                  <div class="thumb-fx phonk-fx"></div>
-                  <span class="thumb-tag font-mont phonk-glow">DRIFT</span>
+              <button class="preset-card" data-preset="cartesian">
+                <div class="preset-preview cartesian-bg">
+                  <div class="thumb-fx cartesian-grid"></div>
+                  <span class="thumb-tag font-serif cartesian-text">CARTESIAN</span>
                 </div>
-                <span>Phonk Drift</span>
+                <span>Cartesian</span>
               </button>
-              <button class="preset-card" data-preset="sakura">
-                <div class="preset-preview sakura-bg">
-                  <span class="thumb-tag font-outfit sakura-glow">桜 CHILL</span>
+              <button class="preset-card" data-preset="cobalt-grid">
+                <div class="preset-preview cobalt-grid-bg">
+                  <div class="thumb-fx riso-grid"></div>
+                  <span class="thumb-tag font-newsreader cobalt-text">RISO</span>
                 </div>
-                <span>Sakura Pastel</span>
+                <span>Cobalt Grid</span>
               </button>
-              <button class="preset-card" data-preset="academia">
-                <div class="preset-preview academia-bg">
-                  <span class="thumb-tag font-cinzel academia-glow">POETRY</span>
+              <button class="preset-card" data-preset="code-editorial">
+                <div class="preset-preview code-ed-bg">
+                  <span class="thumb-tag font-garamond code-coral">DEV BOOK</span>
                 </div>
-                <span>Dark Academia</span>
+                <span>Code Editorial</span>
               </button>
-              <button class="preset-card" data-preset="cosmic">
-                <div class="preset-preview cosmic-bg">
-                  <div class="thumb-fx cosmic-fx"></div>
-                  <span class="thumb-tag font-space cosmic-glow">SPACE</span>
+              <button class="preset-card" data-preset="coral">
+                <div class="preset-preview coral-bg">
+                  <span class="thumb-tag font-bebas coral-text">CORAL</span>
                 </div>
-                <span>Cosmic Space</span>
+                <span>Coral Magazine</span>
               </button>
-              <button class="preset-card" data-preset="retro">
-                <div class="preset-preview retro-bg">
-                  <span class="thumb-tag font-courier retro-glow">VINYL</span>
+              <button class="preset-card" data-preset="creative-mode">
+                <div class="preset-preview creative-bg">
+                  <span class="thumb-tag font-archivo creative-text">CREATIVE</span>
                 </div>
-                <span>Vintage Soul</span>
+                <span>Creative Mode</span>
               </button>
-              <button class="preset-card" data-preset="acid">
-                <div class="preset-preview acid-bg">
-                  <div class="thumb-fx acid-fx"></div>
-                  <span class="thumb-tag font-mont acid-glow">RAVE</span>
+              <button class="preset-card" data-preset="daisy-days">
+                <div class="preset-preview daisy-bg">
+                  <span class="thumb-tag font-fredoka daisy-text">PASTEL</span>
                 </div>
-                <span>Acid Rave</span>
+                <span>Daisy Days</span>
+              </button>
+              <button class="preset-card" data-preset="editorial-forest">
+                <div class="preset-preview forest-bg">
+                  <span class="thumb-tag font-source-serif forest-text">BOTANICAL</span>
+                </div>
+                <span>Editorial Forest</span>
               </button>
               <button class="preset-card" data-preset="highway">
                 <div class="preset-preview highway-bg">
@@ -256,12 +261,12 @@
             <div class="input-group">
               <label for="anim-type">Animation Style</label>
               <select id="anim-type">
+                <option value="smooth-slide">Smooth Slide-Up (HyperFrames 0.38s Ease-Out)</option>
                 <option value="word-stack">Progressive Word Stacking (Highway Drive / Viral Stacker)</option>
-                <option value="smooth-slide">Smooth Slide-Up (Cinematic & Clean)</option>
                 <option value="karaoke-fill">Karaoke Progressive Fill (Left-to-Right)</option>
-                <option value="pop-bounce">Beat Pop & Scale (Energetic / Phonk)</option>
+                <option value="pop-bounce">Beat Pop & Scale (Spring Damping 0.7-0.85)</option>
                 <option value="floating-wave">Floating Ambient Wave (Dreamy / Relaxed)</option>
-                <option value="typewriter">Typewriter Reveal (Retro / Terminal)</option>
+                <option value="typewriter">Typewriter Reveal (Retro Terminal / JetBrains Mono)</option>
                 <option value="cyber-glitch">Cyber Glitch & RGB Shift (Distorted)</option>
               </select>
             </div>
@@ -271,16 +276,24 @@
             <h3>✨ Typography & Colors</h3>
             <div class="form-row">
               <div class="input-group">
-                <label for="font-family">Font Family</label>
+                <label for="font-family">Font Family (HyperFrames Registry)</label>
                 <select id="font-family">
-                  <option value="'Bebas Neue', sans-serif">Bebas Neue (Highway Bold / Viral POV)</option>
-                  <option value="'Anton', sans-serif">Anton (Heavy Impact)</option>
+                  <option value="'Instrument Serif', serif">Instrument Serif (Biennale Yellow / Museum)</option>
+                  <option value="'Inter', sans-serif">Inter (BlockFrame / Blue Professional)</option>
+                  <option value="'Space Grotesk', sans-serif">Space Grotesk (Capsule / Tech)</option>
+                  <option value="'Shrikhand', cursive">Shrikhand (Bold Poster Vintage Display)</option>
+                  <option value="'Libre Baskerville', serif">Libre Baskerville (Bold Poster Body)</option>
+                  <option value="'Barlow', sans-serif">Barlow 900 (Broadside Protest)</option>
+                  <option value="'Bodoni Moda', serif">Bodoni Moda (Capsule Editorial)</option>
+                  <option value="'Playfair Display', serif">Playfair Display (Cartesian Minimal)</option>
+                  <option value="'Newsreader', serif">Newsreader (Cobalt Grid Risograph)</option>
+                  <option value="'EB Garamond', serif">EB Garamond (Code Editorial)</option>
+                  <option value="'Bebas Neue', sans-serif">Bebas Neue (Coral / Highway Bold)</option>
+                  <option value="'Archivo Black', sans-serif">Archivo Black (Creative Mode Neobrutalist)</option>
+                  <option value="'Fredoka', sans-serif">Fredoka (Daisy Days Picture Book)</option>
+                  <option value="'Source Serif 4', serif">Source Serif 4 (Editorial Forest)</option>
+                  <option value="'JetBrains Mono', monospace">JetBrains Mono (Code Chrome)</option>
                   <option value="'Outfit', sans-serif">Outfit (Modern Clean)</option>
-                  <option value="'Space Grotesk', sans-serif">Space Grotesk (Tech / Cyber)</option>
-                  <option value="'Playfair Display', serif">Playfair Display (Classy Serif)</option>
-                  <option value="'Cinzel', serif">Cinzel (Cinematic Epic)</option>
-                  <option value="'Montserrat', sans-serif">Montserrat (Bold Punchy)</option>
-                  <option value="'Courier Prime', monospace">Courier Prime (Typewriter)</option>
                   <option value="system-ui, sans-serif">System Sans</option>
                 </select>
               </div>
@@ -672,6 +685,6 @@
   <audio id="audio-player" preload="auto"></audio>
 
   <!-- Modular Scripts -->
-  <script type="module" src="js/app.js?v=3.4"></script>
+  <script type="module" src="js/app.js?v=3.5"></script>
 </body>
 </html>
