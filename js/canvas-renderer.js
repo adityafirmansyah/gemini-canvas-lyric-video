@@ -59,6 +59,12 @@ export class CanvasRenderer {
       color: '#64ffda'      // Particle / overlay color
     };
 
+    // HyperFrames-inspired layout engine configuration
+    this.autoFitFont = true;        // Auto-shrink font so wrapped lines never overflow hero zone
+    this.showSafeGuides = false;    // Preview-only YouTube / Shorts UI safe-area overlay
+    this.fgCutoutImage = null;      // Foreground subject layer (Text Behind Subject depth layering)
+    this._fitCache = new Map();     // Fit scale cache keyed by font|ratio|width|text
+
     // Visual elements state
     this.particles = [];
     this.rainDrops = [];
@@ -157,6 +163,64 @@ export class CanvasRenderer {
     this.customParticleImage = imgElement;
   }
 
+  setFgCutoutImage(imgElement) {
+    this.fgCutoutImage = imgElement;
+    this._fitCache.clear();
+  }
+
+  /**
+   * HyperFrames 'fitTextFontSize' equivalent:
+   * Given an animation style, a candidate font size, and a width budget, run a binary
+   * search over wrapping cost and return the smallest scale (>= minScale) that keeps
+   * every wrapped line inside maxWidth. Max 8 iteration steps like HF's step-2 loop.
+   */
+  fitLineScale(ctx, text, maxWidth, candidateSize, style) {
+    const key = `${this.fontFamily}|${this.aspectRatio}|${Math.round(maxWidth)}|${text.length}|${text.split(' ').length}|${style}`;
+    if (this._fitCache.has(key)) return this._fitCache.get(key);
+
+    const minScale = 0.55;
+    let scale = 1.0;
+
+    if (this.autoFitFont) {
+      const testLines = (size) => {
+        ctx.font = `700 ${size}px ${this.fontFamily}`;
+        let longest = 0;
+        const words = text.split(' ');
+        let currentLine = words[0] || '';
+        for (let i = 1; i < words.length; i++) {
+          const w = ctx.measureText(currentLine + ' ' + words[i]).width;
+          if (w < maxWidth) currentLine += ' ' + words[i];
+          else {
+            longest = Math.max(longest, ctx.measureText(currentLine).width);
+            currentLine = words[i];
+          }
+        }
+        longest = Math.max(longest, ctx.measureText(currentLine).width);
+        return longest;
+      };
+
+      // Smallest scale that still fits? No — LARGEST scale that still fits.
+      // Feasibility is monotonic decreasing in scale: bigger = overflows.
+      // Binary search: if mid fits, answer is >= mid (hi=mid); else lo=mid. Return hi.
+      let lo = minScale, hi = 1.0;
+      if (testLines(candidateSize) <= maxWidth * 0.98) {
+        scale = 1.0; // Already fits at full size: no shrink needed (hero impact).
+      } else {
+        for (let i = 0; i < 8; i++) {
+          const mid = (lo + hi) / 2;
+          const size = candidateSize * mid;
+          if (testLines(size) <= maxWidth * 0.98) hi = mid;
+          else lo = mid;
+          if (hi - lo < 0.04) break;
+        }
+        scale = hi;
+      }
+    }
+
+    this._fitCache.set(key, scale);
+    return scale;
+  }
+
   setBgConfig(newConfig) {
     this.bgConfig = { ...this.bgConfig, ...newConfig };
   }
@@ -221,7 +285,102 @@ export class CanvasRenderer {
     this.drawOverlayEffect(ctx, W, H, beatPulse, dt);
 
     // 3. Draw Lyrics with selected animation
-    this.drawLyrics(ctx, W, H, beatPulse, overallGlow);
+    this.drawLyrics(ctx, W, H, beatPulse, overallGlow, this.getPosterY());
+
+    // 4. Foreground Subject Layer ("Text Behind Subject" depth layering)
+    //    Attention zone (HF): the subject sits immovable in the lowest 25% of the frame.
+    if (this.fgCutoutImage) {
+      this.drawForegroundSubject(ctx, W, H, beatPulse);
+    }
+
+    // 5. Preview-only UI Safe Area Guides (does NOT burn into exported video)
+    if (this.showSafeGuides) {
+      this.drawSafeAreaGuides(ctx, W, H, this.getPosterY());
+    }
+  }
+
+  /** HyperFrames attention/hero band: portrait keeps empty space where platform UI lives. */
+  getPosterY() {
+    if (this.aspectRatio === '9:16') return this.targetHeight * 0.325; // ~626/1920: above Shorts UI
+    if (this.aspectRatio === '1:1') return this.targetHeight * 0.44;
+    return this.targetHeight * 0.5; // 16:9 centered
+  }
+
+  /** Draws the uploaded PNG cutout pinned to the bottom center (portrait: 55% height max). */
+  drawForegroundSubject(ctx, W, H, beatPulse) {
+    const img = this.fgCutoutImage;
+    const iw = img.naturalWidth || img.width;
+    const ih = img.naturalHeight || img.height;
+    if (!iw || !ih) return;
+
+    const maxH = H * (this.aspectRatio === '9:16' ? 0.52 : 0.62);
+    let dh = Math.min(maxH, H * 0.9);
+    let dw = dh * (iw / ih);
+    if (dw > W * 0.9) { dw = W * 0.9; dh = dw * (ih / iw); }
+
+    const breath = 1 + beatPulse * 0.45;
+    const cx = W / 2;
+    const cy = H - dh / 2;
+
+    ctx.save();
+    const g = ctx.createLinearGradient(0, H - dh * 0.5, 0, H);
+    g.addColorStop(0, 'rgba(5, 6, 10, 0)');
+    g.addColorStop(1, 'rgba(5, 6, 10, 0.75)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, H - dh * 0.55, W, dh * 0.55);
+
+    ctx.translate(cx, cy);
+    ctx.scale(breath, breath);
+    ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
+    ctx.restore();
+  }
+
+  /**
+   * HyperFrames projector frame: UI sits in a 14.3% margin on every side (60/420 in
+   * their 420p viewport). Red band = YouTube Shorts/TikTok action UI, amber = title-safe.
+   */
+  drawSafeAreaGuides(ctx, W, H, posterY) {
+    const m = H * 0.143;
+    ctx.save();
+    ctx.setLineDash([10, 7]);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+    ctx.strokeRect(m, m, W - m * 2, H - m * 2);
+
+    ctx.setLineDash([]);
+    const rH = H * 0.22, y0 = H - rH;
+    ctx.fillStyle = 'rgba(255, 0, 82, 0.16)';
+    ctx.fillRect(0, y0, W * 0.42, rH);
+    ctx.fillStyle = 'rgba(255, 0, 82, 0.3)';
+    const noUi = ['♡', '💬', '↗'];
+    ctx.font = `600 ${Math.round(H * 0.032)}px ${this.fontFamily}`;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    const padx = W * 0.035, gap = rH / 4.2;
+    noUi.forEach((s, i) => ctx.fillText(s, W - padx, y0 + gap * (i + 1)));
+
+    ctx.fillStyle = 'rgba(255, 193, 7, 0.22)';
+    const th = H * 0.085;
+    ctx.fillRect(W * 0.06, m, W * 0.75, th);
+    ctx.fillStyle = 'rgba(255, 193, 7, 0.9)';
+    ctx.textAlign = 'left';
+    ctx.font = `600 ${Math.round(H * 0.026)}px ${this.fontFamily}`;
+    ctx.fillText('@channel • #hashtag', W * 0.08, m + th / 2);
+
+    ctx.strokeStyle = 'rgba(94, 234, 212, 0.8)';
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(0, posterY - H * 0.09);
+    ctx.lineTo(W, posterY - H * 0.09);
+    ctx.moveTo(0, posterY + H * 0.09);
+    ctx.lineTo(W, posterY + H * 0.09);
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(94, 234, 212, 0.95)';
+    ctx.font = `600 ${Math.round(H * 0.022)}px ${this.fontFamily}`;
+    ctx.fillText('LYRIC HERO ZONE', W * 0.04, posterY - H * 0.105);
+    ctx.restore();
   }
 
   drawBaseBackdrop(ctx, W, H, beatPulse) {
@@ -550,14 +709,14 @@ export class CanvasRenderer {
     ctx.restore();
   }
 
-  drawLyrics(ctx, W, H, beatPulse, overallGlow) {
+  drawLyrics(ctx, W, H, beatPulse, overallGlow, posterY) {
     if (!this.lyrics || this.lyrics.length === 0) {
       ctx.save();
       ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
       ctx.font = `600 32px ${this.fontFamily}`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('Ready. Upload music & sync lyrics.', W / 2, H / 2);
+      ctx.fillText('Ready. Upload music & sync lyrics.', W / 2, posterY || H / 2);
       ctx.restore();
       return;
     }
@@ -584,7 +743,7 @@ export class CanvasRenderer {
           ctx,
           text: lastLyric.text,
           x: W / 2,
-          y: H / 2,
+          y: posterY || H / 2,
           maxWidth: W * 0.85,
           baseSize: this.baseFontSize,
           beatPulse: beatPulse * alpha,
@@ -619,7 +778,7 @@ export class CanvasRenderer {
     if (activeIdx === -1) return;
 
     const currentLine = this.lyrics[activeIdx];
-    const centerY = H / 2;
+    const centerY = posterY || H / 2;
     const baseSize = this.baseFontSize;
 
     // Handle brief pause/gap between lines (fade out previous line quickly)
@@ -668,6 +827,14 @@ export class CanvasRenderer {
     const gSize = (this.glowSize !== undefined ? this.glowSize : 25);
     const gDensity = (this.glowDensity !== undefined ? this.glowDensity : 1.0);
     const activeGlowBlur = gSize === 0 ? 0 : (gSize * gDensity + (this.enableAudioReactive ? overallGlow * 0.7 * gDensity : 0));
+
+    // HyperFrames measured defaults: fast moves 0.3-0.6s, words stagger 60-120ms,
+    // springs with 0.7-0.85 damping read premium, 0.5-0.6 playful; landed title = dead still.
+    const STAGGER = 0.09;
+    const inTime = Math.max(0.001, t - start);
+    this._inTime = inTime; // read by wrapAndDrawText for word-level stagger timing
+    const isWordLevelPerLine = ['word-stack', 'pop-bounce', 'cyber-glitch', 'smooth-slide'].includes(this.animType);
+    const springIn = (r, ov = Math.min(1, 0.9 * r)) => Math.min(1.15, 1 + ov * 0.13);
 
     // 1. STYLE: Karaoke Progressive Fill (Spotify / Apple Music style)
     if (this.animType === 'karaoke-fill') {
@@ -854,15 +1021,46 @@ export class CanvasRenderer {
     ctx.restore();
   }
 
-  wrapAndDrawText(ctx, rawText, x, y, maxWidth, lineHeight, animProgress = 1.0) {
+    /**
+     * HF replacement for wrapText + fillText: measure, wrap, and paint in one call.
+     * entryStagger (seconds): words pop in with a premium spring (HF 0.7-0.9 damping,
+     * overshoot <=15%) displaced STAGGER apart; at 1.5+ steps in the word is dead still.
+     */
+    wrapAndDrawText(ctx, rawText, x, y, maxWidth, lineHeight, animProgress = 1.0, entryStagger = 0) {
+      this._internalWrapText(ctx, rawText, x, y, maxWidth, lineHeight, animProgress, (drawWord, wid, wordX, lineY_) => {
+        let alpha = 1, scale = 1, dy = 0;
+        if (entryStagger > 0) {
+          const wi = entryStagger * wid;
+          const r = Math.min(1, Math.max(0.001, ((this._inTime || 1) - wi) / 0.38));
+          if (r >= 1) { alpha = 1; scale = 1; }
+          else {
+            alpha = r;
+            const ov = Math.sin(Math.min(1, r) * Math.PI) * 0.12;
+            scale = 1 + ov;
+            dy = (1 - r) * 14;
+          }
+        }
+        if (alpha > 0.01) {
+          const was = ctx.globalAlpha;
+          ctx.globalAlpha = was * alpha;
+          drawWord(wordX, lineY_ - dy, scale);
+          ctx.globalAlpha = was;
+        }
+      });
+    }
+
+  _internalWrapText(ctx, rawText, x, y, maxWidth, lineHeight, animProgress, wordPainter = null) {
     const sub = this.subtitleConfig || { style: 'none' };
     const style = sub.style || 'none';
     const isUpper = sub.uppercase !== false && style !== 'none';
     const text = isUpper ? rawText.toUpperCase() : rawText;
+    const badgey = style !== 'none' && style !== 'outline-only' && style !== 'highway-3d';
 
     const words = text.split(' ');
     const lines = [];
+    const lineWordIdx = [];
     let currentLine = words[0] || '';
+    let lineStartIdx = 0;
 
     for (let i = 1; i < words.length; i++) {
       const word = words[i];
@@ -871,18 +1069,66 @@ export class CanvasRenderer {
         currentLine += ' ' + word;
       } else {
         lines.push(currentLine);
+        lineWordIdx.push([lineStartIdx, i]);
+        lineStartIdx = i;
         currentLine = word;
       }
     }
     lines.push(currentLine);
+    lineWordIdx.push([lineStartIdx, words.length]);
 
+    const baseAlign = ctx.textAlign;
     const startY = y - ((lines.length - 1) * lineHeight) / 2;
+
+    const paintUnstyled = () => {
+      ctx.textAlign = 'center';
+      for (let li = 0; li < lines.length; li++) {
+        const lineY = startY + li * lineHeight;
+        const [ws, _we] = lineWordIdx[li];
+        const wordsInLine = words.slice(ws, lineWordIdx[li][1]);
+        const widths = wordsInLine.map(w => ctx.measureText(w).width);
+        const spaceW = ctx.measureText(' ').width;
+        const totalW = widths.reduce((a, b) => a + b, 0) + spaceW * (wordsInLine.length - 1);
+        let wx = x - totalW / 2;
+        const linePainter = (dx, dy, scale) => {
+          const wasAlign = ctx.textAlign; ctx.textAlign = 'center';
+          if (scale !== 1) {
+            ctx.save();
+            ctx.translate(dx, dy);
+            ctx.scale(scale, scale);
+            ctx.fillText(wordsInLine.join(' '), 0, 0);
+            ctx.restore();
+          } else {
+            ctx.fillText(wordsInLine.join(' '), dx, dy);
+          }
+          ctx.textAlign = wasAlign;
+        };
+        if (wordPainter && !badgey) {
+          for (let k = 0; k < wordsInLine.length; k++) {
+            const cxk = wx + widths[k] / 2;
+            wordPainter((dx, dy, scale) => {
+              const wasAlign = ctx.textAlign; ctx.textAlign = 'center';
+              if (scale !== 1) {
+                ctx.save(); ctx.translate(dx, dy); ctx.scale(scale, scale);
+                ctx.fillText(wordsInLine[k], 0, 0);
+                ctx.restore();
+              } else {
+                ctx.fillText(wordsInLine[k], dx, dy);
+              }
+              ctx.textAlign = wasAlign;
+            }, ws + k, cxk, lineY);
+            wx += widths[k] + spaceW;
+          }
+        } else {
+          linePainter(x, lineY, 1);
+        }
+      }
+      ctx.textAlign = baseAlign;
+    };
 
     // Mode A: Standard text (no box badge)
     if (style === 'none') {
-      for (let i = 0; i < lines.length; i++) {
-        ctx.fillText(lines[i], x, startY + i * lineHeight);
-      }
+      paintUnstyled();
       return;
     }
 

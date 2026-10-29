@@ -653,6 +653,14 @@ textarea:focus {
   background: linear-gradient(135deg, #030712, #111827, #374151);
 }
 
+.drop-zone.compact {
+  padding: 10px;
+}
+
+.drop-zone.compact .drop-icon {
+  font-size: 1.2rem;
+}
+
 .overlay-settings-wrapper {
   display: flex;
   flex-direction: column;

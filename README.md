@@ -58,6 +58,11 @@ An in-browser, high-performance HTML5 Canvas application that turns uploaded mus
   - **Vintage Soul:** 70s warm terracotta & gold tones with Courier typewriter typography.
   - **Acid Rave:** High-voltage neon lime green with reactive equalizer bars and cyber glitch.
   - **Highway POV (Viral Road Track):** Tall ultra-bold Bebas Neue typography, progressive word-by-word cumulative stacking, deep asphalt drop shadow, 3D vanishing perspective tilt, and subtle road vibration.
+- **🧠 HyperFrames Layout Engine & Motion Craft:**
+  - **Dynamic Auto-Fit Font Size (`fitTextFontSize`):** Dynamically scales candidate font sizes so lines always claim 60%–90% of the screen width with zero clipping, even on extreme multi-word lyrics or 9:16 portrait viewports.
+  - **9:16 Shorts / Reels Safe Area Guides:** Non-destructive preview overlay with 14.3% side margins, YouTube Shorts / TikTok UI danger zones, and title-safe hero bands. Automatically hides during video export.
+  - **Foreground Subject Layer (Text Behind Subject):** Drag & drop PNG cutouts (singers, cars, silhouettes). Lyrics render in 3D depth behind the subject with subtle beat breath.
+  - **Motion Craft Standards:** Staggered word entries (60–120ms), spring damping (0.7–0.85), and dead-still landing locks.
 - **🎬 In-Browser Video Export:**
   - Combines the Canvas render stream and Web Audio destination into a synchronized video export (`.webm` / `.mp4`) directly inside your browser—no backend server, FFmpeg installation, or cloud rendering required.
 - **🔒 Privacy First:**

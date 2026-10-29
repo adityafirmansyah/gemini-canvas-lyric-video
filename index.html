@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@700;900&family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,600;1,600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=3.3">
+  <link rel="stylesheet" href="css/style.css?v=3.4">
 </head>
 <body>
   <div class="app-container">
@@ -471,6 +471,47 @@
             </div>
           </section>
 
+          <!-- HyperFrames Layout Engine Section -->
+          <section class="card">
+            <div class="section-header">
+              <h3>🧠 HyperFrames Layout Engine</h3>
+              <span class="helper-text">HF-grade page layout</span>
+            </div>
+
+            <div class="toggle-group">
+              <label class="switch-label">
+                <input type="checkbox" id="toggle-auto-fit" checked>
+                <span>Auto-Fit Font Size (fitTextFontSize)</span>
+              </label>
+              <small class="helper-text">Dynamically scales lyrics to hero impact (60%–90% width) with no clipping on 16:9 or 9:16.</small>
+            </div>
+
+            <div class="toggle-group">
+              <label class="switch-label">
+                <input type="checkbox" id="toggle-safe-guides">
+                <span>9:16 Shorts / Reels Safe Area Guides (Preview Only)</span>
+              </label>
+              <small class="helper-text">PROJECTOR-FRAME overlay: 14.3% margin, YouTube Shorts UI danger zone, and title-safe band. Guides never export into video.</small>
+            </div>
+
+            <div class="input-group">
+              <label>Foreground Subject Layer (Text Behind Subject)</label>
+              <div class="drop-zone compact" id="fg-drop-zone">
+                <span class="drop-icon">🚶</span>
+                <p>Drag & drop subject PNG cutout</p>
+                <span class="subtext">Vocalist, car, silhouette — lyrics render behind it</span>
+                <input type="file" id="fg-input" accept="image/*">
+              </div>
+              <div id="fg-img-info" class="audio-info hidden">
+                <div class="track-details">
+                  <span id="fg-img-name" class="track-title">subject.png</span>
+                  <button type="button" id="btn-remove-fg-img" class="text-link" style="color: var(--danger); font-weight: 700;">✕ Clear</button>
+                </div>
+              </div>
+              <small class="helper-text">∘ Depth stacking: Background → Lyrics → Subject → Overlay FX. Lyrics land behind the subject for movie-poster dimension.</small>
+            </div>
+          </section>
+
           <!-- Atmospheric Overlay Effect Section -->
           <section class="card">
             <div class="section-header">
@@ -631,6 +672,6 @@
   <audio id="audio-player" preload="auto"></audio>
 
   <!-- Modular Scripts -->
-  <script type="module" src="js/app.js?v=3.3"></script>
+  <script type="module" src="js/app.js?v=3.4"></script>
 </body>
 </html>

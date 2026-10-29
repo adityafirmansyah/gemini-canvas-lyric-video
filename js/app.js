@@ -3,11 +3,11 @@
  * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
  */
 
-import { AudioManager } from './audio-player.js?v=3.3';
-import { AiService } from './ai-service.js?v=3.3';
-import { LrcParser } from './lrc-parser.js?v=3.3';
-import { CanvasRenderer } from './canvas-renderer.js?v=3.3';
-import { VideoRecorder } from './recorder.js?v=3.3';
+import { AudioManager } from './audio-player.js?v=3.4';
+import { AiService } from './ai-service.js?v=3.4';
+import { LrcParser } from './lrc-parser.js?v=3.4';
+import { CanvasRenderer } from './canvas-renderer.js?v=3.4';
+import { VideoRecorder } from './recorder.js?v=3.4';
 
 // DOM Elements
 const canvas = document.getElementById('lyric-canvas');
@@ -104,6 +104,15 @@ const bgAnimIntensityVal = document.getElementById('bg-anim-intensity-val');
 const bgBeatBounceInput = document.getElementById('bg-beat-bounce');
 const bgBeatBounceVal = document.getElementById('bg-beat-bounce-val');
 const toggleAudioReactive = document.getElementById('toggle-audio-reactive');
+
+// HyperFrames Layout Engine Controls
+const toggleAutoFit = document.getElementById('toggle-auto-fit');
+const toggleSafeGuides = document.getElementById('toggle-safe-guides');
+const fgDropZone = document.getElementById('fg-drop-zone');
+const fgInput = document.getElementById('fg-input');
+const fgImgInfo = document.getElementById('fg-img-info');
+const fgImgName = document.getElementById('fg-img-name');
+const btnRemoveFgImg = document.getElementById('btn-remove-fg-img');
 
 // Header Ratio Buttons
 const ratioButtons = document.querySelectorAll('.ratio-btn');
@@ -924,6 +933,58 @@ if (bgDimSlider) {
     const val = parseInt(e.target.value);
     renderer.bgDim = val / 100;
     if (bgDimVal) bgDimVal.textContent = `${val}%`;
+  });
+}
+
+// HyperFrames Layout Engine listeners
+if (toggleAutoFit) {
+  toggleAutoFit.addEventListener('change', (e) => {
+    renderer.autoFitFont = e.target.checked;
+    renderer._fitCache.clear();
+  });
+}
+
+if (toggleSafeGuides) {
+  toggleSafeGuides.addEventListener('change', (e) => {
+    renderer.showSafeGuides = e.target.checked;
+  });
+}
+
+function loadFgImageFile(file) {
+  if (!file) return;
+  const img = new Image();
+  img.src = URL.createObjectURL(file);
+  img.onload = () => {
+    renderer.setFgCutoutImage(img);
+    if (fgImgName) fgImgName.textContent = file.name;
+    if (fgImgInfo) fgImgInfo.classList.remove('hidden');
+  };
+}
+
+if (fgInput) {
+  fgInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) loadFgImageFile(e.target.files[0]);
+  });
+}
+
+if (fgDropZone) {
+  fgDropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    fgDropZone.classList.add('dragover');
+  });
+  fgDropZone.addEventListener('dragleave', () => fgDropZone.classList.remove('dragover'));
+  fgDropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    fgDropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) loadFgImageFile(e.dataTransfer.files[0]);
+  });
+}
+
+if (btnRemoveFgImg) {
+  btnRemoveFgImg.addEventListener('click', () => {
+    renderer.setFgCutoutImage(null);
+    if (fgInput) fgInput.value = '';
+    if (fgImgInfo) fgImgInfo.classList.add('hidden');
   });
 }
 
