@@ -1,13 +1,13 @@
 /**
- * app.js (v4.0 Aura Studio)
+ * app.js (v4.1 Aura Studio)
  * Main Controller coordinating Audio, Three.js 3D Background, Fluid Kinetic Lyrics, and Video Recording.
  */
 
-import { AudioManager } from './audio-player.js?v=4.0';
-import { AiService } from './ai-service.js?v=4.0';
-import { LrcParser } from './lrc-parser.js?v=4.0';
-import { CanvasRenderer } from './canvas-renderer.js?v=4.0';
-import { VideoRecorder } from './recorder.js?v=4.0';
+import { AudioManager } from './audio-player.js?v=4.1';
+import { AiService } from './ai-service.js?v=4.1';
+import { LrcParser } from './lrc-parser.js?v=4.1';
+import { CanvasRenderer } from './canvas-renderer.js?v=4.1';
+import { VideoRecorder } from './recorder.js?v=4.1';
 
 // Canvas & Audio
 const canvas = document.getElementById('lyric-canvas');
@@ -361,10 +361,68 @@ lyricsDataInput.addEventListener('input', applyRawLyrics);
 
 btnSampleLyrics.addEventListener('click', () => {
   const sample = [
-    { start: 0.0, end: 4.8, text: "Neon reflections in the rainy night" },
-    { start: 5.0, end: 9.6, text: "Lost in the rhythm of the city lights" },
-    { start: 9.8, end: 15.5, text: "Drifting through echoes of an old memory that lingers deep inside me tonight" },
-    { start: 16.0, end: 21.0, text: "Finding eternal peace right where we belong" }
+    {
+      start: 0.2,
+      end: 4.8,
+      text: "Neon reflections in the rainy night",
+      words: [
+        { word: "Neon", start: 0.2, end: 0.8 },
+        { word: "reflections", start: 0.85, end: 2.1 },
+        { word: "in", start: 2.15, end: 2.4 },
+        { word: "the", start: 2.45, end: 2.7 },
+        { word: "rainy", start: 2.75, end: 3.6 },
+        { word: "night", start: 3.65, end: 4.6 }
+      ]
+    },
+    {
+      start: 5.0,
+      end: 9.6,
+      text: "Lost in the rhythm of the city lights",
+      words: [
+        { word: "Lost", start: 5.0, end: 5.7 },
+        { word: "in", start: 5.75, end: 6.0 },
+        { word: "the", start: 6.05, end: 6.3 },
+        { word: "rhythm", start: 6.35, end: 7.4 },
+        { word: "of", start: 7.45, end: 7.7 },
+        { word: "the", start: 7.75, end: 8.0 },
+        { word: "city", start: 8.05, end: 8.8 },
+        { word: "lights", start: 8.85, end: 9.5 }
+      ]
+    },
+    {
+      start: 9.8,
+      end: 15.5,
+      text: "Drifting through echoes of an old memory that lingers deep inside me tonight",
+      words: [
+        { word: "Drifting", start: 9.8, end: 10.6 },
+        { word: "through", start: 10.65, end: 11.1 },
+        { word: "echoes", start: 11.15, end: 11.9 },
+        { word: "of", start: 11.95, end: 12.2 },
+        { word: "an", start: 12.25, end: 12.5 },
+        { word: "old", start: 12.55, end: 13.0 },
+        { word: "memory", start: 13.05, end: 13.8 },
+        { word: "that", start: 13.85, end: 14.1 },
+        { word: "lingers", start: 14.15, end: 14.8 },
+        { word: "deep", start: 14.85, end: 15.1 },
+        { word: "inside", start: 15.15, end: 15.35 },
+        { word: "me", start: 15.36, end: 15.42 },
+        { word: "tonight", start: 15.43, end: 15.5 }
+      ]
+    },
+    {
+      start: 16.0,
+      end: 21.0,
+      text: "Finding eternal peace right where we belong",
+      words: [
+        { word: "Finding", start: 16.0, end: 16.8 },
+        { word: "eternal", start: 16.85, end: 17.8 },
+        { word: "peace", start: 17.85, end: 18.6 },
+        { word: "right", start: 18.65, end: 19.2 },
+        { word: "where", start: 19.25, end: 19.7 },
+        { word: "we", start: 19.75, end: 20.1 },
+        { word: "belong", start: 20.15, end: 20.9 }
+      ]
+    }
   ];
   lyricsDataInput.value = JSON.stringify(sample, null, 2);
   renderer.setLyrics(sample);

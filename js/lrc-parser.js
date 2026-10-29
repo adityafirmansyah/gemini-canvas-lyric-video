@@ -90,7 +90,7 @@ export class LrcParser {
   /**
    * Fluid Lyric Chunker:
    * Enforces that NO lyric chunk on screen ever exceeds maxWords (strict ceiling: 5 words).
-   * Distributes line duration proportionally based on character weight.
+   * Preserves word-level AI timestamps (words: [{word, start, end}]) across chunks.
    */
   static chunkLyricsToMaxWords(lyrics, maxWords = 4) {
     if (!Array.isArray(lyrics) || lyrics.length === 0) return [];
@@ -99,11 +99,21 @@ export class LrcParser {
     const chunked = [];
     for (const item of lyrics) {
       if (!item || !item.text) continue;
-      const words = item.text.trim().split(/\s+/).filter(Boolean);
+
+      const hasWordTimestamps = Array.isArray(item.words) && item.words.length > 0;
+      const words = hasWordTimestamps
+        ? item.words
+        : item.text.trim().split(/\s+/).filter(Boolean).map(w => ({ word: w }));
+
       const totalWords = words.length;
 
       if (totalWords <= limit) {
-        chunked.push(item);
+        chunked.push({
+          start: item.start,
+          end: item.end,
+          text: item.text.trim(),
+          words: hasWordTimestamps ? words : undefined
+        });
         continue;
       }
 
@@ -111,7 +121,7 @@ export class LrcParser {
       const baseSize = Math.floor(totalWords / numChunks);
       const remainder = totalWords % numChunks;
 
-      const totalChars = words.reduce((sum, w) => sum + w.length, 0) || 1;
+      const totalChars = words.reduce((sum, w) => sum + (w.word ? w.word.length : 1), 0) || 1;
       const duration = Math.max(0.2, (item.end || item.start + 3.0) - item.start);
 
       let wIdx = 0;
@@ -122,17 +132,25 @@ export class LrcParser {
         const chunkWords = words.slice(wIdx, wIdx + size);
         wIdx += size;
 
-        const chunkChars = chunkWords.reduce((sum, w) => sum + w.length, 0);
-        const chunkDur = duration * (chunkChars / totalChars);
-        const chunkEnd = c === numChunks - 1 ? item.end : curTime + chunkDur;
+        let chunkStart = curTime;
+        let chunkEnd = curTime;
+
+        if (hasWordTimestamps) {
+          chunkStart = chunkWords[0].start;
+          chunkEnd = chunkWords[chunkWords.length - 1].end;
+        } else {
+          const chunkChars = chunkWords.reduce((sum, w) => sum + (w.word ? w.word.length : 1), 0);
+          const chunkDur = duration * (chunkChars / totalChars);
+          chunkEnd = c === numChunks - 1 ? item.end : curTime + chunkDur;
+          curTime += chunkDur;
+        }
 
         chunked.push({
-          start: parseFloat(curTime.toFixed(2)),
+          start: parseFloat(chunkStart.toFixed(2)),
           end: parseFloat(chunkEnd.toFixed(2)),
-          text: chunkWords.join(' ')
+          text: chunkWords.map(w => w.word).join(' '),
+          words: hasWordTimestamps ? chunkWords : undefined
         });
-
-        curTime += chunkDur;
       }
     }
 

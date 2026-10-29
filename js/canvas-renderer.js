@@ -7,8 +7,8 @@
  * - 100% Canvas Compositing for 60FPS Video Export and PNG Thumbnail Snapshot
  */
 
-import { ThreeBackground } from './three-background.js?v=4.0';
-import { LrcParser } from './lrc-parser.js?v=4.0';
+import { ThreeBackground } from './three-background.js?v=4.1';
+import { LrcParser } from './lrc-parser.js?v=4.1';
 
 export class CanvasRenderer {
   constructor(canvas) {
@@ -217,19 +217,24 @@ export class CanvasRenderer {
     this.renderFluidChunk({
       ctx,
       text: chunk.text,
+      chunkWords: chunk.words, // True AI word timestamps
       centerX: W / 2,
       centerY: posterY,
       maxWidth: W * (this.aspectRatio === '9:16' ? 0.88 : 0.82),
       baseSize: this.baseFontSize,
       progress,
       inTime,
+      currentTime: isPausedAtStart ? (chunk.words ? chunk.words[0].start + 0.1 : chunk.start + 0.2) : t,
+      chunkStart: chunk.start,
+      chunkDuration: duration,
+      isPausedAtStart,
       beatPulse,
       overallGlow
     });
     ctx.restore();
   }
 
-  renderFluidChunk({ ctx, text, centerX, centerY, maxWidth, baseSize, progress, inTime, beatPulse, overallGlow }) {
+  renderFluidChunk({ ctx, text, chunkWords, centerX, centerY, maxWidth, baseSize, progress, inTime, currentTime, chunkStart, chunkDuration, isPausedAtStart, beatPulse, overallGlow }) {
     const isUpper = this.badgeConfig && this.badgeConfig.uppercase;
     const displayText = isUpper ? text.toUpperCase() : text;
     const words = displayText.split(/\s+/).filter(Boolean);
@@ -256,7 +261,47 @@ export class CanvasRenderer {
 
     const gSize = this.glowSize;
     const gDensity = this.glowDensity;
-    const activeWordIdx = Math.min(totalWords - 1, Math.floor(progress * totalWords));
+
+    // --- ACCURATE WORD-TO-WORD TIMING ENGINE ---
+    // If AI word timestamps exist, check exactly which word matches current playback time!
+    const hasWordTimestamps = Array.isArray(chunkWords) && chunkWords.length === totalWords;
+    let activeWordIdx = 0;
+
+    if (hasWordTimestamps) {
+      activeWordIdx = -1;
+      for (let j = 0; j < totalWords; j++) {
+        const w = chunkWords[j];
+        if (currentTime >= w.start && currentTime <= w.end) {
+          activeWordIdx = j;
+          break;
+        } else if (j < totalWords - 1 && currentTime > w.end && currentTime < chunkWords[j + 1].start) {
+          activeWordIdx = j; // sustained vowel or micro-gap between words
+          break;
+        }
+      }
+      if (activeWordIdx === -1) {
+        if (currentTime < chunkWords[0].start) activeWordIdx = 0;
+        else activeWordIdx = totalWords - 1;
+      }
+    } else {
+      // Syllable / character weight distribution across chunk duration (natural pacing fallback)
+      const wordWeights = words.map(w => Math.max(1, w.length));
+      const totalWeight = wordWeights.reduce((a, b) => a + b, 0) || 1;
+      let elapsedWeight = 0;
+      activeWordIdx = -1;
+      for (let j = 0; j < totalWords; j++) {
+        const wStart = chunkStart + chunkDuration * (elapsedWeight / totalWeight);
+        const wEnd = wStart + chunkDuration * (wordWeights[j] / totalWeight);
+        if (currentTime >= wStart && currentTime <= wEnd) {
+          activeWordIdx = j;
+          break;
+        }
+        elapsedWeight += wordWeights[j];
+      }
+      if (activeWordIdx === -1) {
+        activeWordIdx = isPausedAtStart ? 0 : Math.min(totalWords - 1, Math.floor(progress * totalWords));
+      }
+    }
 
     for (let i = 0; i < totalWords; i++) {
       const m = wordMetrics[i];
@@ -289,8 +334,10 @@ export class CanvasRenderer {
       }
 
       // 3. Active Word Spotlight & Vocal Pop
-      const isActive = i === activeWordIdx;
-      const isPast = i < activeWordIdx;
+      const isActive = (i === activeWordIdx);
+      const isPast = hasWordTimestamps
+        ? (currentTime > chunkWords[i].end)
+        : (i < activeWordIdx);
 
       let wordScale = enterScale * (1.0 + beatPulse * 0.06);
       let wordColor = this.textColor || '#ffffff';
