@@ -3,11 +3,11 @@
  * Main Controller coordinating Audio, Three.js 3D Background, Fluid Kinetic Lyrics, and Video Recording.
  */
 
-import { AudioManager } from './audio-player.js?v=4.1';
-import { AiService } from './ai-service.js?v=4.1';
-import { LrcParser } from './lrc-parser.js?v=4.1';
-import { CanvasRenderer } from './canvas-renderer.js?v=4.1';
-import { VideoRecorder } from './recorder.js?v=4.1';
+import { AudioManager } from './audio-player.js?v=4.2';
+import { AiService } from './ai-service.js?v=4.2';
+import { LrcParser } from './lrc-parser.js?v=4.2';
+import { CanvasRenderer } from './canvas-renderer.js?v=4.2';
+import { VideoRecorder } from './recorder.js?v=4.2';
 
 // Canvas & Audio
 const canvas = document.getElementById('lyric-canvas');

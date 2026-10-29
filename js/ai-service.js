@@ -38,6 +38,78 @@ export class AiService {
   }
 
   /**
+   * Downsamples large audio to 16kHz mono WAV in browser to prevent 503 / gateway timeouts
+   */
+  async compressAudioForGemini(file, onProgress) {
+    // If small MP3 under 6MB, send directly
+    if (file.size < 6 * 1024 * 1024 && file.type === 'audio/mpeg') {
+      return { base64: await this.fileToBase64(file), mimeType: 'audio/mp3' };
+    }
+
+    try {
+      if (onProgress) onProgress('Optimizing audio payload for Gemini (16kHz mono)...');
+      const arrayBuffer = await file.arrayBuffer();
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const decodedBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+      const targetSampleRate = 16000;
+      const targetLength = Math.round(decodedBuffer.duration * targetSampleRate);
+      const offlineCtx = new OfflineAudioContext(1, targetLength, targetSampleRate);
+      const source = offlineCtx.createBufferSource();
+      source.buffer = decodedBuffer;
+      source.connect(offlineCtx.destination);
+      source.start();
+
+      const renderedBuffer = await offlineCtx.startRendering();
+      const channelData = renderedBuffer.getChannelData(0);
+
+      // Encode into 16-bit PCM WAV
+      const numSamples = channelData.length;
+      const buffer = new ArrayBuffer(44 + numSamples * 2);
+      const view = new DataView(buffer);
+
+      const writeString = (offset, string) => {
+        for (let i = 0; i < string.length; i++) {
+          view.setUint8(offset + i, string.charCodeAt(i));
+        }
+      };
+
+      writeString(0, 'RIFF');
+      view.setUint32(4, 36 + numSamples * 2, true);
+      writeString(8, 'WAVE');
+      writeString(12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true); // PCM
+      view.setUint16(22, 1, true); // Mono
+      view.setUint32(24, targetSampleRate, true);
+      view.setUint32(28, targetSampleRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeString(36, 'data');
+      view.setUint32(40, numSamples * 2, true);
+
+      let offset = 44;
+      for (let i = 0; i < numSamples; i++, offset += 2) {
+        const s = Math.max(-1, Math.min(1, channelData[i]));
+        view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      }
+
+      // Convert Uint8Array to base64
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      const len = bytes.byteLength;
+      const chunkSize = 0x8000;
+      for (let i = 0; i < len; i += chunkSize) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+      }
+      return { base64: btoa(binary), mimeType: 'audio/wav' };
+    } catch (err) {
+      console.warn('Audio compression fallback to raw base64:', err);
+      return { base64: await this.fileToBase64(file), mimeType: file.type || 'audio/mp3' };
+    }
+  }
+
+  /**
    * Main sync entrypoint dispatching to provider
    */
   async syncLyrics({ provider, apiKey, model, customUrl, audioFile, referenceLyrics, onProgress }) {
@@ -138,11 +210,7 @@ export class AiService {
    * 1. Google Gemini Audio Sync with Word-to-Word Timestamps
    */
   async syncWithGemini({ apiKey, model, audioFile, referenceLyrics, onProgress }) {
-    if (onProgress) onProgress('Encoding audio for Gemini...');
-    const base64Audio = await this.fileToBase64(audioFile);
-
-    let mimeType = audioFile.type || 'audio/mp3';
-    if (!mimeType.startsWith('audio/')) mimeType = 'audio/mp3';
+    const { base64: base64Audio, mimeType } = await this.compressAudioForGemini(audioFile, onProgress);
 
     let prompt = `You are an expert audio engineer and vocal alignment specialist.
 Listen to this audio track carefully and generate synchronized lyrics with precise word-level and line-level timestamps in seconds.
@@ -177,32 +245,64 @@ Rules:
       prompt += `\n\nReference lyrics provided by user (align these exact words):\n"""\n${referenceLyrics.trim()}\n"""`;
     }
 
-    if (onProgress) onProgress(`Detecting word-to-word timestamps via Gemini (${model})...`);
-
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              { inline_data: { mime_type: mimeType, data: base64Audio } },
-              { text: prompt }
-            ]
+    let response;
+    const maxRetries = 3;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      if (onProgress) {
+        onProgress(attempt === 1 
+          ? `Detecting word-to-word timestamps via Gemini (${model})...` 
+          : `Retrying Gemini connection (${attempt}/${maxRetries})...`
+        );
+      }
+
+      try {
+        response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { inline_data: { mime_type: mimeType, data: base64Audio } },
+                  { text: prompt }
+                ]
+              }
+            ],
+            generationConfig: {
+              response_mime_type: 'application/json',
+              temperature: 0.1
+            }
+          })
+        });
+
+        if (response.status === 503 || response.status === 429) {
+          if (attempt < maxRetries) {
+            const waitSec = attempt * 2.5;
+            if (onProgress) onProgress(`Gemini servers temporarily busy (503). Retrying in ${waitSec}s (attempt ${attempt + 1}/${maxRetries})...`);
+            await new Promise(r => setTimeout(r, waitSec * 1000));
+            continue;
           }
-        ],
-        generationConfig: {
-          response_mime_type: 'application/json',
-          temperature: 0.1
         }
-      })
-    });
+
+        break;
+      } catch (netErr) {
+        if (attempt < maxRetries) {
+          await new Promise(r => setTimeout(r, 2000));
+          continue;
+        }
+        throw netErr;
+      }
+    }
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
-      const msg = errData?.error?.message || `HTTP ${response.status}: ${response.statusText}`;
+      let msg = errData?.error?.message || `HTTP ${response.status}: ${response.statusText}`;
+      if (response.status === 503) {
+        msg += `\n\n💡 Google Gemini is currently overloaded with high traffic (503 Service Unavailable). Recommended: Switch AI Provider to "Groq Whisper" in the dropdown for instant 2-second alignment with zero 503 errors!`;
+      }
       throw new Error(`Gemini Error: ${msg}`);
     }
 
