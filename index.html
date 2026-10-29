@@ -3,11 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Lyric Canvas Studio (Multi-AI & LRC)</title>
+  <title>Aura Canvas Studio — Fluid Kinetic AI Lyric Video</title>
+  
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,700;0,900;1,700&family=Bebas+Neue&family=Bodoni+Moda:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Fredoka:wght@400;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Newsreader:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,600;1,600&family=Shrikhand&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=3.5">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;600;800;900&family=Montserrat:wght@700;900&family=Outfit:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Three.js & Anime.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  
+  <!-- Studio Stylesheet -->
+  <link rel="stylesheet" href="css/style.css?v=4.0">
 </head>
 <body>
   <div class="app-container">
@@ -15,8 +23,8 @@
     <header class="app-header">
       <div class="logo">
         <span class="icon">✨</span>
-        <span class="brand-text"><strong>Lyric</strong> Canvas Studio</span>
-        <span class="badge">MULTI-AI & LRC</span>
+        <span class="brand-text"><strong>Aura</strong> Canvas Studio</span>
+        <span class="badge">THREE.JS & FLUID KINETIC</span>
       </div>
       <div class="header-actions">
         <div class="aspect-ratio-selector">
@@ -26,7 +34,7 @@
           <button class="ratio-btn" data-ratio="1:1">1:1 Square</button>
         </div>
         <a href="https://github.com/adityafirmansyah/gemini-canvas-lyric-video" target="_blank" class="github-btn" title="View Source on GitHub">
-          <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+          <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor">
             <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
           </svg>
           GitHub
@@ -41,18 +49,18 @@
         <!-- Tab Navigation -->
         <div class="tabs">
           <button class="tab-btn active" data-tab="tab-audio">1. Audio & Lyrics</button>
-          <button class="tab-btn" data-tab="tab-style">2. Visual Style</button>
+          <button class="tab-btn" data-tab="tab-style">2. Visual Settings</button>
           <button class="tab-btn" data-tab="tab-export">3. Export</button>
         </div>
 
+        <!-- Tab 1: Audio & Lyrics -->
         <div class="tab-content active" id="tab-audio">
-          <!-- Audio Upload Section -->
           <section class="card">
             <h3>🎵 1. Audio Track</h3>
             <div class="drop-zone" id="drop-zone">
               <span class="drop-icon">📂</span>
               <p>Drag & drop MP3 / WAV here</p>
-              <span class="subtext">or click to browse</span>
+              <span class="subtext">or click to browse audio</span>
               <input type="file" id="audio-input" accept="audio/*">
             </div>
             <div id="audio-info" class="audio-info hidden">
@@ -63,9 +71,8 @@
             </div>
           </section>
 
-          <!-- Lyrics Source Section -->
           <section class="card">
-            <h3>⚡ 2. Lyric Sync Method</h3>
+            <h3>⚡ 2. Lyric Sync Engine</h3>
             <div class="sync-method-selector">
               <label class="radio-label">
                 <input type="radio" name="sync-method" value="ai" checked>
@@ -80,50 +87,45 @@
             <!-- Panel A: AI Providers -->
             <div id="method-ai-panel">
               <div class="input-group">
-                <label for="ai-provider">AI Engine / Provider</label>
+                <label for="ai-provider">AI Provider</label>
                 <select id="ai-provider">
                   <option value="gemini">Google Gemini (Audio Multimodal)</option>
                   <option value="groq">Groq Whisper (Ultra Fast)</option>
                   <option value="openai">OpenAI Whisper (whisper-1)</option>
-                  <option value="custom">Custom OpenAI-Compatible API</option>
+                  <option value="custom">Custom Endpoint</option>
                 </select>
               </div>
 
-              <!-- Model Selector -->
               <div class="input-group" id="group-model">
                 <label for="ai-model">Model</label>
                 <select id="ai-model">
-                  <option value="gemini-3.8-flash">gemini-3.8-flash (Latest & Recommended)</option>
+                  <option value="gemini-3.8-flash">gemini-3.8-flash (Recommended)</option>
                   <option value="gemini-3.8-pro">gemini-3.8-pro (Highest Reasoning)</option>
                   <option value="gemini-1.5-flash">gemini-1.5-flash (Legacy)</option>
-                  <option value="gemini-1.5-pro">gemini-1.5-pro (Legacy)</option>
                 </select>
               </div>
 
-              <!-- Custom URL Input -->
               <div class="input-group hidden" id="group-custom-url">
                 <label for="custom-endpoint-url">Custom Endpoint URL</label>
                 <input type="text" id="custom-endpoint-url" placeholder="http://localhost:8000/v1/audio/transcriptions">
               </div>
 
-              <!-- API Key Input -->
               <div class="input-group" id="group-api-key">
                 <div class="label-with-link">
                   <label for="api-key" id="label-api-key">Gemini API Key</label>
-                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" id="api-key-link" class="get-key-link">Get Free Gemini Key ↗</a>
+                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" id="api-key-link" class="get-key-link">Get Free Key ↗</a>
                 </div>
                 <div class="key-input-wrapper">
                   <input type="password" id="api-key" placeholder="AIzaSy..." autocomplete="off">
-                  <button type="button" id="btn-test-key" class="mini-btn test-btn" title="Test API Key Connection">⚡ Test</button>
-                  <button type="button" id="toggle-key-visibility" class="mini-btn" title="Show/Hide Key">👁️</button>
+                  <button type="button" id="btn-test-key" class="mini-btn test-btn" title="Test API Key">⚡ Test</button>
+                  <button type="button" id="toggle-key-visibility" class="mini-btn" title="Show/Hide">👁️</button>
                 </div>
                 <div id="key-test-result" class="key-status-badge hidden"></div>
-                <small class="helper-text">Key is saved only in your browser local storage.</small>
               </div>
 
               <div class="input-group">
                 <label for="optional-lyrics">Reference Lyrics (Optional)</label>
-                <textarea id="optional-lyrics" rows="2" placeholder="Paste known lyrics here to guide AI alignment, or leave blank to let AI auto-transcribe."></textarea>
+                <textarea id="optional-lyrics" rows="2" placeholder="Paste known song lyrics to guide alignment, or leave blank for pure audio ASR."></textarea>
               </div>
 
               <button id="btn-sync-ai" class="primary-btn" disabled>
@@ -137,179 +139,135 @@
               <div class="drop-zone lrc-drop-zone" id="lrc-drop-zone">
                 <span class="drop-icon">📜</span>
                 <p>Drag & drop .LRC or .SRT file here</p>
-                <span class="subtext">Zero API key or external network needed</span>
+                <span class="subtext">Zero API key required</span>
                 <input type="file" id="lrc-input" accept=".lrc,.srt,.txt">
               </div>
             </div>
           </section>
 
-          <!-- Lyric Editor / Preview -->
           <section class="card">
             <div class="section-header">
-              <h3>📝 Timed Lyrics (JSON / Timestamps)</h3>
-              <button id="btn-sample-lyrics" class="text-link">Load Sample</button>
+              <h3>📝 Timed Lyrics Data</h3>
+              <button id="btn-sample-lyrics" class="text-link">Load Demo Song</button>
             </div>
-            <textarea id="lyrics-data" rows="7" placeholder='[
-  {"start": 0.0, "end": 3.5, "text": "Neon lights reflect the rain"},
-  {"start": 3.8, "end": 7.0, "text": "Drifting down the empty street"}
+            <textarea id="lyrics-data" rows="6" placeholder='[
+  {"start": 0.0, "end": 4.5, "text": "Neon reflections in the rainy night"},
+  {"start": 4.8, "end": 8.5, "text": "Lost in the rhythm of the city lights"}
 ]'></textarea>
-            <small class="helper-text">Format: JSON array of {start, end, text} in seconds. Edit timing manually anytime!</small>
+            <small class="helper-text">Lines are automatically chunked into fluid phrases of <strong>&le; 5 words</strong>.</small>
           </section>
         </div>
 
-        <!-- Tab 2: Visual Style -->
+        <!-- Tab 2: Visual Settings -->
         <div class="tab-content" id="tab-style">
+          <!-- 3D Three.js Background Section -->
           <section class="card">
             <div class="section-header">
-              <h3>🎨 HyperFrames Design Presets</h3>
-              <span class="helper-text">Official Frame.md Tokens</span>
+              <h3>🌌 3D Background Generator (Three.js)</h3>
+              <button type="button" id="btn-reset-bg-3d" class="text-link" title="Reset 3D settings">↺ Reset</button>
             </div>
-            <div class="preset-grid">
-              <button class="preset-card active" data-preset="biennale-yellow">
-                <div class="preset-preview biennale-bg">
-                  <div class="thumb-fx biennale-bloom"></div>
-                  <span class="thumb-tag font-instrument">BIENNALE</span>
-                </div>
-                <span>Biennale Yellow</span>
-              </button>
-              <button class="preset-card" data-preset="blockframe">
-                <div class="preset-preview blockframe-bg">
-                  <div class="thumb-fx blockframe-fx"></div>
-                  <span class="thumb-tag font-inter blockframe-text">BLOCK</span>
-                </div>
-                <span>BlockFrame</span>
-              </button>
-              <button class="preset-card" data-preset="blue-professional">
-                <div class="preset-preview blue-prof-bg">
-                  <span class="thumb-tag font-space blue-prof-text">COBALT</span>
-                </div>
-                <span>Blue Professional</span>
-              </button>
-              <button class="preset-card" data-preset="bold-poster">
-                <div class="preset-preview bold-poster-bg">
-                  <span class="thumb-tag font-shrikhand bold-poster-text">POSTER</span>
-                </div>
-                <span>Bold Poster</span>
-              </button>
-              <button class="preset-card" data-preset="broadside">
-                <div class="preset-preview broadside-bg">
-                  <span class="thumb-tag font-barlow broadside-text">BROADSIDE</span>
-                </div>
-                <span>Broadside</span>
-              </button>
-              <button class="preset-card" data-preset="capsule">
-                <div class="preset-preview capsule-bg">
-                  <span class="thumb-tag font-bodoni capsule-pill">PILL</span>
-                </div>
-                <span>Capsule</span>
-              </button>
-              <button class="preset-card" data-preset="cartesian">
-                <div class="preset-preview cartesian-bg">
-                  <div class="thumb-fx cartesian-grid"></div>
-                  <span class="thumb-tag font-serif cartesian-text">CARTESIAN</span>
-                </div>
-                <span>Cartesian</span>
-              </button>
-              <button class="preset-card" data-preset="cobalt-grid">
-                <div class="preset-preview cobalt-grid-bg">
-                  <div class="thumb-fx riso-grid"></div>
-                  <span class="thumb-tag font-newsreader cobalt-text">RISO</span>
-                </div>
-                <span>Cobalt Grid</span>
-              </button>
-              <button class="preset-card" data-preset="code-editorial">
-                <div class="preset-preview code-ed-bg">
-                  <span class="thumb-tag font-garamond code-coral">DEV BOOK</span>
-                </div>
-                <span>Code Editorial</span>
-              </button>
-              <button class="preset-card" data-preset="coral">
-                <div class="preset-preview coral-bg">
-                  <span class="thumb-tag font-bebas coral-text">CORAL</span>
-                </div>
-                <span>Coral Magazine</span>
-              </button>
-              <button class="preset-card" data-preset="creative-mode">
-                <div class="preset-preview creative-bg">
-                  <span class="thumb-tag font-archivo creative-text">CREATIVE</span>
-                </div>
-                <span>Creative Mode</span>
-              </button>
-              <button class="preset-card" data-preset="daisy-days">
-                <div class="preset-preview daisy-bg">
-                  <span class="thumb-tag font-fredoka daisy-text">PASTEL</span>
-                </div>
-                <span>Daisy Days</span>
-              </button>
-              <button class="preset-card" data-preset="editorial-forest">
-                <div class="preset-preview forest-bg">
-                  <span class="thumb-tag font-source-serif forest-text">BOTANICAL</span>
-                </div>
-                <span>Editorial Forest</span>
-              </button>
-              <button class="preset-card" data-preset="highway">
-                <div class="preset-preview highway-bg">
-                  <span class="thumb-tag font-bebas highway-glow">POV DRIVE</span>
-                </div>
-                <span>Highway POV</span>
-              </button>
-            </div>
-          </section>
 
-          <section class="card">
-            <h3>⚡ Lyric Animation Engine</h3>
             <div class="input-group">
-              <label for="anim-type">Animation Style</label>
-              <select id="anim-type">
-                <option value="smooth-slide">Smooth Slide-Up (HyperFrames 0.38s Ease-Out)</option>
-                <option value="word-stack">Progressive Word Stacking (Highway Drive / Viral Stacker)</option>
-                <option value="karaoke-fill">Karaoke Progressive Fill (Left-to-Right)</option>
-                <option value="pop-bounce">Beat Pop & Scale (Spring Damping 0.7-0.85)</option>
-                <option value="floating-wave">Floating Ambient Wave (Dreamy / Relaxed)</option>
-                <option value="typewriter">Typewriter Reveal (Retro Terminal / JetBrains Mono)</option>
-                <option value="cyber-glitch">Cyber Glitch & RGB Shift (Distorted)</option>
+              <label for="three-style">3D Visual Mode</label>
+              <select id="three-style">
+                <option value="particle-waves">Cosmic Particle Waves (Glowing 3D Field)</option>
+                <option value="ethereal-silk">Ethereal Silk Flow (Undulating Mesh Lines)</option>
+                <option value="cyber-grid">Cyber Matrix Grid (Rolling 3D Perspective)</option>
+                <option value="starfield">Celestial Starfield (Deep Cosmic Warp)</option>
               </select>
             </div>
-          </section>
 
-          <section class="card">
-            <h3>✨ Typography & Colors</h3>
             <div class="form-row">
               <div class="input-group">
-                <label for="font-family">Font Family (HyperFrames Registry)</label>
+                <label for="three-color">Particle / Mesh Color</label>
+                <input type="color" id="three-color" value="#64ffda">
+              </div>
+              <div class="input-group">
+                <label for="three-bg-color">Space Base Color</label>
+                <input type="color" id="three-bg-color" value="#080b14">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="input-group">
+                <div class="label-with-link">
+                  <label for="three-speed">Wave Speed</label>
+                  <span id="three-speed-val" class="helper-text">1.0x</span>
+                </div>
+                <input type="range" id="three-speed" min="20" max="300" value="100" step="10">
+              </div>
+              <div class="input-group">
+                <div class="label-with-link">
+                  <label for="three-height">Wave Height</label>
+                  <span id="three-height-val" class="helper-text">45px</span>
+                </div>
+                <input type="range" id="three-height" min="10" max="100" value="45" step="5">
+              </div>
+            </div>
+
+            <div class="toggle-group">
+              <label class="switch-label">
+                <input type="checkbox" id="toggle-audio-reactive" checked>
+                <span>Audio Beat Pulse & Reactive Waves</span>
+              </label>
+            </div>
+          </section>
+
+          <!-- Fluid Kinetic Typography Section -->
+          <section class="card">
+            <div class="section-header">
+              <h3>✍️ Fluid Kinetic Typography</h3>
+              <button type="button" id="btn-reset-lyrics" class="text-link" title="Reset lyric styling">↺ Reset</button>
+            </div>
+
+            <div class="input-group">
+              <label for="lyric-motion-style">Fluid Motion Style</label>
+              <select id="lyric-motion-style">
+                <option value="liquid-spring">Liquid Spring Wave (Organic Stagger & Undulation)</option>
+                <option value="vocal-pop">Vocal Pop Spotlight (Spring Bounce on Active Word)</option>
+                <option value="ethereal-mist">Cinematic Ethereal Float (Slow Ambient Breath)</option>
+                <option value="minimal">Minimalist Editorial (Restrained Typographic Focus)</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div class="input-group">
+                <label for="font-family">Typography Font</label>
                 <select id="font-family">
-                  <option value="'Instrument Serif', serif">Instrument Serif (Biennale Yellow / Museum)</option>
-                  <option value="'Inter', sans-serif">Inter (BlockFrame / Blue Professional)</option>
-                  <option value="'Space Grotesk', sans-serif">Space Grotesk (Capsule / Tech)</option>
-                  <option value="'Shrikhand', cursive">Shrikhand (Bold Poster Vintage Display)</option>
-                  <option value="'Libre Baskerville', serif">Libre Baskerville (Bold Poster Body)</option>
-                  <option value="'Barlow', sans-serif">Barlow 900 (Broadside Protest)</option>
-                  <option value="'Bodoni Moda', serif">Bodoni Moda (Capsule Editorial)</option>
-                  <option value="'Playfair Display', serif">Playfair Display (Cartesian Minimal)</option>
-                  <option value="'Newsreader', serif">Newsreader (Cobalt Grid Risograph)</option>
-                  <option value="'EB Garamond', serif">EB Garamond (Code Editorial)</option>
-                  <option value="'Bebas Neue', sans-serif">Bebas Neue (Coral / Highway Bold)</option>
-                  <option value="'Archivo Black', sans-serif">Archivo Black (Creative Mode Neobrutalist)</option>
-                  <option value="'Fredoka', sans-serif">Fredoka (Daisy Days Picture Book)</option>
-                  <option value="'Source Serif 4', serif">Source Serif 4 (Editorial Forest)</option>
-                  <option value="'JetBrains Mono', monospace">JetBrains Mono (Code Chrome)</option>
                   <option value="'Outfit', sans-serif">Outfit (Modern Clean)</option>
-                  <option value="system-ui, sans-serif">System Sans</option>
+                  <option value="'Bebas Neue', sans-serif">Bebas Neue (Viral Tall Caps)</option>
+                  <option value="'Instrument Serif', serif">Instrument Serif (Luxury Editorial)</option>
+                  <option value="'Space Grotesk', sans-serif">Space Grotesk (Tech Modern)</option>
+                  <option value="'Inter', sans-serif">Inter (Neo-Grotesque)</option>
+                  <option value="'Montserrat', sans-serif">Montserrat (Bold Punchy)</option>
                 </select>
               </div>
               <div class="input-group">
-                <label for="font-size">Font Size</label>
-                <input type="range" id="font-size" min="28" max="72" value="48">
+                <div class="label-with-link">
+                  <label for="font-size">Font Size</label>
+                  <span id="font-size-val" class="helper-text">56px</span>
+                </div>
+                <input type="range" id="font-size" min="36" max="84" value="56" step="2">
               </div>
+            </div>
+
+            <!-- Strict Max Words Per Chunk Setting -->
+            <div class="input-group">
+              <div class="label-with-link">
+                <label for="max-words">Max Words Per Beat / Line Chunk (Strictly &le; 5)</label>
+                <span id="max-words-val" class="helper-text" style="color: var(--accent); font-weight: 700;">4 words</span>
+              </div>
+              <input type="range" id="max-words" min="1" max="5" value="4" step="1">
+              <small class="helper-text">Never overloads the screen. Keeps viral, punchy reading cadence.</small>
             </div>
 
             <div class="form-row">
               <div class="input-group">
-                <label for="text-color">Text Color</label>
+                <label for="text-color">Base Lyric Color</label>
                 <input type="color" id="text-color" value="#ffffff">
               </div>
               <div class="input-group">
-                <label for="accent-color">Accent Glow / Active</label>
+                <label for="accent-color">Active Vocal Glow Color</label>
                 <input type="color" id="accent-color" value="#64ffda">
               </div>
             </div>
@@ -331,188 +289,40 @@
               </div>
             </div>
 
-            <div class="toggle-group">
-              <label class="switch-label">
-                <input type="checkbox" id="toggle-audio-reactive" checked>
-                <span>Audio-reactive Beat Pulse (RMS / Kick)</span>
-              </label>
-            </div>
-          </section>
-
-          <!-- Subtitle & Box Badge Design Section -->
-          <section class="card">
-            <div class="section-header">
-              <h3>🏷️ Subtitle & Box Badge Design</h3>
-              <button type="button" id="btn-reset-subtitle" class="text-link" title="Reset subtitle badge settings to defaults">↺ Reset Style</button>
-            </div>
-
             <div class="input-group">
-              <label for="sub-style">Subtitle Badge Style</label>
-              <select id="sub-style">
-                <option value="none">Standard Glowing Text (No Box)</option>
-                <option value="highway-3d">Highway 3D Perspective (Deep Asphalt Shadow & Driver Vanishing Tilt)</option>
-                <option value="boxed-banner">Solid Highlight Box Banner (Like Reference Image)</option>
-                <option value="alternating-badge">Dual-Tone Inverted Badges (Lime & Dark)</option>
-                <option value="word-badges">Individual Box Badge per Word</option>
-                <option value="karaoke-word-pop">Active Word Pop-out Badge (Viral Shorts)</option>
-                <option value="outline-only">Heavy Text Outline (Bold Comic)</option>
+              <label for="container-style">Word Container / Badge Style</label>
+              <select id="container-style">
+                <option value="clean-glow">Clean Glowing Typography (No Box)</option>
+                <option value="pill-badge">Liquid Pill Badges (Rounded Capsule Badges)</option>
+                <option value="contrast-box">Modern Contrast Box (Sharp Creative Badges)</option>
+                <option value="ambient-scrim">Ambient Glass Scrim (Subtle Tinted Cards)</option>
               </select>
             </div>
 
-            <div id="sub-settings-panel" class="overlay-settings-wrapper hidden">
-              <!-- Quick Color Presets -->
-              <div class="input-group">
-                <label>Quick Badge Colors</label>
-                <div class="badge-color-palette">
-                  <button type="button" class="palette-btn" data-box="#c9fa53" data-text="#000000" style="background: #c9fa53;" title="Lime Volt"></button>
-                  <button type="button" class="palette-btn" data-box="#facc15" data-text="#000000" style="background: #facc15;" title="Electric Yellow"></button>
-                  <button type="button" class="palette-btn" data-box="#22d3ee" data-text="#000000" style="background: #22d3ee;" title="Cyber Cyan"></button>
-                  <button type="button" class="palette-btn" data-box="#ff007f" data-text="#ffffff" style="background: #ff007f;" title="Neon Pink"></button>
-                  <button type="button" class="palette-btn" data-box="#ef4444" data-text="#ffffff" style="background: #ef4444;" title="Crimson Red"></button>
-                  <button type="button" class="palette-btn" data-box="#ffffff" data-text="#000000" style="background: #ffffff;" title="Clean White"></button>
-                  <button type="button" class="palette-btn" data-box="#0a0c10" data-text="#c9fa53" style="background: #0a0c10; border: 1px solid #444;" title="Pitch Dark"></button>
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="input-group">
-                  <label for="sub-box-color">Box Background Color</label>
-                  <input type="color" id="sub-box-color" value="#c9fa53">
-                </div>
-                <div class="input-group">
-                  <label for="sub-text-color">Text Color in Box</label>
-                  <input type="color" id="sub-text-color" value="#000000">
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="input-group">
-                  <div class="label-with-link">
-                    <label for="sub-corner-radius">Corner Rounding</label>
-                    <span id="sub-corner-radius-val" class="helper-text">4px</span>
-                  </div>
-                  <input type="range" id="sub-corner-radius" min="0" max="24" value="4" step="1">
-                </div>
-                <div class="input-group">
-                  <div class="label-with-link">
-                    <label for="sub-padding">Box Padding</label>
-                    <span id="sub-padding-val" class="helper-text">14px</span>
-                  </div>
-                  <input type="range" id="sub-padding" min="6" max="32" value="14" step="2">
-                </div>
-              </div>
-
-              <div class="toggle-group">
-                <label class="switch-label">
-                  <input type="checkbox" id="sub-uppercase" checked>
-                  <span>ALL CAPS / Uppercase Badges (High Impact)</span>
-                </label>
-              </div>
-            </div>
-          </section>
-
-          <!-- Custom Background Image Section -->
-          <section class="card">
-            <div class="section-header">
-              <h3>🖼️ Custom Background Image</h3>
-              <button type="button" id="btn-reset-bg-motion" class="text-link" title="Reset background motion settings to defaults">↺ Reset Motion</button>
-            </div>
-            <div class="drop-zone" id="bg-drop-zone">
-              <span class="drop-icon">🌄</span>
-              <p>Drag & drop background artwork or video</p>
-              <span class="subtext">JPG, PNG, WebP or MP4/WebM driving POV clips</span>
-              <input type="file" id="custom-bg-input" accept="image/*,video/*">
-            </div>
-
-            <div id="bg-img-info" class="audio-info hidden">
-              <div class="track-details">
-                <span id="bg-img-name" class="track-title">artwork.png</span>
-                <button type="button" id="btn-remove-bg-img" class="text-link" style="color: var(--danger); font-weight: 700;">✕ Clear</button>
-              </div>
-            </div>
-
-            <div class="input-group">
-              <div class="label-with-link">
-                <label for="bg-dim">Background Dimming / Tint</label>
-                <span id="bg-dim-val" class="helper-text">55%</span>
-              </div>
-              <input type="range" id="bg-dim" min="10" max="90" value="55" step="5">
-              <small class="helper-text">Darkens the background image so lyrics pop with optimal contrast.</small>
-            </div>
-
-            <!-- Background Motion & Animation Settings -->
-            <div class="overlay-settings-wrapper" id="bg-motion-panel">
-              <div class="input-group">
-                <label for="bg-anim-type">Background Motion Style</label>
-                <select id="bg-anim-type">
-                  <option value="ken-burns">Ken Burns (Slow Breathing Zoom In & Out)</option>
-                  <option value="zoom-in">Continuous Zoom In (Slow Push)</option>
-                  <option value="zoom-out">Continuous Zoom Out (Slow Pull)</option>
-                  <option value="pan-horizontal">Slow Horizontal Pan (Left-Right Drift)</option>
-                  <option value="pan-vertical">Slow Vertical Pan (Up-Down Drift)</option>
-                  <option value="sway">Gentle Pendulum Sway / Tilt</option>
-                  <option value="beat-only">Beat Bounce Only (Reactive Kick Pulse)</option>
-                  <option value="static">Static (Completely Still)</option>
-                </select>
-              </div>
-
-              <div class="form-row">
-                <div class="input-group">
-                  <div class="label-with-link">
-                    <label for="bg-anim-speed">Motion Speed</label>
-                    <span id="bg-anim-speed-val" class="helper-text">1.0x</span>
-                  </div>
-                  <input type="range" id="bg-anim-speed" min="20" max="300" value="100" step="10">
-                </div>
-                <div class="input-group">
-                  <div class="label-with-link">
-                    <label for="bg-anim-intensity">Motion Intensity</label>
-                    <span id="bg-anim-intensity-val" class="helper-text">100%</span>
-                  </div>
-                  <input type="range" id="bg-anim-intensity" min="0" max="250" value="100" step="10">
-                </div>
-              </div>
-
-              <div class="input-group">
-                <div class="label-with-link">
-                  <label for="bg-beat-bounce">Audio Beat Bounce Intensity</label>
-                  <span id="bg-beat-bounce-val" class="helper-text">100%</span>
-                </div>
-                <input type="range" id="bg-beat-bounce" min="0" max="250" value="100" step="10">
-                <small class="helper-text">Pulsing zoom scale on heavy sub-bass / kick drum hits.</small>
-              </div>
-            </div>
-          </section>
-
-          <!-- HyperFrames Layout Engine Section -->
-          <section class="card">
-            <div class="section-header">
-              <h3>🧠 HyperFrames Layout Engine</h3>
-              <span class="helper-text">HF-grade page layout</span>
-            </div>
-
             <div class="toggle-group">
               <label class="switch-label">
-                <input type="checkbox" id="toggle-auto-fit" checked>
-                <span>Auto-Fit Font Size (fitTextFontSize)</span>
+                <input type="checkbox" id="toggle-uppercase">
+                <span>ALL CAPS / Uppercase Punch</span>
               </label>
-              <small class="helper-text">Dynamically scales lyrics to hero impact (60%–90% width) with no clipping on 16:9 or 9:16.</small>
             </div>
+          </section>
 
+          <!-- Layout & Depth Layering Section -->
+          <section class="card">
+            <h3>🛡️ Layout & Depth Layering</h3>
             <div class="toggle-group">
               <label class="switch-label">
                 <input type="checkbox" id="toggle-safe-guides">
-                <span>9:16 Shorts / Reels Safe Area Guides (Preview Only)</span>
+                <span>9:16 Shorts Safe Area Guides (Preview Only)</span>
               </label>
-              <small class="helper-text">PROJECTOR-FRAME overlay: 14.3% margin, YouTube Shorts UI danger zone, and title-safe band. Guides never export into video.</small>
+              <small class="helper-text">Shows YouTube Shorts UI boundaries. Automatically hidden during export.</small>
             </div>
 
-            <div class="input-group">
-              <label>Foreground Subject Layer (Text Behind Subject)</label>
+            <div class="input-group" style="margin-top: 10px;">
+              <label>Foreground Subject Cutout (Text Behind Subject)</label>
               <div class="drop-zone compact" id="fg-drop-zone">
                 <span class="drop-icon">🚶</span>
-                <p>Drag & drop subject PNG cutout</p>
-                <span class="subtext">Vocalist, car, silhouette — lyrics render behind it</span>
+                <p>Drag & drop PNG cutout (singer, car, silhouette)</p>
                 <input type="file" id="fg-input" accept="image/*">
               </div>
               <div id="fg-img-info" class="audio-info hidden">
@@ -520,95 +330,6 @@
                   <span id="fg-img-name" class="track-title">subject.png</span>
                   <button type="button" id="btn-remove-fg-img" class="text-link" style="color: var(--danger); font-weight: 700;">✕ Clear</button>
                 </div>
-              </div>
-              <small class="helper-text">∘ Depth stacking: Background → Lyrics → Subject → Overlay FX. Lyrics land behind the subject for movie-poster dimension.</small>
-            </div>
-          </section>
-
-          <!-- Atmospheric Overlay Effect Section -->
-          <section class="card">
-            <div class="section-header">
-              <h3>🌌 Atmospheric Overlay Effect</h3>
-              <button type="button" id="btn-reset-overlay" class="text-link" title="Reset all overlay sliders to defaults">↺ Reset Overlay</button>
-            </div>
-            <div class="input-group">
-              <label for="overlay-type">Overlay Style (Layers on top of Background)</label>
-              <select id="overlay-type">
-                <option value="particles">Floating Dust Bokeh (Lofi Sparks)</option>
-                <option value="rain">Dreamy Rainy Window (Rain on Glass)</option>
-                <option value="starfield">Starfield Hyperspace (3D Stars)</option>
-                <option value="waveform">Audio-Reactive Equalizer Waveform</option>
-                <option value="synthwave-grid">Retro Synthwave 3D Grid</option>
-                <option value="none">None (Clean Background Only)</option>
-              </select>
-            </div>
-
-            <!-- Overlay Fine-Tuning Controls -->
-            <div id="overlay-settings-panel" class="overlay-settings-wrapper">
-              <!-- 1. Flow Direction Full Width -->
-              <div class="input-group">
-                <label for="overlay-direction">Flow Direction</label>
-                <select id="overlay-direction">
-                  <option value="default">Default Drift (Natural)</option>
-                  <option value="down">Downward (Rain / Falling Snow)</option>
-                  <option value="up">Upward (Rising Embers / Floating)</option>
-                  <option value="left">Drifting Left</option>
-                  <option value="right">Drifting Right</option>
-                </select>
-              </div>
-
-              <!-- 2. Four Settings: Density, Speed, Size, Opacity (Max 100%) -->
-              <div class="form-row">
-                <div class="input-group">
-                  <div class="label-with-link">
-                    <label for="overlay-density">Density / Count</label>
-                    <span id="overlay-density-val" class="helper-text">100%</span>
-                  </div>
-                  <input type="range" id="overlay-density" min="20" max="250" value="100" step="10">
-                </div>
-                <div class="input-group">
-                  <div class="label-with-link">
-                    <label for="overlay-speed">Speed</label>
-                    <span id="overlay-speed-val" class="helper-text">1.0x</span>
-                  </div>
-                  <input type="range" id="overlay-speed" min="20" max="300" value="100" step="10">
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="input-group">
-                  <div class="label-with-link">
-                    <label for="overlay-size">Particle Size</label>
-                    <span id="overlay-size-val" class="helper-text">1.0x</span>
-                  </div>
-                  <input type="range" id="overlay-size" min="40" max="250" value="100" step="10">
-                </div>
-                <div class="input-group">
-                  <div class="label-with-link">
-                    <label for="overlay-opacity">Overlay Opacity</label>
-                    <span id="overlay-opacity-val" class="helper-text">100%</span>
-                  </div>
-                  <input type="range" id="overlay-opacity" min="10" max="100" value="100" step="5">
-                </div>
-              </div>
-
-              <!-- 3. Particle Color -->
-              <div class="input-group">
-                <label for="overlay-color">Particle Color</label>
-                <input type="color" id="overlay-color" value="#64ffda">
-              </div>
-
-              <!-- 4. Custom Particle Image -->
-              <div class="input-group">
-                <label for="custom-particle-input">Custom Particle Image (Optional)</label>
-                <input type="file" id="custom-particle-input" accept="image/*">
-                <div id="particle-img-info" class="audio-info hidden" style="margin-top: 6px;">
-                  <div class="track-details">
-                    <span id="particle-img-name" class="track-title">particle.png</span>
-                    <button type="button" id="btn-remove-particle-img" class="text-link" style="color: var(--danger); font-weight: 700;">✕ Clear</button>
-                  </div>
-                </div>
-                <small class="helper-text">Upload a transparent PNG (e.g. sakura petal, snowflake, leaf, money note) to replace dots with custom floating graphics.</small>
               </div>
             </div>
           </section>
@@ -628,7 +349,7 @@
 
             <div class="export-banner">
               <div class="info-icon">💡</div>
-              <p>Uses high-performance browser stream capture combining the animated Canvas and Web Audio bus into a synchronized video file.</p>
+              <p>Renders the Three.js 3D WebGL background and fluid kinetic typography synchronously with audio into video.</p>
             </div>
 
             <button id="btn-start-record" class="record-btn" disabled>
@@ -646,10 +367,9 @@
             </div>
           </section>
 
-          <!-- Thumbnail Export Section -->
           <section class="card">
-            <h3>📸 YouTube Video Thumbnail</h3>
-            <p class="helper-text">Capture the current canvas frame as a high-resolution PNG image (1920x1080 or current aspect ratio) ready for YouTube cover art.</p>
+            <h3>📸 Video Cover / Thumbnail</h3>
+            <p class="helper-text">Capture the current animated frame as a crisp high-resolution PNG image ready for YouTube thumbnail.</p>
             <button id="btn-export-thumbnail" class="secondary-btn">
               📸 Snapshot Frame as Thumbnail (.PNG)
             </button>
@@ -657,12 +377,12 @@
         </div>
       </aside>
 
-      <!-- Center / Right Stage: Live Canvas Preview -->
+      <!-- Stage / Canvas Preview -->
       <section class="stage-container">
         <div class="canvas-wrapper" id="canvas-wrapper">
           <canvas id="lyric-canvas"></canvas>
-          
-          <!-- Overlay Controls -->
+
+          <!-- Playback Transport Bar -->
           <div class="playback-bar">
             <button id="btn-play-pause" class="play-btn" disabled>▶</button>
             <div class="time-slider-wrapper">
@@ -684,7 +404,7 @@
   <!-- Audio Element (Hidden) -->
   <audio id="audio-player" preload="auto"></audio>
 
-  <!-- Modular Scripts -->
-  <script type="module" src="js/app.js?v=3.5"></script>
+  <!-- Modular Main Script -->
+  <script type="module" src="js/app.js?v=4.0"></script>
 </body>
 </html>

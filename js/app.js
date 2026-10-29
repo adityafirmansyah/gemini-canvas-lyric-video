@@ -1,15 +1,15 @@
 /**
- * app.js
- * Main Controller coordinating Audio, Multi-AI Service, LRC Parser, Canvas Rendering, and Video Export.
+ * app.js (v4.0 Aura Studio)
+ * Main Controller coordinating Audio, Three.js 3D Background, Fluid Kinetic Lyrics, and Video Recording.
  */
 
-import { AudioManager } from './audio-player.js?v=3.5';
-import { AiService } from './ai-service.js?v=3.5';
-import { LrcParser } from './lrc-parser.js?v=3.5';
-import { CanvasRenderer } from './canvas-renderer.js?v=3.5';
-import { VideoRecorder } from './recorder.js?v=3.5';
+import { AudioManager } from './audio-player.js?v=4.0';
+import { AiService } from './ai-service.js?v=4.0';
+import { LrcParser } from './lrc-parser.js?v=4.0';
+import { CanvasRenderer } from './canvas-renderer.js?v=4.0';
+import { VideoRecorder } from './recorder.js?v=4.0';
 
-// DOM Elements
+// Canvas & Audio
 const canvas = document.getElementById('lyric-canvas');
 const audioPlayer = document.getElementById('audio-player');
 const dropZone = document.getElementById('drop-zone');
@@ -18,19 +18,18 @@ const audioInfo = document.getElementById('audio-info');
 const trackNameEl = document.getElementById('track-name');
 const trackDurationEl = document.getElementById('track-duration');
 
-// Sync Method Selector (AI vs LRC)
+// Sync Method
 const syncMethodRadios = document.querySelectorAll('input[name="sync-method"]');
 const methodAiPanel = document.getElementById('method-ai-panel');
 const methodLrcPanel = document.getElementById('method-lrc-panel');
 const lrcInput = document.getElementById('lrc-input');
 const lrcDropZone = document.getElementById('lrc-drop-zone');
 
-// AI Provider Controls
+// AI Settings
 const aiProviderSelect = document.getElementById('ai-provider');
 const aiModelSelect = document.getElementById('ai-model');
 const groupCustomUrl = document.getElementById('group-custom-url');
 const customEndpointUrl = document.getElementById('custom-endpoint-url');
-const groupApiKey = document.getElementById('group-api-key');
 const labelApiKey = document.getElementById('label-api-key');
 const apiKeyLink = document.getElementById('api-key-link');
 const apiKeyInput = document.getElementById('api-key');
@@ -41,72 +40,39 @@ const optionalLyricsInput = document.getElementById('optional-lyrics');
 const btnSyncAi = document.getElementById('btn-sync-ai');
 const aiStatus = document.getElementById('ai-status');
 
-// Lyrics Editor
+// Lyrics Data
 const lyricsDataInput = document.getElementById('lyrics-data');
 const btnSampleLyrics = document.getElementById('btn-sample-lyrics');
 
-// Style Controls
-const presetCards = document.querySelectorAll('.preset-card');
-const animTypeSelect = document.getElementById('anim-type');
+// 3D Background Controls
+const threeStyleSelect = document.getElementById('three-style');
+const threeColorInput = document.getElementById('three-color');
+const threeBgColorInput = document.getElementById('three-bg-color');
+const threeSpeedInput = document.getElementById('three-speed');
+const threeSpeedVal = document.getElementById('three-speed-val');
+const threeHeightInput = document.getElementById('three-height');
+const threeHeightVal = document.getElementById('three-height-val');
+const toggleAudioReactive = document.getElementById('toggle-audio-reactive');
+const btnResetBg3D = document.getElementById('btn-reset-bg-3d');
+
+// Fluid Kinetic Typography Controls
+const lyricMotionStyleSelect = document.getElementById('lyric-motion-style');
 const fontFamilySelect = document.getElementById('font-family');
 const fontSizeRange = document.getElementById('font-size');
+const fontSizeVal = document.getElementById('font-size-val');
+const maxWordsRange = document.getElementById('max-words');
+const maxWordsVal = document.getElementById('max-words-val');
 const textColorInput = document.getElementById('text-color');
 const accentColorInput = document.getElementById('accent-color');
 const glowSizeInput = document.getElementById('glow-size');
 const glowSizeVal = document.getElementById('glow-size-val');
 const glowDensityInput = document.getElementById('glow-density');
 const glowDensityVal = document.getElementById('glow-density-val');
+const containerStyleSelect = document.getElementById('container-style');
+const toggleUppercase = document.getElementById('toggle-uppercase');
+const btnResetLyrics = document.getElementById('btn-reset-lyrics');
 
-// Subtitle & Box Badge Controls
-const subStyleSelect = document.getElementById('sub-style');
-const subSettingsPanel = document.getElementById('sub-settings-panel');
-const subBoxColorInput = document.getElementById('sub-box-color');
-const subTextColorInput = document.getElementById('sub-text-color');
-const subCornerRadiusInput = document.getElementById('sub-corner-radius');
-const subCornerRadiusVal = document.getElementById('sub-corner-radius-val');
-const subPaddingInput = document.getElementById('sub-padding');
-const subPaddingVal = document.getElementById('sub-padding-val');
-const subUppercaseInput = document.getElementById('sub-uppercase');
-const btnResetSubtitle = document.getElementById('btn-reset-subtitle');
-const paletteBtns = document.querySelectorAll('.palette-btn');
-
-const overlayTypeSelect = document.getElementById('overlay-type');
-const overlaySettingsPanel = document.getElementById('overlay-settings-panel');
-const overlayDensityInput = document.getElementById('overlay-density');
-const overlayDensityVal = document.getElementById('overlay-density-val');
-const overlaySpeedInput = document.getElementById('overlay-speed');
-const overlaySpeedVal = document.getElementById('overlay-speed-val');
-const overlayDirectionSelect = document.getElementById('overlay-direction');
-const overlaySizeInput = document.getElementById('overlay-size');
-const overlaySizeVal = document.getElementById('overlay-size-val');
-const overlayOpacityInput = document.getElementById('overlay-opacity');
-const overlayOpacityVal = document.getElementById('overlay-opacity-val');
-const overlayColorInput = document.getElementById('overlay-color');
-const btnResetOverlay = document.getElementById('btn-reset-overlay');
-const customParticleInput = document.getElementById('custom-particle-input');
-const particleImgInfo = document.getElementById('particle-img-info');
-const particleImgName = document.getElementById('particle-img-name');
-const btnRemoveParticleImg = document.getElementById('btn-remove-particle-img');
-
-const bgDropZone = document.getElementById('bg-drop-zone');
-const customBgInput = document.getElementById('custom-bg-input');
-const bgImgInfo = document.getElementById('bg-img-info');
-const bgImgName = document.getElementById('bg-img-name');
-const btnRemoveBgImg = document.getElementById('btn-remove-bg-img');
-const bgDimSlider = document.getElementById('bg-dim');
-const bgDimVal = document.getElementById('bg-dim-val');
-const btnResetBgMotion = document.getElementById('btn-reset-bg-motion');
-const bgAnimTypeSelect = document.getElementById('bg-anim-type');
-const bgAnimSpeedInput = document.getElementById('bg-anim-speed');
-const bgAnimSpeedVal = document.getElementById('bg-anim-speed-val');
-const bgAnimIntensityInput = document.getElementById('bg-anim-intensity');
-const bgAnimIntensityVal = document.getElementById('bg-anim-intensity-val');
-const bgBeatBounceInput = document.getElementById('bg-beat-bounce');
-const bgBeatBounceVal = document.getElementById('bg-beat-bounce-val');
-const toggleAudioReactive = document.getElementById('toggle-audio-reactive');
-
-// HyperFrames Layout Engine Controls
-const toggleAutoFit = document.getElementById('toggle-auto-fit');
+// Depth & Safe Guides
 const toggleSafeGuides = document.getElementById('toggle-safe-guides');
 const fgDropZone = document.getElementById('fg-drop-zone');
 const fgInput = document.getElementById('fg-input');
@@ -114,7 +80,7 @@ const fgImgInfo = document.getElementById('fg-img-info');
 const fgImgName = document.getElementById('fg-img-name');
 const btnRemoveFgImg = document.getElementById('btn-remove-fg-img');
 
-// Header Ratio Buttons
+// Aspect Ratio
 const ratioButtons = document.querySelectorAll('.ratio-btn');
 
 // Playback Bar
@@ -131,6 +97,8 @@ const btnStopRecord = document.getElementById('btn-stop-record');
 const recordProgress = document.getElementById('record-progress');
 const progressFill = document.getElementById('progress-fill');
 const recordStatusText = document.getElementById('record-status');
+const btnExportThumbnail = document.getElementById('btn-export-thumbnail');
+const btnSnapshotBar = document.getElementById('btn-snapshot-bar');
 
 // Tabs
 const tabButtons = document.querySelectorAll('.tab-btn');
@@ -143,7 +111,6 @@ const renderer = new CanvasRenderer(canvas);
 let recorder = null;
 let currentAudioFile = null;
 
-// Helper: Format Seconds to mm:ss
 function formatTime(seconds) {
   if (isNaN(seconds)) return '0:00';
   const m = Math.floor(seconds / 60);
@@ -157,134 +124,106 @@ function showAiStatus(message, type = 'info') {
   aiStatus.classList.remove('hidden');
 }
 
-// 1. Multi-Provider Configuration
+// 1. AI Provider Setup
 const providerModels = {
   gemini: [
-    { value: 'gemini-3.8-flash', label: 'gemini-3.8-flash (Latest & Fast Multimodal Audio)' },
+    { value: 'gemini-3.8-flash', label: 'gemini-3.8-flash (Recommended)' },
     { value: 'gemini-3.8-pro', label: 'gemini-3.8-pro (Highest Reasoning)' },
-    { value: 'gemini-1.5-flash', label: 'gemini-1.5-flash (Legacy)' },
-    { value: 'gemini-1.5-pro', label: 'gemini-1.5-pro (Legacy)' }
+    { value: 'gemini-1.5-flash', label: 'gemini-1.5-flash (Legacy)' }
   ],
   groq: [
     { value: 'whisper-large-v3-turbo', label: 'whisper-large-v3-turbo (Ultra Fast)' },
-    { value: 'whisper-large-v3', label: 'whisper-large-v3 (Maximum Accuracy)' }
+    { value: 'whisper-large-v3', label: 'whisper-large-v3 (Accurate)' }
   ],
   openai: [
-    { value: 'whisper-1', label: 'whisper-1 (Industry Standard ASR)' }
+    { value: 'whisper-1', label: 'whisper-1' }
   ],
   custom: [
-    { value: 'whisper-1', label: 'whisper-1 / Custom Model' }
+    { value: 'whisper-1', label: 'Default / Custom Model' }
   ]
 };
 
 function updateProviderUI() {
   const provider = aiProviderSelect.value;
-
-  // Populate models
   aiModelSelect.innerHTML = '';
-  const models = providerModels[provider] || [];
-  models.forEach(m => {
+  (providerModels[provider] || []).forEach(m => {
     const opt = document.createElement('option');
     opt.value = m.value;
     opt.textContent = m.label;
     aiModelSelect.appendChild(opt);
   });
 
-  // Custom Endpoint input
   groupCustomUrl.classList.toggle('hidden', provider !== 'custom');
 
-  // Key label, link & placeholder
   if (provider === 'gemini') {
     labelApiKey.textContent = 'Google Gemini API Key';
     apiKeyInput.placeholder = 'AIzaSy...';
-    if (apiKeyLink) {
-      apiKeyLink.href = 'https://aistudio.google.com/app/apikey';
-      apiKeyLink.textContent = 'Get Free Gemini Key ↗';
-      apiKeyLink.classList.remove('hidden');
-    }
+    apiKeyLink.href = 'https://aistudio.google.com/app/apikey';
+    apiKeyLink.textContent = 'Get Free Key ↗';
+    apiKeyLink.classList.remove('hidden');
   } else if (provider === 'groq') {
     labelApiKey.textContent = 'Groq API Key';
     apiKeyInput.placeholder = 'gsk_...';
-    if (apiKeyLink) {
-      apiKeyLink.href = 'https://console.groq.com/keys';
-      apiKeyLink.textContent = 'Get Free Groq Key ↗';
-      apiKeyLink.classList.remove('hidden');
-    }
+    apiKeyLink.href = 'https://console.groq.com/keys';
+    apiKeyLink.textContent = 'Get Groq Key ↗';
+    apiKeyLink.classList.remove('hidden');
   } else if (provider === 'openai') {
     labelApiKey.textContent = 'OpenAI API Key';
     apiKeyInput.placeholder = 'sk-...';
-    if (apiKeyLink) {
-      apiKeyLink.href = 'https://platform.openai.com/api-keys';
-      apiKeyLink.textContent = 'Get OpenAI Key ↗';
-      apiKeyLink.classList.remove('hidden');
-    }
+    apiKeyLink.href = 'https://platform.openai.com/api-keys';
+    apiKeyLink.textContent = 'Get OpenAI Key ↗';
+    apiKeyLink.classList.remove('hidden');
   } else {
-    labelApiKey.textContent = 'Authorization Key (Optional)';
+    labelApiKey.textContent = 'Auth Token (Optional)';
     apiKeyInput.placeholder = 'Bearer token or empty';
-    if (apiKeyLink) {
-      apiKeyLink.classList.add('hidden');
-    }
+    apiKeyLink.classList.add('hidden');
   }
 
   apiKeyInput.value = aiService.getSavedApiKey(provider);
-  if (keyTestResult) {
-    keyTestResult.classList.add('hidden');
-    keyTestResult.textContent = '';
-  }
+  keyTestResult.classList.add('hidden');
 }
 
 aiProviderSelect.addEventListener('change', updateProviderUI);
 apiKeyInput.addEventListener('input', (e) => {
   aiService.saveApiKey(aiProviderSelect.value, e.target.value);
-  if (keyTestResult) {
-    keyTestResult.classList.add('hidden');
-  }
+  keyTestResult.classList.add('hidden');
 });
 toggleKeyBtn.addEventListener('click', () => {
   apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
 });
 
 if (btnTestKey) {
-  const runTest = async (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  btnTestKey.addEventListener('click', async () => {
     const provider = aiProviderSelect.value;
     const apiKey = apiKeyInput.value.trim();
     const customUrl = customEndpointUrl.value.trim();
 
-    btnTestKey.textContent = '⏳ Checking...';
+    btnTestKey.textContent = '⏳';
     btnTestKey.disabled = true;
-
     keyTestResult.className = 'key-status-badge loading';
-    keyTestResult.textContent = `Connecting to ${provider.toUpperCase()} servers... ⏳`;
+    keyTestResult.textContent = `Testing ${provider.toUpperCase()}...`;
     keyTestResult.classList.remove('hidden');
 
     try {
-      const successMsg = await aiService.testApiKey({ provider, apiKey, customUrl });
+      const msg = await aiService.testApiKey({ provider, apiKey, customUrl });
       keyTestResult.className = 'key-status-badge success';
-      keyTestResult.textContent = successMsg;
+      keyTestResult.textContent = msg;
       btnTestKey.textContent = '✓ OK';
     } catch (err) {
       keyTestResult.className = 'key-status-badge error';
       keyTestResult.textContent = `Error: ${err.message}`;
-      btnTestKey.textContent = '✗ Error';
+      btnTestKey.textContent = '✗';
     } finally {
       setTimeout(() => {
         btnTestKey.textContent = '⚡ Test';
         btnTestKey.disabled = false;
       }, 3500);
     }
-  };
-
-  btnTestKey.addEventListener('click', runTest);
-  btnTestKey.addEventListener('touchend', runTest);
+  });
 }
-
 updateProviderUI();
 
-// 2. Sync Method Switcher (AI vs LRC)
+// 2. Sync Method Switcher
 syncMethodRadios.forEach(radio => {
   radio.addEventListener('change', (e) => {
     const isAi = e.target.value === 'ai';
@@ -293,26 +232,18 @@ syncMethodRadios.forEach(radio => {
   });
 });
 
-// LRC / SRT Drop handling
 function handleLrcFile(file) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = (e) => {
     const content = e.target.result;
-    let parsedLyrics = [];
-
-    if (file.name.endsWith('.srt')) {
-      parsedLyrics = LrcParser.parseSRT(content);
+    let parsed = file.name.endsWith('.srt') ? LrcParser.parseSRT(content) : LrcParser.parseLRC(content);
+    if (parsed.length > 0) {
+      lyricsDataInput.value = JSON.stringify(parsed, null, 2);
+      renderer.setLyrics(parsed);
+      showAiStatus(`Imported ${parsed.length} lines from ${file.name}! Automatically chunked to ≤ ${renderer.maxWordsPerChunk} words.`, 'success');
     } else {
-      parsedLyrics = LrcParser.parseLRC(content);
-    }
-
-    if (parsedLyrics.length > 0) {
-      lyricsDataInput.value = JSON.stringify(parsedLyrics, null, 2);
-      renderer.setLyrics(parsedLyrics);
-      showAiStatus(`Imported ${parsedLyrics.length} lines from ${file.name}!`, 'success');
-    } else {
-      showAiStatus('Could not find timestamps in this file. Ensure it is valid LRC or SRT format.', 'error');
+      showAiStatus('Could not find timestamps. Ensure file is valid LRC or SRT.', 'error');
     }
   };
   reader.readAsText(file);
@@ -321,11 +252,7 @@ function handleLrcFile(file) {
 lrcInput.addEventListener('change', (e) => {
   if (e.target.files.length > 0) handleLrcFile(e.target.files[0]);
 });
-
-lrcDropZone.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  lrcDropZone.classList.add('dragover');
-});
+lrcDropZone.addEventListener('dragover', (e) => { e.preventDefault(); lrcDropZone.classList.add('dragover'); });
 lrcDropZone.addEventListener('dragleave', () => lrcDropZone.classList.remove('dragover'));
 lrcDropZone.addEventListener('drop', (e) => {
   e.preventDefault();
@@ -339,8 +266,7 @@ tabButtons.forEach(btn => {
     tabButtons.forEach(b => b.classList.remove('active'));
     tabContents.forEach(c => c.classList.remove('active'));
     btn.classList.add('active');
-    const tabId = btn.getAttribute('data-tab');
-    document.getElementById(tabId).classList.add('active');
+    document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
   });
 });
 
@@ -348,7 +274,6 @@ tabButtons.forEach(btn => {
 function handleAudioFile(file) {
   if (!file) return;
   currentAudioFile = file;
-
   trackNameEl.textContent = file.name;
   audioInfo.classList.remove('hidden');
   audioManager.loadAudioFile(file);
@@ -367,11 +292,7 @@ function handleAudioFile(file) {
 audioInput.addEventListener('change', (e) => {
   if (e.target.files.length > 0) handleAudioFile(e.target.files[0]);
 });
-
-dropZone.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  dropZone.classList.add('dragover');
-});
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
 dropZone.addEventListener('drop', (e) => {
   e.preventDefault();
@@ -379,7 +300,7 @@ dropZone.addEventListener('drop', (e) => {
   if (e.dataTransfer.files.length > 0) handleAudioFile(e.dataTransfer.files[0]);
 });
 
-// 5. AI Audio Sync Dispatcher
+// 5. AI Sync Dispatcher
 btnSyncAi.addEventListener('click', async () => {
   const provider = aiProviderSelect.value;
   const apiKey = apiKeyInput.value.trim();
@@ -398,9 +319,9 @@ btnSyncAi.addEventListener('click', async () => {
 
   try {
     btnSyncAi.disabled = true;
-    showAiStatus(`Detecting audio and aligning lyrics using ${provider.toUpperCase()} (${model})...`, 'info');
+    showAiStatus(`Aligning audio via ${provider.toUpperCase()} (${model})...`, 'info');
 
-    const syncedLyrics = await aiService.syncLyrics({
+    const synced = await aiService.syncLyrics({
       provider,
       apiKey,
       model,
@@ -410,9 +331,9 @@ btnSyncAi.addEventListener('click', async () => {
       onProgress: (status) => showAiStatus(status, 'info')
     });
 
-    lyricsDataInput.value = JSON.stringify(syncedLyrics, null, 2);
-    renderer.setLyrics(syncedLyrics);
-    showAiStatus(`Successfully aligned ${syncedLyrics.length} lyric lines!`, 'success');
+    lyricsDataInput.value = JSON.stringify(synced, null, 2);
+    renderer.setLyrics(synced);
+    showAiStatus(`Successfully aligned and fluidly chunked into ${renderer.chunkedLyrics.length} phrases!`, 'success');
   } catch (err) {
     console.error(err);
     showAiStatus(err.message, 'error');
@@ -421,8 +342,8 @@ btnSyncAi.addEventListener('click', async () => {
   }
 });
 
-// 6. Lyrics Input & Parser
-function parseAndApplyLyrics() {
+// 6. Lyrics Editor & Sample Loader
+function applyRawLyrics() {
   try {
     const raw = lyricsDataInput.value.trim();
     if (!raw) {
@@ -433,348 +354,116 @@ function parseAndApplyLyrics() {
     if (Array.isArray(parsed)) {
       renderer.setLyrics(parsed);
     }
-  } catch (err) {
-    // Typing incomplete JSON
-  }
+  } catch (err) {}
 }
-lyricsDataInput.addEventListener('input', parseAndApplyLyrics);
 
-// Sample Lyrics
+lyricsDataInput.addEventListener('input', applyRawLyrics);
+
 btnSampleLyrics.addEventListener('click', () => {
   const sample = [
-    { start: 0.0, end: 4.5, text: "Neon reflections in the rainy night" },
-    { start: 4.8, end: 8.5, text: "Lost in the rhythm of the city lights" },
-    { start: 8.8, end: 12.2, text: "Drifting through echoes of an old memory" },
-    { start: 12.5, end: 17.0, text: "Finding peace where we're meant to be" }
+    { start: 0.0, end: 4.8, text: "Neon reflections in the rainy night" },
+    { start: 5.0, end: 9.6, text: "Lost in the rhythm of the city lights" },
+    { start: 9.8, end: 15.5, text: "Drifting through echoes of an old memory that lingers deep inside me tonight" },
+    { start: 16.0, end: 21.0, text: "Finding eternal peace right where we belong" }
   ];
   lyricsDataInput.value = JSON.stringify(sample, null, 2);
-  parseAndApplyLyrics();
+  renderer.setLyrics(sample);
 });
 
-// 7. Visual Style Controls & Presets (Official HyperFrames Frame.md Tokens)
-const presets = {
-  'biennale-yellow': {
-    font: "'Instrument Serif', serif",
-    fontSize: 54,
-    textColor: '#1B2566', // deep indigo ink
-    accentColor: '#F1EE2E', // solar yellow
-    glowSize: 0,
-    glowDensity: 0,
-    overlayType: 'none',
-    animType: 'smooth-slide',
-    subtitleStyle: 'none',
-    bgAnimType: 'ken-burns',
-    bgSpeed: 0.8
-  },
-  'blockframe': {
-    font: "'Inter', sans-serif",
-    fontSize: 50,
-    textColor: '#000000',
-    accentColor: '#FE90E8',
-    glowSize: 0,
-    glowDensity: 0,
-    overlayType: 'none',
-    animType: 'pop-bounce',
-    subtitleStyle: 'word-badges',
-    subBoxColor: '#FE90E8',
-    subTextColor: '#000000',
-    subRadius: 0,
-    subPadding: 16,
-    subUppercase: true,
-    bgAnimType: 'beat-only'
-  },
-  'blue-professional': {
-    font: "'Space Grotesk', sans-serif",
-    fontSize: 50,
-    textColor: '#111111',
-    accentColor: '#1E2BFA',
-    glowSize: 14,
-    glowDensity: 0.6,
-    overlayType: 'none',
-    animType: 'smooth-slide',
-    subtitleStyle: 'boxed-banner',
-    subBoxColor: 'rgba(30, 43, 250, 0.12)',
-    subTextColor: '#1E2BFA',
-    subRadius: 12,
-    subPadding: 16,
-    subUppercase: false,
-    bgAnimType: 'ken-burns'
-  },
-  'bold-poster': {
-    font: "'Shrikhand', cursive",
-    fontSize: 52,
-    textColor: '#1C1410',
-    accentColor: '#D8000F',
-    glowSize: 0,
-    glowDensity: 0,
-    overlayType: 'none',
-    animType: 'word-stack',
-    subtitleStyle: 'boxed-banner',
-    subBoxColor: '#D8000F',
-    subTextColor: '#FFFFFF',
-    subRadius: 2,
-    subPadding: 14,
-    subUppercase: true,
-    bgAnimType: 'zoom-in'
-  },
-  'broadside': {
-    font: "'Barlow', sans-serif",
-    fontSize: 58,
-    textColor: '#F0ECE5',
-    accentColor: '#E85D26',
-    glowSize: 0,
-    glowDensity: 0,
-    overlayType: 'none',
-    animType: 'word-stack',
-    subtitleStyle: 'alternating-badge',
-    subBoxColor: '#E85D26',
-    subTextColor: '#111111',
-    subRadius: 0,
-    subPadding: 16,
-    subUppercase: false,
-    bgAnimType: 'zoom-in'
-  },
-  'capsule': {
-    font: "'Bodoni Moda', serif",
-    fontSize: 50,
-    textColor: '#1A1A1A',
-    accentColor: '#E85D4E',
-    glowSize: 12,
-    glowDensity: 0.5,
-    overlayType: 'particles',
-    particleColor: '#E85D4E',
-    animType: 'floating-wave',
-    subtitleStyle: 'word-badges',
-    subBoxColor: '#E85D4E',
-    subTextColor: '#FFFFFF',
-    subRadius: 24, // pill geometry
-    subPadding: 18,
-    subUppercase: false,
-    bgAnimType: 'sway'
-  },
-  'cartesian': {
-    font: "'Playfair Display', serif",
-    fontSize: 48,
-    textColor: '#1A1A1A',
-    accentColor: '#8A8178',
-    glowSize: 0,
-    glowDensity: 0,
-    overlayType: 'none',
-    animType: 'smooth-slide',
-    subtitleStyle: 'none',
-    bgAnimType: 'ken-burns',
-    bgSpeed: 0.7
-  },
-  'cobalt-grid': {
-    font: "'Newsreader', serif",
-    fontSize: 52,
-    textColor: '#1F2BE0',
-    accentColor: '#5560E5',
-    glowSize: 10,
-    glowDensity: 0.6,
-    overlayType: 'waveform',
-    particleColor: '#1F2BE0',
-    animType: 'typewriter',
-    subtitleStyle: 'outline-only',
-    bgAnimType: 'pan-horizontal'
-  },
-  'code-editorial': {
-    font: "'EB Garamond', serif",
-    fontSize: 52,
-    textColor: '#FAF9F5',
-    accentColor: '#CC785C',
-    glowSize: 12,
-    glowDensity: 0.5,
-    overlayType: 'none',
-    animType: 'typewriter',
-    subtitleStyle: 'boxed-banner',
-    subBoxColor: '#252320',
-    subTextColor: '#FAF9F5',
-    subRadius: 4,
-    subPadding: 14,
-    subUppercase: false,
-    bgAnimType: 'static'
-  },
-  'coral': {
-    font: "'Bebas Neue', sans-serif",
-    fontSize: 64,
-    textColor: '#FFFFFF',
-    accentColor: '#E85D5D',
-    glowSize: 0,
-    glowDensity: 0,
-    overlayType: 'none',
-    animType: 'word-stack',
-    subtitleStyle: 'boxed-banner',
-    subBoxColor: '#E85D5D',
-    subTextColor: '#FFFFFF',
-    subRadius: 0,
-    subPadding: 16,
-    subUppercase: true,
-    bgAnimType: 'zoom-in'
-  },
-  'creative-mode': {
-    font: "'Archivo Black', sans-serif",
-    fontSize: 48,
-    textColor: '#0F0F0F',
-    accentColor: '#1F8A4C',
-    glowSize: 0,
-    glowDensity: 0,
-    overlayType: 'none',
-    animType: 'pop-bounce',
-    subtitleStyle: 'word-badges',
-    subBoxColor: '#1F8A4C',
-    subTextColor: '#FFFFFF',
-    subRadius: 0,
-    subPadding: 14,
-    subUppercase: true,
-    bgAnimType: 'beat-only'
-  },
-  'daisy-days': {
-    font: "'Fredoka', sans-serif",
-    fontSize: 52,
-    textColor: '#2D2D2D',
-    accentColor: '#7ECDC0',
-    glowSize: 0,
-    glowDensity: 0,
-    overlayType: 'particles',
-    particleColor: '#FDE68A',
-    animType: 'pop-bounce',
-    subtitleStyle: 'word-badges',
-    subBoxColor: '#7ECDC0',
-    subTextColor: '#2D2D2D',
-    subRadius: 16,
-    subPadding: 14,
-    subUppercase: false,
-    bgAnimType: 'sway'
-  },
-  'editorial-forest': {
-    font: "'Source Serif 4', serif",
-    fontSize: 52,
-    textColor: '#EFE7D4',
-    accentColor: '#E89CB1',
-    glowSize: 12,
-    glowDensity: 0.6,
-    overlayType: 'particles',
-    particleColor: '#E89CB1',
-    animType: 'floating-wave',
-    subtitleStyle: 'boxed-banner',
-    subBoxColor: '#2E4A2A',
-    subTextColor: '#EFE7D4',
-    subRadius: 6,
-    subPadding: 14,
-    subUppercase: false,
-    bgAnimType: 'ken-burns'
-  },
-  'highway': {
-    font: "'Bebas Neue', sans-serif",
-    fontSize: 68,
-    textColor: '#FFFFFF',
-    accentColor: '#FACC15',
-    glowSize: 10,
-    glowDensity: 0.4,
-    overlayType: 'none',
-    animType: 'word-stack',
-    subtitleStyle: 'highway-3d',
-    subBoxColor: '#0A0C10',
-    subTextColor: '#FFFFFF',
-    subRadius: 4,
-    subPadding: 14,
-    subUppercase: true,
-    bgAnimType: 'zoom-in',
-    bgSpeed: 1.2,
-    bgIntensity: 1.2,
-    bgBounce: 0.8
-  }
-};
-
-presetCards.forEach(card => {
-  card.addEventListener('click', () => {
-    presetCards.forEach(c => c.classList.remove('active'));
-    card.classList.add('active');
-
-    const presetKey = card.getAttribute('data-preset');
-    const p = presets[presetKey];
-    if (p) {
-      renderer.groundTheme = presetKey;
-      renderer.fontFamily = p.font;
-      renderer.baseFontSize = p.fontSize;
-      renderer.textColor = p.textColor;
-      renderer.accentColor = p.accentColor;
-      renderer.overlayType = p.overlayType;
-      renderer.animType = p.animType;
-      renderer.glowSize = p.glowSize !== undefined ? p.glowSize : 25;
-      renderer.glowDensity = p.glowDensity !== undefined ? p.glowDensity : 1.0;
-
-      // Sync form inputs
-      fontFamilySelect.value = p.font;
-      fontSizeRange.value = p.fontSize;
-      textColorInput.value = p.textColor;
-      accentColorInput.value = p.accentColor;
-      if (glowSizeInput) glowSizeInput.value = renderer.glowSize;
-      if (glowSizeVal) glowSizeVal.textContent = `${renderer.glowSize}px`;
-      if (glowDensityInput) glowDensityInput.value = Math.round(renderer.glowDensity * 100);
-      if (glowDensityVal) glowDensityVal.textContent = `${Math.round(renderer.glowDensity * 100)}%`;
-
-      const partColor = p.particleColor || p.accentColor || '#64ffda';
-      renderer.setOverlayConfig({ color: partColor });
-      if (overlayColorInput) overlayColorInput.value = partColor;
-
-      if (overlayTypeSelect) {
-        overlayTypeSelect.value = p.overlayType;
-        if (overlaySettingsPanel) {
-          overlaySettingsPanel.classList.toggle('hidden', p.overlayType === 'none');
-        }
-      }
-      animTypeSelect.value = p.animType;
-
-      if (p.subtitleStyle !== undefined) {
-        const subConf = {
-          style: p.subtitleStyle,
-          boxColor: p.subBoxColor || '#c9fa53',
-          boxTextColor: p.subTextColor || '#000000',
-          boxRadius: p.subRadius !== undefined ? p.subRadius : 4,
-          boxPadding: p.subPadding !== undefined ? p.subPadding : 14,
-          uppercase: p.subUppercase !== undefined ? p.subUppercase : true
-        };
-        renderer.setSubtitleConfig(subConf);
-
-        if (subStyleSelect) subStyleSelect.value = p.subtitleStyle;
-        if (subBoxColorInput && p.subBoxColor) subBoxColorInput.value = p.subBoxColor.startsWith('#') ? p.subBoxColor : '#c9fa53';
-        if (subTextColorInput && p.subTextColor) subTextColorInput.value = p.subTextColor.startsWith('#') ? p.subTextColor : '#000000';
-        if (subCornerRadiusInput && p.subRadius !== undefined) {
-          subCornerRadiusInput.value = p.subRadius;
-          if (subCornerRadiusVal) subCornerRadiusVal.textContent = `${p.subRadius}px`;
-        }
-        if (subPaddingInput && p.subPadding !== undefined) {
-          subPaddingInput.value = p.subPadding;
-          if (subPaddingVal) subPaddingVal.textContent = `${p.subPadding}px`;
-        }
-        if (subUppercaseInput && p.subUppercase !== undefined) subUppercaseInput.checked = p.subUppercase;
-
-        if (subSettingsPanel) {
-          subSettingsPanel.classList.toggle('hidden', p.subtitleStyle === 'none' || p.subtitleStyle === 'highway-3d');
-        }
-      }
-
-      if (p.bgAnimType !== undefined) {
-        renderer.setBgConfig({
-          animType: p.bgAnimType,
-          speed: p.bgSpeed || 1.0,
-          intensity: p.bgIntensity || 1.0,
-          beatBounce: p.bgBounce || 1.0
-        });
-        if (bgAnimTypeSelect) bgAnimTypeSelect.value = p.bgAnimType;
-      }
-    }
+// 7. 3D Background Settings Listeners (Three.js)
+if (threeStyleSelect) {
+  threeStyleSelect.addEventListener('change', (e) => {
+    renderer.threeBg.updateSettings({ style: e.target.value });
   });
-});
+}
+if (threeColorInput) {
+  threeColorInput.addEventListener('input', (e) => {
+    renderer.threeBg.updateSettings({ color: e.target.value });
+  });
+}
+if (threeBgColorInput) {
+  threeBgColorInput.addEventListener('input', (e) => {
+    renderer.threeBg.updateSettings({ bgColor: e.target.value });
+  });
+}
+if (threeSpeedInput) {
+  threeSpeedInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.threeBg.updateSettings({ speed: val / 100 });
+    if (threeSpeedVal) threeSpeedVal.textContent = `${(val / 100).toFixed(1)}x`;
+  });
+}
+if (threeHeightInput) {
+  threeHeightInput.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.threeBg.updateSettings({ waveHeight: val });
+    if (threeHeightVal) threeHeightVal.textContent = `${val}px`;
+  });
+}
+if (toggleAudioReactive) {
+  toggleAudioReactive.addEventListener('change', (e) => {
+    renderer.enableAudioReactive = e.target.checked;
+    renderer.threeBg.updateSettings({ audioReactive: e.target.checked });
+  });
+}
+if (btnResetBg3D) {
+  btnResetBg3D.addEventListener('click', () => {
+    if (threeStyleSelect) threeStyleSelect.value = 'particle-waves';
+    if (threeColorInput) threeColorInput.value = '#64ffda';
+    if (threeBgColorInput) threeBgColorInput.value = '#080b14';
+    if (threeSpeedInput) threeSpeedInput.value = 100;
+    if (threeSpeedVal) threeSpeedVal.textContent = '1.0x';
+    if (threeHeightInput) threeHeightInput.value = 45;
+    if (threeHeightVal) threeHeightVal.textContent = '45px';
+    if (toggleAudioReactive) toggleAudioReactive.checked = true;
 
-animTypeSelect.addEventListener('change', (e) => renderer.animType = e.target.value);
-fontFamilySelect.addEventListener('change', (e) => renderer.fontFamily = e.target.value);
-fontSizeRange.addEventListener('input', (e) => renderer.baseFontSize = parseInt(e.target.value));
-textColorInput.addEventListener('input', (e) => renderer.textColor = e.target.value);
-accentColorInput.addEventListener('input', (e) => renderer.accentColor = e.target.value);
+    renderer.threeBg.updateSettings({
+      style: 'particle-waves',
+      color: '#64ffda',
+      bgColor: '#080b14',
+      speed: 1.0,
+      waveHeight: 45,
+      audioReactive: true
+    });
+  });
+}
 
+// 8. Fluid Kinetic Lyric Settings Listeners
+if (lyricMotionStyleSelect) {
+  lyricMotionStyleSelect.addEventListener('change', (e) => {
+    renderer.motionStyle = e.target.value;
+  });
+}
+if (fontFamilySelect) {
+  fontFamilySelect.addEventListener('change', (e) => {
+    renderer.fontFamily = e.target.value;
+  });
+}
+if (fontSizeRange) {
+  fontSizeRange.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    renderer.baseFontSize = val;
+    if (fontSizeVal) fontSizeVal.textContent = `${val}px`;
+  });
+}
+if (maxWordsRange) {
+  maxWordsRange.addEventListener('input', (e) => {
+    const val = Math.max(1, Math.min(5, parseInt(e.target.value)));
+    renderer.setMaxWords(val);
+    if (maxWordsVal) maxWordsVal.textContent = `${val} words`;
+  });
+}
+if (textColorInput) {
+  textColorInput.addEventListener('input', (e) => {
+    renderer.textColor = e.target.value;
+  });
+}
+if (accentColorInput) {
+  accentColorInput.addEventListener('input', (e) => {
+    renderer.accentColor = e.target.value;
+    if (renderer.badgeConfig) renderer.badgeConfig.boxColor = e.target.value;
+  });
+}
 if (glowSizeInput) {
   glowSizeInput.addEventListener('input', (e) => {
     const val = parseInt(e.target.value);
@@ -782,7 +471,6 @@ if (glowSizeInput) {
     if (glowSizeVal) glowSizeVal.textContent = `${val}px`;
   });
 }
-
 if (glowDensityInput) {
   glowDensityInput.addEventListener('input', (e) => {
     const val = parseInt(e.target.value);
@@ -790,287 +478,54 @@ if (glowDensityInput) {
     if (glowDensityVal) glowDensityVal.textContent = `${val}%`;
   });
 }
+if (containerStyleSelect) {
+  containerStyleSelect.addEventListener('change', (e) => {
+    renderer.containerStyle = e.target.value;
+  });
+}
+if (toggleUppercase) {
+  toggleUppercase.addEventListener('change', (e) => {
+    if (renderer.badgeConfig) renderer.badgeConfig.uppercase = e.target.checked;
+  });
+}
+if (btnResetLyrics) {
+  btnResetLyrics.addEventListener('click', () => {
+    if (lyricMotionStyleSelect) lyricMotionStyleSelect.value = 'liquid-spring';
+    if (fontFamilySelect) fontFamilySelect.value = "'Outfit', sans-serif";
+    if (fontSizeRange) fontSizeRange.value = 56;
+    if (fontSizeVal) fontSizeVal.textContent = '56px';
+    if (maxWordsRange) maxWordsRange.value = 4;
+    if (maxWordsVal) maxWordsVal.textContent = '4 words';
+    if (textColorInput) textColorInput.value = '#ffffff';
+    if (accentColorInput) accentColorInput.value = '#64ffda';
+    if (glowSizeInput) glowSizeInput.value = 25;
+    if (glowSizeVal) glowSizeVal.textContent = '25px';
+    if (glowDensityInput) glowDensityInput.value = 100;
+    if (glowDensityVal) glowDensityVal.textContent = '100%';
+    if (containerStyleSelect) containerStyleSelect.value = 'clean-glow';
+    if (toggleUppercase) toggleUppercase.checked = false;
 
-// Subtitle & Box Badge Design Listeners
-if (subStyleSelect) {
-  subStyleSelect.addEventListener('change', (e) => {
-    const val = e.target.value;
-    renderer.setSubtitleConfig({ style: val });
-    if (subSettingsPanel) {
-      subSettingsPanel.classList.toggle('hidden', val === 'none');
-    }
+    renderer.motionStyle = 'liquid-spring';
+    renderer.fontFamily = "'Outfit', sans-serif";
+    renderer.baseFontSize = 56;
+    renderer.setMaxWords(4);
+    renderer.textColor = '#ffffff';
+    renderer.accentColor = '#64ffda';
+    renderer.glowSize = 25;
+    renderer.glowDensity = 1.0;
+    renderer.containerStyle = 'clean-glow';
+    renderer.badgeConfig.uppercase = false;
   });
 }
 
-if (subBoxColorInput) {
-  subBoxColorInput.addEventListener('input', (e) => {
-    renderer.setSubtitleConfig({ boxColor: e.target.value });
-  });
-}
-
-if (subTextColorInput) {
-  subTextColorInput.addEventListener('input', (e) => {
-    renderer.setSubtitleConfig({ boxTextColor: e.target.value });
-  });
-}
-
-if (subCornerRadiusInput) {
-  subCornerRadiusInput.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value);
-    renderer.setSubtitleConfig({ boxRadius: val });
-    if (subCornerRadiusVal) subCornerRadiusVal.textContent = `${val}px`;
-  });
-}
-
-if (subPaddingInput) {
-  subPaddingInput.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value);
-    renderer.setSubtitleConfig({ boxPadding: val });
-    if (subPaddingVal) subPaddingVal.textContent = `${val}px`;
-  });
-}
-
-if (subUppercaseInput) {
-  subUppercaseInput.addEventListener('change', (e) => {
-    renderer.setSubtitleConfig({ uppercase: e.target.checked });
-  });
-}
-
-paletteBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    const boxColor = btn.getAttribute('data-box');
-    const textColor = btn.getAttribute('data-text');
-    if (boxColor) {
-      if (subBoxColorInput) subBoxColorInput.value = boxColor;
-      renderer.setSubtitleConfig({ boxColor });
-    }
-    if (textColor) {
-      if (subTextColorInput) subTextColorInput.value = textColor;
-      renderer.setSubtitleConfig({ boxTextColor: textColor });
-    }
-  });
-});
-
-if (btnResetSubtitle) {
-  btnResetSubtitle.addEventListener('click', () => {
-    if (subStyleSelect) subStyleSelect.value = 'none';
-    if (subSettingsPanel) subSettingsPanel.classList.add('hidden');
-    if (subBoxColorInput) subBoxColorInput.value = '#c9fa53';
-    if (subTextColorInput) subTextColorInput.value = '#000000';
-    if (subCornerRadiusInput) subCornerRadiusInput.value = 4;
-    if (subCornerRadiusVal) subCornerRadiusVal.textContent = '4px';
-    if (subPaddingInput) subPaddingInput.value = 14;
-    if (subPaddingVal) subPaddingVal.textContent = '14px';
-    if (subUppercaseInput) subUppercaseInput.checked = true;
-
-    renderer.setSubtitleConfig({
-      style: 'none',
-      boxColor: '#c9fa53',
-      boxTextColor: '#000000',
-      boxRadius: 4,
-      boxPadding: 14,
-      uppercase: true
-    });
-  });
-}
-
-if (overlayTypeSelect) {
-  overlayTypeSelect.addEventListener('change', (e) => {
-    renderer.setOverlayType(e.target.value);
-    if (overlaySettingsPanel) {
-      overlaySettingsPanel.classList.toggle('hidden', e.target.value === 'none');
-    }
-  });
-}
-
-// Overlay Fine-tuning Listeners
-if (overlayDensityInput) {
-  overlayDensityInput.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value);
-    renderer.setOverlayConfig({ density: val / 100 });
-    if (overlayDensityVal) overlayDensityVal.textContent = `${val}%`;
-  });
-}
-
-if (overlaySpeedInput) {
-  overlaySpeedInput.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value);
-    renderer.setOverlayConfig({ speed: val / 100 });
-    if (overlaySpeedVal) overlaySpeedVal.textContent = `${(val / 100).toFixed(1)}x`;
-  });
-}
-
-if (overlayDirectionSelect) {
-  overlayDirectionSelect.addEventListener('change', (e) => {
-    renderer.setOverlayConfig({ direction: e.target.value });
-  });
-}
-
-if (overlaySizeInput) {
-  overlaySizeInput.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value);
-    renderer.setOverlayConfig({ size: val / 100 });
-    if (overlaySizeVal) overlaySizeVal.textContent = `${(val / 100).toFixed(1)}x`;
-  });
-}
-
-if (overlayOpacityInput) {
-  overlayOpacityInput.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value);
-    renderer.setOverlayConfig({ opacity: val / 100 });
-    if (overlayOpacityVal) overlayOpacityVal.textContent = `${val}%`;
-  });
-}
-
-if (overlayColorInput) {
-  overlayColorInput.addEventListener('input', (e) => {
-    renderer.setOverlayConfig({ color: e.target.value });
-  });
-}
-
-if (btnResetOverlay) {
-  btnResetOverlay.addEventListener('click', () => {
-    if (overlayDensityInput) overlayDensityInput.value = 100;
-    if (overlayDensityVal) overlayDensityVal.textContent = '100%';
-    if (overlaySpeedInput) overlaySpeedInput.value = 100;
-    if (overlaySpeedVal) overlaySpeedVal.textContent = '1.0x';
-    if (overlayDirectionSelect) overlayDirectionSelect.value = 'default';
-    if (overlaySizeInput) overlaySizeInput.value = 100;
-    if (overlaySizeVal) overlaySizeVal.textContent = '1.0x';
-    if (overlayOpacityInput) overlayOpacityInput.value = 100;
-    if (overlayOpacityVal) overlayOpacityVal.textContent = '100%';
-    if (overlayColorInput) overlayColorInput.value = '#64ffda';
-
-    renderer.setCustomParticleImage(null);
-    if (customParticleInput) customParticleInput.value = '';
-    if (particleImgInfo) particleImgInfo.classList.add('hidden');
-
-    renderer.setOverlayConfig({
-      density: 1.0,
-      speed: 1.0,
-      direction: 'default',
-      size: 1.0,
-      opacity: 1.0,
-      color: '#64ffda'
-    });
-  });
-}
-
-// Custom Particle Image Handling
-function loadParticleImageFile(file) {
-  if (!file) return;
-  const img = new Image();
-  img.src = URL.createObjectURL(file);
-  img.onload = () => {
-    renderer.setCustomParticleImage(img);
-    if (particleImgName) particleImgName.textContent = file.name;
-    if (particleImgInfo) particleImgInfo.classList.remove('hidden');
-  };
-}
-
-if (customParticleInput) {
-  customParticleInput.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-      loadParticleImageFile(e.target.files[0]);
-    }
-  });
-}
-
-if (btnRemoveParticleImg) {
-  btnRemoveParticleImg.addEventListener('click', () => {
-    renderer.setCustomParticleImage(null);
-    if (customParticleInput) customParticleInput.value = '';
-    if (particleImgInfo) particleImgInfo.classList.add('hidden');
-  });
-}
-
-// Custom Background Media Handling (Images & Video)
-function loadBgImageFile(file) {
-  if (!file) return;
-  const isVideo = file.type.startsWith('video/') || file.name.endsWith('.mp4') || file.name.endsWith('.webm');
-  if (isVideo) {
-    const video = document.createElement('video');
-    video.src = URL.createObjectURL(file);
-    video.muted = true;
-    video.loop = true;
-    video.playsInline = true;
-    video.autoplay = true;
-    video.onloadeddata = () => {
-      renderer.setCustomImage(null);
-      renderer.setCustomVideo(video);
-      if (audioManager.isPlaying) video.play().catch(() => {});
-      if (bgImgName) bgImgName.textContent = `🎬 ${file.name}`;
-      if (bgImgInfo) bgImgInfo.classList.remove('hidden');
-    };
-  } else {
-    const img = new Image();
-    img.src = URL.createObjectURL(file);
-    img.onload = () => {
-      renderer.setCustomVideo(null);
-      renderer.setCustomImage(img);
-      if (bgImgName) bgImgName.textContent = `🖼️ ${file.name}`;
-      if (bgImgInfo) bgImgInfo.classList.remove('hidden');
-    };
-  }
-}
-
-if (customBgInput) {
-  customBgInput.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-      loadBgImageFile(e.target.files[0]);
-    }
-  });
-}
-
-if (bgDropZone) {
-  bgDropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    bgDropZone.classList.add('dragover');
-  });
-  bgDropZone.addEventListener('dragleave', () => {
-    bgDropZone.classList.remove('dragover');
-  });
-  bgDropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    bgDropZone.classList.remove('dragover');
-    if (e.dataTransfer.files.length > 0) {
-      loadBgImageFile(e.dataTransfer.files[0]);
-    }
-  });
-}
-
-if (btnRemoveBgImg) {
-  btnRemoveBgImg.addEventListener('click', () => {
-    renderer.setCustomImage(null);
-    renderer.setCustomVideo(null);
-    if (customBgInput) customBgInput.value = '';
-    if (bgImgInfo) bgImgInfo.classList.add('hidden');
-  });
-}
-
-if (bgDimSlider) {
-  bgDimSlider.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value);
-    renderer.bgDim = val / 100;
-    if (bgDimVal) bgDimVal.textContent = `${val}%`;
-  });
-}
-
-// HyperFrames Layout Engine listeners
-if (toggleAutoFit) {
-  toggleAutoFit.addEventListener('change', (e) => {
-    renderer.autoFitFont = e.target.checked;
-    renderer._fitCache.clear();
-  });
-}
-
+// 9. Depth & Safe Guides Listeners
 if (toggleSafeGuides) {
   toggleSafeGuides.addEventListener('change', (e) => {
     renderer.showSafeGuides = e.target.checked;
   });
 }
 
-function loadFgImageFile(file) {
+function loadFgFile(file) {
   if (!file) return;
   const img = new Image();
   img.src = URL.createObjectURL(file);
@@ -1083,23 +538,18 @@ function loadFgImageFile(file) {
 
 if (fgInput) {
   fgInput.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) loadFgImageFile(e.target.files[0]);
+    if (e.target.files.length > 0) loadFgFile(e.target.files[0]);
   });
 }
-
 if (fgDropZone) {
-  fgDropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    fgDropZone.classList.add('dragover');
-  });
+  fgDropZone.addEventListener('dragover', (e) => { e.preventDefault(); fgDropZone.classList.add('dragover'); });
   fgDropZone.addEventListener('dragleave', () => fgDropZone.classList.remove('dragover'));
   fgDropZone.addEventListener('drop', (e) => {
     e.preventDefault();
     fgDropZone.classList.remove('dragover');
-    if (e.dataTransfer.files.length > 0) loadFgImageFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files.length > 0) loadFgFile(e.dataTransfer.files[0]);
   });
 }
-
 if (btnRemoveFgImg) {
   btnRemoveFgImg.addEventListener('click', () => {
     renderer.setFgCutoutImage(null);
@@ -1108,119 +558,48 @@ if (btnRemoveFgImg) {
   });
 }
 
-// Background Motion Listeners
-if (bgAnimTypeSelect) {
-  bgAnimTypeSelect.addEventListener('change', (e) => {
-    renderer.setBgConfig({ animType: e.target.value });
-  });
-}
-
-if (bgAnimSpeedInput) {
-  bgAnimSpeedInput.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value);
-    renderer.setBgConfig({ speed: val / 100 });
-    if (bgAnimSpeedVal) bgAnimSpeedVal.textContent = `${(val / 100).toFixed(1)}x`;
-  });
-}
-
-if (bgAnimIntensityInput) {
-  bgAnimIntensityInput.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value);
-    renderer.setBgConfig({ intensity: val / 100 });
-    if (bgAnimIntensityVal) bgAnimIntensityVal.textContent = `${val}%`;
-  });
-}
-
-if (bgBeatBounceInput) {
-  bgBeatBounceInput.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value);
-    renderer.setBgConfig({ beatBounce: val / 100 });
-    if (bgBeatBounceVal) bgBeatBounceVal.textContent = `${val}%`;
-  });
-}
-
-if (btnResetBgMotion) {
-  btnResetBgMotion.addEventListener('click', () => {
-    if (bgAnimTypeSelect) bgAnimTypeSelect.value = 'ken-burns';
-    if (bgAnimSpeedInput) bgAnimSpeedInput.value = 100;
-    if (bgAnimSpeedVal) bgAnimSpeedVal.textContent = '1.0x';
-    if (bgAnimIntensityInput) bgAnimIntensityInput.value = 100;
-    if (bgAnimIntensityVal) bgAnimIntensityVal.textContent = '100%';
-    if (bgBeatBounceInput) bgBeatBounceInput.value = 100;
-    if (bgBeatBounceVal) bgBeatBounceVal.textContent = '100%';
-
-    renderer.setBgConfig({
-      animType: 'ken-burns',
-      speed: 1.0,
-      intensity: 1.0,
-      beatBounce: 1.0
-    });
-  });
-}
-
-toggleAudioReactive.addEventListener('change', (e) => {
-  renderer.enableAudioReactive = e.target.checked;
-});
-
-// Aspect Ratio Switcher
+// 10. Aspect Ratio
 ratioButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     ratioButtons.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    const ratio = btn.getAttribute('data-ratio');
-    renderer.setAspectRatio(ratio, exportResSelect.value);
+    renderer.setAspectRatio(btn.getAttribute('data-ratio'), exportResSelect.value);
   });
 });
-
 exportResSelect.addEventListener('change', () => {
-  const activeRatioBtn = document.querySelector('.ratio-btn.active');
-  const ratio = activeRatioBtn ? activeRatioBtn.getAttribute('data-ratio') : '16:9';
+  const activeBtn = document.querySelector('.ratio-btn.active');
+  const ratio = activeBtn ? activeBtn.getAttribute('data-ratio') : '16:9';
   renderer.setAspectRatio(ratio, exportResSelect.value);
 });
 
-// 8. Playback Controls
+// 11. Playback Controls
 btnPlayPause.addEventListener('click', () => {
   if (audioManager.isPlaying) {
     audioManager.pause();
-    if (renderer.customBgVideo) renderer.customBgVideo.pause();
     btnPlayPause.textContent = '▶';
   } else {
     audioManager.play();
-    if (renderer.customBgVideo) renderer.customBgVideo.play().catch(() => {});
     btnPlayPause.textContent = '⏸';
   }
 });
-
 seekSlider.addEventListener('input', (e) => {
   const time = parseFloat(e.target.value);
   audioManager.seek(time);
-  if (renderer.customBgVideo && renderer.customBgVideo.duration) {
-    renderer.customBgVideo.currentTime = time % renderer.customBgVideo.duration;
-  }
   currentTimeDisplay.textContent = formatTime(time);
 });
-
 volumeSlider.addEventListener('input', (e) => {
   audioPlayer.volume = parseFloat(e.target.value);
 });
-
 audioPlayer.addEventListener('timeupdate', () => {
   seekSlider.value = audioPlayer.currentTime;
   currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
 });
-
 audioPlayer.addEventListener('ended', () => {
   btnPlayPause.textContent = '▶';
-  if (renderer.customBgVideo) {
-    renderer.customBgVideo.pause();
-    renderer.customBgVideo.currentTime = 0;
-  }
-  if (recorder && recorder.isRecording) {
-    recorder.stop();
-  }
+  if (recorder && recorder.isRecording) recorder.stop();
 });
 
-// 9. Recording / Video Export
+// 12. Video & Thumbnail Export
 btnStartRecord.addEventListener('click', () => {
   if (!currentAudioFile) return;
 
@@ -1237,7 +616,7 @@ btnStartRecord.addEventListener('click', () => {
       btnStartRecord.classList.remove('hidden');
       btnStopRecord.classList.add('hidden');
       recordProgress.classList.add('hidden');
-      const filename = `${currentAudioFile.name.replace(/\.[^/.]+$/, "")}_lyric_video.webm`;
+      const filename = `${currentAudioFile.name.replace(/\.[^/.]+$/, "")}_aura_lyric_video.webm`;
       recorder.downloadBlob(blob, filename);
     }
   });
@@ -1254,11 +633,10 @@ btnStopRecord.addEventListener('click', () => {
   }
 });
 
-// 10. Thumbnail Snapshot Export
 function captureThumbnail() {
   canvas.toBlob((blob) => {
     if (!blob) return;
-    const trackBase = currentAudioFile ? currentAudioFile.name.replace(/\.[^/.]+$/, "") : "lyric_canvas";
+    const trackBase = currentAudioFile ? currentAudioFile.name.replace(/\.[^/.]+$/, "") : "aura_canvas";
     const filename = `${trackBase}_thumbnail_${Date.now()}.png`;
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1273,12 +651,10 @@ function captureThumbnail() {
   }, 'image/png');
 }
 
-const btnExportThumbnail = document.getElementById('btn-export-thumbnail');
-const btnSnapshotBar = document.getElementById('btn-snapshot-bar');
 if (btnExportThumbnail) btnExportThumbnail.addEventListener('click', captureThumbnail);
 if (btnSnapshotBar) btnSnapshotBar.addEventListener('click', captureThumbnail);
 
-// 11. Main Animation Loop (60 FPS)
+// 13. Main 60 FPS Render Loop
 let lastTimestamp = performance.now();
 function animate(now) {
   const dt = (now - lastTimestamp) / 1000;
@@ -1301,6 +677,6 @@ function animate(now) {
   requestAnimationFrame(animate);
 }
 
-// Initialize sample lyrics
+// Load initial demo lyrics and start 60fps loop
 btnSampleLyrics.click();
 requestAnimationFrame(animate);

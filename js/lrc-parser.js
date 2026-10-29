@@ -86,4 +86,56 @@ export class LrcParser {
 
     return result.sort((a, b) => a.start - b.start);
   }
+
+  /**
+   * Fluid Lyric Chunker:
+   * Enforces that NO lyric chunk on screen ever exceeds maxWords (strict ceiling: 5 words).
+   * Distributes line duration proportionally based on character weight.
+   */
+  static chunkLyricsToMaxWords(lyrics, maxWords = 4) {
+    if (!Array.isArray(lyrics) || lyrics.length === 0) return [];
+    const limit = Math.max(1, Math.min(5, maxWords)); // strictly 1 to 5 words!
+
+    const chunked = [];
+    for (const item of lyrics) {
+      if (!item || !item.text) continue;
+      const words = item.text.trim().split(/\s+/).filter(Boolean);
+      const totalWords = words.length;
+
+      if (totalWords <= limit) {
+        chunked.push(item);
+        continue;
+      }
+
+      const numChunks = Math.ceil(totalWords / limit);
+      const baseSize = Math.floor(totalWords / numChunks);
+      const remainder = totalWords % numChunks;
+
+      const totalChars = words.reduce((sum, w) => sum + w.length, 0) || 1;
+      const duration = Math.max(0.2, (item.end || item.start + 3.0) - item.start);
+
+      let wIdx = 0;
+      let curTime = item.start;
+
+      for (let c = 0; c < numChunks; c++) {
+        const size = baseSize + (c < remainder ? 1 : 0);
+        const chunkWords = words.slice(wIdx, wIdx + size);
+        wIdx += size;
+
+        const chunkChars = chunkWords.reduce((sum, w) => sum + w.length, 0);
+        const chunkDur = duration * (chunkChars / totalChars);
+        const chunkEnd = c === numChunks - 1 ? item.end : curTime + chunkDur;
+
+        chunked.push({
+          start: parseFloat(curTime.toFixed(2)),
+          end: parseFloat(chunkEnd.toFixed(2)),
+          text: chunkWords.join(' ')
+        });
+
+        curTime += chunkDur;
+      }
+    }
+
+    return chunked.sort((a, b) => a.start - b.start);
+  }
 }

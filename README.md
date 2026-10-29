@@ -1,158 +1,58 @@
-# ✨ AI Lyric Canvas Studio (Multi-AI & LRC)
+# ✨ Aura Canvas Studio — Fluid Kinetic AI Lyric Video
 
-An in-browser, high-performance HTML5 Canvas application that turns uploaded music tracks into animated kinetic typography lyric videos using **Multi-AI Audio Alignment (Gemini, Groq Whisper, OpenAI Whisper)** or **Direct .LRC / .SRT Subtitle Import (Zero API)**.
+A modern, high-standard in-browser video production suite built with **Three.js WebGL** and **HTML5 Canvas** for generating fluid, viral kinetic typography lyric videos directly in your browser.
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Format](https://img.shields.io/badge/Format-16%3A9%20%7C%209%3A16%20%7C%201%3A1-purple.svg)](#)
 [![Zero Backend](https://img.shields.io/badge/Architecture-100%25%20Client--Side-green.svg)](#)
-[![Sync](https://img.shields.io/badge/Sync-Multi--AI%20%7C%20LRC%20%7C%20SRT-cyan.svg)](#)
+[![Sync](https://img.shields.io/badge/Sync-Three.js%20%7C%20Fluid%20Kinetic%20Lyrics-cyan.svg)](#)
 
 ---
 
-## 🚀 Key Features
+## 💎 The Four Core Pillars
 
-- **🌐 Multi-AI Audio Detection & Alignment:**
-  - **Google Gemini (gemini-3.8-flash / gemini-3.8-pro):** Native multimodal audio understanding directly in-browser.
-  - **Groq Whisper (whisper-large-v3-turbo):** Lightning fast ASR transcription with segment timestamps.
-  - **OpenAI Whisper (whisper-1):** Industry standard high-accuracy speech-to-text.
-  - **Custom OpenAI-Compatible Endpoint:** Connect to your own local Whisper/Ollama server.
-- **📄 Zero-API .LRC / .SRT Direct Import:**
-  - Already have timed lyrics from Spotify, Musixmatch, or Suno? Drag & drop `.lrc` or `.srt` files and render immediately—no AI calls, no internet connection, zero API keys required.
-- **🎨 60 FPS Kinetic Typography Animation Engine:**
-  - **Smooth Slide-Up:** Cinematic cubic ease-out glide upward.
-  - **Karaoke Progressive Fill:** Spotify/Apple Music style progressive left-to-right highlight wipe.
-  - **Beat Pop & Scale:** Punchy spring bounce timed to vocal onsets and kick drum bass.
-  - **Progressive Word Stacking (Highway Drive / Viral POV):** Accumulates words progressively on beat as they are sung into a massive, multi-line typography stack (exact viral road POV format).
-  - **Floating Ambient Wave:** Dreamy vertical sine-wave undulating motion.
-  - **Typewriter Reveal:** Vintage terminal character-by-character typing with blinking cursor.
-  - **Cyber Glitch:** Chromatic aberration RGB channel splitting and digital jitter.
-  - **Glow Size & Density Controls:** Real-time Glow Radius (0px to 60px) and Glow Density (0% to 200%) for dense, multi-pass neon radiance.
-- **🏷️ Subtitle & Box Badge Design (Agency / TikTok Viral Styles):**
-  - **Badge Styles:** Solid Highlight Box Banner, Dual-Tone Inverted Badges (alternating Lime Green & Dark boxes like creative agency branding), Individual Word Badges, Active Word Pop-out Badge (karaoke spoken-word pop), and Heavy Comic Outline.
-  - **Customizable Badges:** Box background color, inner text color, quick palette buttons (Volt Lime, Electric Yellow, Cyan, Pink, Red, White, Pitch Black).
-  - **Corner Rounding & Padding:** Sliders for sharp crisp rectangular sticker corners (0px) to rounded pills (24px).
-  - **ALL CAPS Impact:** Toggle for bold high-contrast uppercase lettering.
-- **🖼️ Custom Artwork Backdrop & Cinematic Motion Engine:**
-  - **Upload Any Background:** Drag & drop Midjourney art, anime illustrations, lofi room visuals, or album covers.
-  - **Motion Animation Styles:** Ken Burns breathing zoom, Continuous Zoom In, Continuous Zoom Out, Slow Horizontal Pan Drift, Slow Vertical Pan Drift, Gentle Pendulum Sway/Tilt, Beat Bounce Only, or Static.
-  - **Motion Controls:** Motion Speed (0.2x-3.0x), Motion Intensity (0%-250%), and Audio Beat Bounce Intensity (0%-250%).
-  - **Adjustable Dimming Tint:** Slider from 10% to 90% with 1-click Reset Motion button.
-- **🌌 Atmospheric Overlay Effects & Real-Time Physics Tuning:**
-  - **Layered Effects:** Floating Dust Bokeh, Dreamy Rain on Glass, Starfield Hyperspace, Audio Reactive Waveform, Retro Synthwave 3D Grid.
-  - **Flow Direction:** Custom physics direction: Default drift, Downward (rain/snow), Upward (rising embers/floating), Left, or Right.
-  - **Fine-Tuning Sliders:** Real-time Density (20%-250%), Speed (0.2x-3.0x), Size (0.4x-2.5x), and Opacity (10%-100%).
-  - **Custom Particle Image Upload:** Upload transparent PNG graphics (sakura petals, snowflakes, leaves, cash notes, sparks) with automatic realistic tumbling rotation and beat bounce.
-  - **Color Picker & 1-Click Reset:** Custom particle color tinting and instant reset to defaults.
-  - **None (Clean):** Display pristine artwork with zero overlay.
-- **🎨 14 Curated HyperFrames Design Presets (Official Frame.md Tokens):**
-  - **Biennale Yellow:** Art-biennale museum catalogue: warm parchment ground (`#E9E5DB`), deep indigo ink (`#1B2566`), solar yellow sun-bloom (`#F1EE2E`), Instrument Serif display, 1px hairlines.
-  - **BlockFrame:** Loud neobrutalist: 4px black borders, hard offset shadows, candy pastels (`#FE90E8`), Inter 900 caps, spring pop bounce.
-  - **Blue Professional:** Consulting restraint: warm cream canvas (`#FDFCEB`), single saturated cobalt accent (`#1E2BFA`), Space Grotesk, soft tinted cards.
-  - **Bold Poster:** Vintage editorial poster: stark white ground, brown-black ink (`#1C1410`), tomato red (`#D8000F`), Shrikhand tilted display, double borders.
-  - **Broadside:** Protest poster: ink-black (`#111111`) & fire-orange planes (`#E85D26`), giant lowercase Barlow 900, dual-tone badges.
-  - **Capsule:** Friendly editorial: sun-bleached cream canvas (`#F5F5F0`), candy coral (`#E85D4E`), pill geometry (`boxRadius: 24px`), Bodoni Moda.
-  - **Cartesian:** Quiet mathematical catalogue: warm-stone palette (`#EDE8E0`), taupe hairline grid, Playfair Display 400.
-  - **Cobalt Grid:** Two-colour risograph: cream paper (`#F0EBDE`), cobalt ink (`#1F2BE0`), permanent graph grid, Newsreader serif.
-  - **Code Editorial:** Developer brand book: deep warm-navy surface (`#181715`), terracotta coral voltage (`#CC785C`), EB Garamond display.
-  - **Coral Magazine:** Bold magazine: coral fire (`#E85D5D`), ink black (`#1A1A1A`) hard color split, Bebas Neue tracked uppercase.
-  - **Creative Mode:** Sparse neobrutalist: warm cream (`#EFE9D9`), 4px ink borders, Archivo Black caps, emerald green accent (`#1F8A4C`).
-  - **Daisy Days:** Sunny picture book: garden pastels (`#7ECDC0`), charcoal outlines (`#2D2D2D`), Fredoka One playful bounce.
-  - **Editorial Forest:** Literary botanical: deep forest green (`#2E4A2A`), blush pink (`#E89CB1`), warm cream, Source Serif 4 display.
-  - **Highway POV:** Viral road POV: Bebas Neue, progressive word stacking, deep asphalt drop shadow, 3D vanishing tilt, road shake.
-- **🧠 HyperFrames Layout Engine & Motion Craft:**
-  - **Dynamic Auto-Fit Font Size (`fitTextFontSize`):** Dynamically scales candidate font sizes so lines always claim 60%–90% of the screen width with zero clipping, even on extreme multi-word lyrics or 9:16 portrait viewports.
-  - **9:16 Shorts / Reels Safe Area Guides:** Non-destructive preview overlay with 14.3% side margins, YouTube Shorts / TikTok UI danger zones, and title-safe hero bands. Automatically hides during video export.
-  - **Foreground Subject Layer (Text Behind Subject):** Drag & drop PNG cutouts (singers, cars, silhouettes). Lyrics render in 3D depth behind the subject with subtle beat breath.
-  - **Motion Craft Standards:** Staggered word entries (60–120ms), spring damping (0.7–0.85), and dead-still landing locks.
-- **🎬 In-Browser Video Export:**
-  - Combines the Canvas render stream and Web Audio destination into a synchronized video export (`.webm` / `.mp4`) directly inside your browser—no backend server, FFmpeg installation, or cloud rendering required.
-- **🔒 Privacy First:**
-  - Your API keys are stored strictly in your browser's `localStorage` and sent only to the provider you select.
+### 1. 🌌 Three.js 3D Procedural Audio-Reactive Background
+No static backgrounds or boring repetitive video loops. The environment is procedurally generated in real-time WebGL:
+- **Visual 3D Modes:**
+  - *Cosmic Particle Waves:* Thousands of glowing 3D particles undulating in a continuous liquid plane.
+  - *Ethereal Silk Flow:* Silk-like luminous mesh lines with additive light blending.
+  - *Cyber Matrix Grid:* 3D rolling perspective wireframe grid.
+  - *Celestial Starfield:* Deep cosmic hyperspace warp.
+- **Audio-Reactive Physics:** Sub-bass kicks and rhythm frequencies physically ripple and elevate the 3D surface in real time.
+- **Customizable:** Wave Speed (0.2x–3.0x), Wave Height/Amplitude (10px–100px), Particle Colors, and Deep Space Base Colors.
+
+### 2. ✍️ Fluid Kinetic Lyric Engine (Never Monotonous)
+Ditching rigid slide transitions for organic, fluid motion design:
+- **Staggered Liquid-Spring Entrance:** Words arrive sequentially with an organic spring curve (overshoot damping ~0.78), gliding gracefully into place.
+- **Continuous Organic Undulation (Floating Wave):** Once on screen, words subtly breathe and float along a phase-shifted sine wave—keeping the canvas alive and organic.
+- **Active Vocal Spotlight:** The active word being sung scales dynamically with vivid multi-pass neon radiance (`accentColor`), while past words settle elegantly and upcoming words wait softly.
+- **Dissolve & Upward Liquid Glide Exit:** Phrases disperse upward with smooth opacity falloff rather than abrupt cuts.
+
+### 3. 🎯 Strict &le; 5 Words Pacing (Viral Reading Cadence)
+- Wall-of-text lyrics kill viewer retention.
+- All imported lyrics (AI alignment or LRC/SRT files) are **automatically chunked into short, punchy phrases of &le; 5 words** (configurable from 1 to 5 words).
+- Pacing duration is weighted proportionally by character and word count for natural, effortless reading.
+
+### 4. 🎛️ 100% Fully Customizable Through Clean Settings
+- **Typography:** Outfit, Bebas Neue, Instrument Serif, Space Grotesk, Inter, Montserrat.
+- **Font Size & Auto-Fit:** Scales seamlessly to prevent line clipping on 16:9, 9:16 Shorts, and 1:1 Square.
+- **Colors & Glow:** Base text color, active glow accent color, glow radius (0–60px), multi-pass glow density (0%–200%).
+- **Container / Badge Styling:**
+  - *Clean Glowing Typography* (Minimalist direct glow)
+  - *Liquid Pill Badges* (Rounded capsule badges)
+  - *Modern Contrast Box* (Sharp agency badges)
+  - *Ambient Glass Scrim* (Subtle frosted cards)
+- **Depth Layering (Text Behind Subject):** Drag & drop a transparent PNG cutout to place the singer, vehicle, or subject in front of the animated 3D lyrics.
+- **9:16 Shorts Safe Area Guides:** Non-destructive overlay for YouTube Shorts / TikTok UI safety zones.
 
 ---
 
-## 🛠️ Architecture & Pipeline
-
-```
-[ Upload MP3 / WAV ]
-         │
-         ├────────────────────────────────────────┐
-         ▼                                        ▼
-[ Mode A: Multi-AI Auto-Sync ]         [ Mode B: Direct .LRC / .SRT ]
-(Gemini / Groq / OpenAI / Custom)       (Zero API / Instant Local Parse)
-         │                                        │
-         └───────────────────┬────────────────────┘
-                             │
-                             ▼
-              [ Timed Lyrics JSON Matrix ]
-                             │
-                             ▼
-                 [ Web Audio API Analyser ]
-               (Real-time FFT & Bass Pulse)
-                             │
-                             ▼
-                [ HTML5 Canvas 60FPS Engine ]
-            (Kinetic Typography + Dynamic Glow)
-                             │
-                             ▼
-                   [ MediaRecorder API ]
-             (Synchronized Video File Export)
-```
+## 🎬 In-Browser Video Export
+- Renders the composite 3D Three.js WebGL scene and 2D fluid typography synchronously with the Web Audio stream directly into `.webm` / `.mp4` video.
+- **1-Click 4K/HD Snapshot:** Capture the current animated frame as a high-resolution `.png` cover art thumbnail.
 
 ---
 
-## 💻 Quick Start / Local Setup
-
-This project is a modern client-side application with zero build step required.
-
-### 1. Clone the repository:
-```bash
-git clone https://github.com/adityafirmansyah/gemini-canvas-lyric-video.git
-cd gemini-canvas-lyric-video
-```
-
-### 2. Serve with any local HTTP server:
-Because it uses ES Modules, open it via a local web server:
-
-**Using Python:**
-```bash
-python3 -m http.server 8000
-```
-Then open `http://localhost:8000` in your browser.
-
-**Using Node / npx:**
-```bash
-npx serve .
-```
-
----
-
-## 🌐 Deploy to GitHub Pages (1-Click)
-
-1. Go to your GitHub repository **Settings** > **Pages**.
-2. Under **Build and deployment** > **Source**, select `Deploy from a branch`.
-3. Choose the `main` branch and `/ (root)` folder, then click **Save**.
-4. Your lyric video generator is live at `https://adityafirmansyah.github.io/gemini-canvas-lyric-video/`.
-
----
-
-## 📖 How to Use
-
-1. **Step 1: Upload Music**
-   - Drag and drop your audio track (MP3 or WAV) into the drop zone.
-2. **Step 2: Choose Sync Method**
-   - **Method A (AI Auto-Detect):** Select your preferred AI provider, click the link to get your key if needed ([Google AI Studio](https://aistudio.google.com/app/apikey), [Groq Console](https://console.groq.com/keys), or [OpenAI Platform](https://platform.openai.com/api-keys)), enter your key, and click **Run Audio Detection & Alignment**.
-   - **Method B (LRC/SRT Import):** Drag and drop your `.lrc` or `.srt` file to load timestamps instantly with zero API keys.
-3. **Step 3: Customize Style**
-   - Pick an aspect ratio (`16:9` for YouTube or `9:16` for Shorts).
-   - Select a visual preset (Lofi, Cyberpunk, Minimal) or tweak fonts and colors.
-   - Upload a custom background image or toggle the audio-reactive beat pulse.
-4. **Step 4: Record & Export**
-   - Switch to the **Export** tab and click **Record & Export Video**.
-   - The app will play the track, animate the canvas in sync, and automatically download your video file when complete!
-
----
-
-## 📄 License
-
-MIT License. Free to use, modify, and distribute for personal or commercial projects.
+## 🚀 Live Demo
+Deployable anywhere on GitHub Pages:
+👉 **[adityafirmansyah.github.io/gemini-canvas-lyric-video](https://adityafirmansyah.github.io/gemini-canvas-lyric-video/)**
