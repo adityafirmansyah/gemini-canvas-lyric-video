@@ -15,7 +15,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
   
   <!-- Studio Stylesheet -->
-  <link rel="stylesheet" href="css/style.css?v=4.1">
+  <link rel="stylesheet" href="css/style.css?v=5.0">
 </head>
 <body>
   <div class="app-container">
@@ -160,18 +160,127 @@
 
         <!-- Tab 2: Visual Settings -->
         <div class="tab-content" id="tab-style">
+          <!-- Canvas Visual Theme & Quick Palettes -->
+          <section class="card">
+            <div class="section-header">
+              <h3>🎨 Visual Theme & Palette</h3>
+              <span class="helper-text">Image Replica Style</span>
+            </div>
+
+            <div class="input-group">
+              <label for="canvas-theme">Canvas Surface Theme</label>
+              <select id="canvas-theme">
+                <option value="poster-light" selected>Poster Gallery Light (Exact Attached Image Style — Clean White Canvas)</option>
+                <option value="dark-studio">Obsidian Stage Dark (Deep Dark Canvas with Glowing Typography)</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label>Quick Palette (1-Click Color Match)</label>
+              <div class="palette-quick-buttons">
+                <button type="button" class="theme-palette-btn active" data-accent="#F5B010" data-text="#121212" data-bg="#FDFFFC" style="background: #F5B010; color: #000;" title="Poster Yellow & Black (Attached Image)">★ Image Yellow</button>
+                <button type="button" class="theme-palette-btn" data-accent="#C9FA53" data-text="#0A0C10" data-bg="#FDFFFC" style="background: #C9FA53; color: #000;" title="Volt Lime">Volt Lime</button>
+                <button type="button" class="theme-palette-btn" data-accent="#00F0FF" data-text="#080B14" data-bg="#FDFFFC" style="background: #00F0FF; color: #000;" title="Cyber Cyan">Cyber Cyan</button>
+                <button type="button" class="theme-palette-btn" data-accent="#FF007F" data-text="#121212" data-bg="#FDFFFC" style="background: #FF007F; color: #fff;" title="Neon Pink">Neon Pink</button>
+                <button type="button" class="theme-palette-btn" data-accent="#F5B010" data-text="#FFFFFF" data-bg="#080B14" style="background: #080B14; color: #F5B010; border: 1.5px solid #F5B010;" title="Gold & Obsidian Dark">Dark Gold</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Fluid Kinetic Typography Section -->
+          <section class="card">
+            <div class="section-header">
+              <h3>✍️ Typographic Collage & Kinetic Style</h3>
+              <button type="button" id="btn-reset-lyrics" class="text-link" title="Reset lyric styling">↺ Reset</button>
+            </div>
+
+            <div class="input-group">
+              <label for="lyric-motion-style">Typographic Layout Mode</label>
+              <select id="lyric-motion-style">
+                <option value="poster-collage" selected>Typographic Poster Cloud (Attached Image Replica — Hero + Vertical/Horizontal Grid)</option>
+                <option value="hero-morph">Dynamic Hero Morph (Active Word Takes Center Stage as Giant Hero)</option>
+                <option value="liquid-spring">Liquid Spring Wave (Fluid Horizontal Stagger Line)</option>
+                <option value="vocal-pop">Vocal Pop Spotlight (Horizontal Spring Punch)</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div class="input-group">
+                <label for="font-family">Typography Font</label>
+                <select id="font-family">
+                  <option value="'Montserrat', sans-serif" selected>Montserrat (Bold Poster / Image Style)</option>
+                  <option value="'Bebas Neue', sans-serif">Bebas Neue (Viral Tall Caps)</option>
+                  <option value="'Inter', sans-serif">Inter 900 (Neo-Grotesque Heavy)</option>
+                  <option value="'Outfit', sans-serif">Outfit (Modern Clean)</option>
+                  <option value="'Space Grotesk', sans-serif">Space Grotesk (Tech Modern)</option>
+                  <option value="'Instrument Serif', serif">Instrument Serif (Luxury Editorial)</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <div class="label-with-link">
+                  <label for="hero-scale">Hero Word Scale</label>
+                  <span id="hero-scale-val" class="helper-text">2.2x</span>
+                </div>
+                <input type="range" id="hero-scale" min="12" max="30" value="22" step="1">
+              </div>
+            </div>
+
+            <!-- Strict Max Words Per Chunk Setting -->
+            <div class="form-row">
+              <div class="input-group">
+                <div class="label-with-link">
+                  <label for="max-words">Max Words Per Beat (Strictly &le; 5)</label>
+                  <span id="max-words-val" class="helper-text" style="color: var(--accent); font-weight: 700;">4 words</span>
+                </div>
+                <input type="range" id="max-words" min="1" max="5" value="4" step="1">
+              </div>
+              <div class="input-group">
+                <div class="label-with-link">
+                  <label for="font-size">Base Font Size</label>
+                  <span id="font-size-val" class="helper-text">56px</span>
+                </div>
+                <input type="range" id="font-size" min="36" max="84" value="56" step="2">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="input-group">
+                <label for="text-color">Supporting Words Color</label>
+                <input type="color" id="text-color" value="#121212">
+              </div>
+              <div class="input-group">
+                <label for="accent-color">Hero / Active Word Color</label>
+                <input type="color" id="accent-color" value="#F5B010">
+              </div>
+            </div>
+
+            <div class="toggle-group">
+              <label class="switch-label">
+                <input type="checkbox" id="toggle-vertical-rot" checked>
+                <span>Allow 90° Vertical Rotated Words (Like Reference Image)</span>
+              </label>
+            </div>
+
+            <div class="toggle-group">
+              <label class="switch-label">
+                <input type="checkbox" id="toggle-uppercase" checked>
+                <span>ALL CAPS / Uppercase Poster Impact</span>
+              </label>
+            </div>
+          </section>
+
           <!-- 3D Three.js Background Section -->
           <section class="card">
             <div class="section-header">
-              <h3>🌌 3D Background Generator (Three.js)</h3>
+              <h3>🌌 3D Procedural Background (Three.js)</h3>
               <button type="button" id="btn-reset-bg-3d" class="text-link" title="Reset 3D settings">↺ Reset</button>
             </div>
 
             <div class="input-group">
-              <label for="three-style">3D Visual Mode</label>
+              <label for="three-style">3D Background Geometry</label>
               <select id="three-style">
-                <option value="particle-waves">Cosmic Particle Waves (Glowing 3D Field)</option>
-                <option value="ethereal-silk">Ethereal Silk Flow (Undulating Mesh Lines)</option>
+                <option value="particle-waves" selected>Cosmic Particle Waves (Flowing 3D Surface)</option>
+                <option value="ethereal-silk">Ethereal Silk Flow (Delicate Undulating Mesh)</option>
                 <option value="cyber-grid">Cyber Matrix Grid (Rolling 3D Perspective)</option>
                 <option value="starfield">Celestial Starfield (Deep Cosmic Warp)</option>
               </select>
@@ -179,12 +288,12 @@
 
             <div class="form-row">
               <div class="input-group">
-                <label for="three-color">Particle / Mesh Color</label>
-                <input type="color" id="three-color" value="#64ffda">
+                <label for="three-color">3D Particles / Wireframe Color</label>
+                <input type="color" id="three-color" value="#F5B010">
               </div>
               <div class="input-group">
-                <label for="three-bg-color">Space Base Color</label>
-                <input type="color" id="three-bg-color" value="#080b14">
+                <label for="three-bg-color">Canvas Base Background</label>
+                <input type="color" id="three-bg-color" value="#FDFFFC">
               </div>
             </div>
 
@@ -199,110 +308,16 @@
               <div class="input-group">
                 <div class="label-with-link">
                   <label for="three-height">Wave Height</label>
-                  <span id="three-height-val" class="helper-text">45px</span>
+                  <span id="three-height-val" class="helper-text">35px</span>
                 </div>
-                <input type="range" id="three-height" min="10" max="100" value="45" step="5">
+                <input type="range" id="three-height" min="10" max="100" value="35" step="5">
               </div>
             </div>
 
             <div class="toggle-group">
               <label class="switch-label">
                 <input type="checkbox" id="toggle-audio-reactive" checked>
-                <span>Audio Beat Pulse & Reactive Waves</span>
-              </label>
-            </div>
-          </section>
-
-          <!-- Fluid Kinetic Typography Section -->
-          <section class="card">
-            <div class="section-header">
-              <h3>✍️ Fluid Kinetic Typography</h3>
-              <button type="button" id="btn-reset-lyrics" class="text-link" title="Reset lyric styling">↺ Reset</button>
-            </div>
-
-            <div class="input-group">
-              <label for="lyric-motion-style">Fluid Motion Style</label>
-              <select id="lyric-motion-style">
-                <option value="liquid-spring">Liquid Spring Wave (Organic Stagger & Undulation)</option>
-                <option value="vocal-pop">Vocal Pop Spotlight (Spring Bounce on Active Word)</option>
-                <option value="ethereal-mist">Cinematic Ethereal Float (Slow Ambient Breath)</option>
-                <option value="minimal">Minimalist Editorial (Restrained Typographic Focus)</option>
-              </select>
-            </div>
-
-            <div class="form-row">
-              <div class="input-group">
-                <label for="font-family">Typography Font</label>
-                <select id="font-family">
-                  <option value="'Outfit', sans-serif">Outfit (Modern Clean)</option>
-                  <option value="'Bebas Neue', sans-serif">Bebas Neue (Viral Tall Caps)</option>
-                  <option value="'Instrument Serif', serif">Instrument Serif (Luxury Editorial)</option>
-                  <option value="'Space Grotesk', sans-serif">Space Grotesk (Tech Modern)</option>
-                  <option value="'Inter', sans-serif">Inter (Neo-Grotesque)</option>
-                  <option value="'Montserrat', sans-serif">Montserrat (Bold Punchy)</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <div class="label-with-link">
-                  <label for="font-size">Font Size</label>
-                  <span id="font-size-val" class="helper-text">56px</span>
-                </div>
-                <input type="range" id="font-size" min="36" max="84" value="56" step="2">
-              </div>
-            </div>
-
-            <!-- Strict Max Words Per Chunk Setting -->
-            <div class="input-group">
-              <div class="label-with-link">
-                <label for="max-words">Max Words Per Beat / Line Chunk (Strictly &le; 5)</label>
-                <span id="max-words-val" class="helper-text" style="color: var(--accent); font-weight: 700;">4 words</span>
-              </div>
-              <input type="range" id="max-words" min="1" max="5" value="4" step="1">
-              <small class="helper-text">Never overloads the screen. Keeps viral, punchy reading cadence.</small>
-            </div>
-
-            <div class="form-row">
-              <div class="input-group">
-                <label for="text-color">Base Lyric Color</label>
-                <input type="color" id="text-color" value="#ffffff">
-              </div>
-              <div class="input-group">
-                <label for="accent-color">Active Vocal Glow Color</label>
-                <input type="color" id="accent-color" value="#64ffda">
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="input-group">
-                <div class="label-with-link">
-                  <label for="glow-size">Glow Size</label>
-                  <span id="glow-size-val" class="helper-text">25px</span>
-                </div>
-                <input type="range" id="glow-size" min="0" max="60" value="25" step="2">
-              </div>
-              <div class="input-group">
-                <div class="label-with-link">
-                  <label for="glow-density">Glow Density</label>
-                  <span id="glow-density-val" class="helper-text">100%</span>
-                </div>
-                <input type="range" id="glow-density" min="0" max="200" value="100" step="10">
-              </div>
-            </div>
-
-            <div class="input-group">
-              <label for="container-style">Word Container / Badge Style</label>
-              <select id="container-style">
-                <option value="clean-glow">Clean Glowing Typography (No Box)</option>
-                <option value="pill-badge">Liquid Pill Badges (Rounded Capsule Badges)</option>
-                <option value="contrast-box">Modern Contrast Box (Sharp Creative Badges)</option>
-                <option value="ambient-scrim">Ambient Glass Scrim (Subtle Tinted Cards)</option>
-              </select>
-            </div>
-
-            <div class="toggle-group">
-              <label class="switch-label">
-                <input type="checkbox" id="toggle-uppercase">
-                <span>ALL CAPS / Uppercase Punch</span>
+                <span>Audio Beat Pulse & Reactive Wave Bounce</span>
               </label>
             </div>
           </section>
@@ -405,6 +420,6 @@
   <audio id="audio-player" preload="auto"></audio>
 
   <!-- Modular Main Script -->
-  <script type="module" src="js/app.js?v=4.2"></script>
+  <script type="module" src="js/app.js?v=5.0"></script>
 </body>
 </html>

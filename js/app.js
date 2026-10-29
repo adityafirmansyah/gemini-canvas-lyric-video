@@ -1,13 +1,13 @@
 /**
- * app.js (v4.1 Aura Studio)
+ * app.js (v5.0 Typographic Poster Collage Edition)
  * Main Controller coordinating Audio, Three.js 3D Background, Fluid Kinetic Lyrics, and Video Recording.
  */
 
-import { AudioManager } from './audio-player.js?v=4.2';
-import { AiService } from './ai-service.js?v=4.2';
-import { LrcParser } from './lrc-parser.js?v=4.2';
-import { CanvasRenderer } from './canvas-renderer.js?v=4.2';
-import { VideoRecorder } from './recorder.js?v=4.2';
+import { AudioManager } from './audio-player.js?v=5.0';
+import { AiService } from './ai-service.js?v=5.0';
+import { LrcParser } from './lrc-parser.js?v=5.0';
+import { CanvasRenderer } from './canvas-renderer.js?v=5.0';
+import { VideoRecorder } from './recorder.js?v=5.0';
 
 // Canvas & Audio
 const canvas = document.getElementById('lyric-canvas');
@@ -54,6 +54,13 @@ const threeHeightInput = document.getElementById('three-height');
 const threeHeightVal = document.getElementById('three-height-val');
 const toggleAudioReactive = document.getElementById('toggle-audio-reactive');
 const btnResetBg3D = document.getElementById('btn-reset-bg-3d');
+
+// Typographic Collage & Theme Controls (Attached Image Style)
+const canvasThemeSelect = document.getElementById('canvas-theme');
+const paletteQuickBtns = document.querySelectorAll('.theme-palette-btn');
+const heroScaleRange = document.getElementById('hero-scale');
+const heroScaleVal = document.getElementById('hero-scale-val');
+const toggleVerticalRot = document.getElementById('toggle-vertical-rot');
 
 // Fluid Kinetic Typography Controls
 const lyricMotionStyleSelect = document.getElementById('lyric-motion-style');
@@ -364,69 +371,111 @@ btnSampleLyrics.addEventListener('click', () => {
     {
       start: 0.2,
       end: 4.8,
-      text: "Neon reflections in the rainy night",
+      text: "Our creative ideas will inspire",
       words: [
-        { word: "Neon", start: 0.2, end: 0.8 },
-        { word: "reflections", start: 0.85, end: 2.1 },
-        { word: "in", start: 2.15, end: 2.4 },
-        { word: "the", start: 2.45, end: 2.7 },
-        { word: "rainy", start: 2.75, end: 3.6 },
-        { word: "night", start: 3.65, end: 4.6 }
+        { word: "Our", start: 0.2, end: 0.8 },
+        { word: "creative", start: 0.85, end: 2.1 },
+        { word: "ideas", start: 2.15, end: 3.2 },
+        { word: "will", start: 3.25, end: 3.7 },
+        { word: "inspire", start: 3.75, end: 4.6 }
       ]
     },
     {
       start: 5.0,
       end: 9.6,
-      text: "Lost in the rhythm of the city lights",
+      text: "Innovative minds break the mold",
       words: [
-        { word: "Lost", start: 5.0, end: 5.7 },
-        { word: "in", start: 5.75, end: 6.0 },
-        { word: "the", start: 6.05, end: 6.3 },
-        { word: "rhythm", start: 6.35, end: 7.4 },
-        { word: "of", start: 7.45, end: 7.7 },
-        { word: "the", start: 7.75, end: 8.0 },
-        { word: "city", start: 8.05, end: 8.8 },
-        { word: "lights", start: 8.85, end: 9.5 }
+        { word: "Innovative", start: 5.0, end: 6.4 },
+        { word: "minds", start: 6.45, end: 7.2 },
+        { word: "break", start: 7.25, end: 7.9 },
+        { word: "the", start: 7.95, end: 8.3 },
+        { word: "mold", start: 8.35, end: 9.4 }
       ]
     },
     {
       start: 9.8,
       end: 15.5,
-      text: "Drifting through echoes of an old memory that lingers deep inside me tonight",
+      text: "Ingenious vision giving digital strength to your brand",
       words: [
-        { word: "Drifting", start: 9.8, end: 10.6 },
-        { word: "through", start: 10.65, end: 11.1 },
-        { word: "echoes", start: 11.15, end: 11.9 },
-        { word: "of", start: 11.95, end: 12.2 },
-        { word: "an", start: 12.25, end: 12.5 },
-        { word: "old", start: 12.55, end: 13.0 },
-        { word: "memory", start: 13.05, end: 13.8 },
-        { word: "that", start: 13.85, end: 14.1 },
-        { word: "lingers", start: 14.15, end: 14.8 },
-        { word: "deep", start: 14.85, end: 15.1 },
-        { word: "inside", start: 15.15, end: 15.35 },
-        { word: "me", start: 15.36, end: 15.42 },
-        { word: "tonight", start: 15.43, end: 15.5 }
+        { word: "Ingenious", start: 9.8, end: 10.9 },
+        { word: "vision", start: 10.95, end: 11.8 },
+        { word: "giving", start: 11.85, end: 12.5 },
+        { word: "digital", start: 12.55, end: 13.4 },
+        { word: "strength", start: 13.45, end: 14.3 },
+        { word: "to", start: 14.35, end: 14.6 },
+        { word: "your", start: 14.65, end: 14.9 },
+        { word: "brand", start: 14.95, end: 15.5 }
       ]
     },
     {
       start: 16.0,
       end: 21.0,
-      text: "Finding eternal peace right where we belong",
+      text: "Clever design makes you unforgettable",
       words: [
-        { word: "Finding", start: 16.0, end: 16.8 },
-        { word: "eternal", start: 16.85, end: 17.8 },
-        { word: "peace", start: 17.85, end: 18.6 },
-        { word: "right", start: 18.65, end: 19.2 },
-        { word: "where", start: 19.25, end: 19.7 },
-        { word: "we", start: 19.75, end: 20.1 },
-        { word: "belong", start: 20.15, end: 20.9 }
+        { word: "Clever", start: 16.0, end: 16.9 },
+        { word: "design", start: 16.95, end: 17.9 },
+        { word: "makes", start: 17.95, end: 18.5 },
+        { word: "you", start: 18.55, end: 18.9 },
+        { word: "unforgettable", start: 18.95, end: 20.8 }
       ]
     }
   ];
   lyricsDataInput.value = JSON.stringify(sample, null, 2);
   renderer.setLyrics(sample);
 });
+
+// Typographic Collage & Theme Listeners (Attached Image Style)
+if (canvasThemeSelect) {
+  canvasThemeSelect.addEventListener('change', (e) => {
+    renderer.setTheme(e.target.value);
+    if (textColorInput) textColorInput.value = renderer.textColor;
+    if (accentColorInput) accentColorInput.value = renderer.accentColor;
+    if (threeBgColorInput) threeBgColorInput.value = renderer.threeBg.bgColor;
+    if (threeColorInput) threeColorInput.value = renderer.threeBg.color;
+  });
+}
+
+paletteQuickBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    paletteQuickBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const accent = btn.getAttribute('data-accent');
+    const text = btn.getAttribute('data-text');
+    const bg = btn.getAttribute('data-bg');
+
+    if (accent) {
+      renderer.accentColor = accent;
+      if (accentColorInput) accentColorInput.value = accent;
+    }
+    if (text) {
+      renderer.textColor = text;
+      if (textColorInput) textColorInput.value = text;
+    }
+    if (bg) {
+      renderer.threeBg.updateSettings({ bgColor: bg, color: accent });
+      if (threeBgColorInput) threeBgColorInput.value = bg;
+      if (threeColorInput) threeColorInput.value = accent;
+      const theme = bg === '#080B14' ? 'dark-studio' : 'poster-light';
+      renderer.canvasTheme = theme;
+      if (canvasThemeSelect) canvasThemeSelect.value = theme;
+    }
+  });
+});
+
+if (heroScaleRange) {
+  heroScaleRange.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value) / 10;
+    renderer.heroScale = val;
+    if (heroScaleVal) heroScaleVal.textContent = `${val.toFixed(1)}x`;
+  });
+}
+
+if (toggleVerticalRot) {
+  toggleVerticalRot.addEventListener('change', (e) => {
+    renderer.allowVerticalRotation = e.target.checked;
+  });
+}
 
 // 7. 3D Background Settings Listeners (Three.js)
 if (threeStyleSelect) {
@@ -548,31 +597,30 @@ if (toggleUppercase) {
 }
 if (btnResetLyrics) {
   btnResetLyrics.addEventListener('click', () => {
-    if (lyricMotionStyleSelect) lyricMotionStyleSelect.value = 'liquid-spring';
-    if (fontFamilySelect) fontFamilySelect.value = "'Outfit', sans-serif";
+    if (lyricMotionStyleSelect) lyricMotionStyleSelect.value = 'poster-collage';
+    if (canvasThemeSelect) canvasThemeSelect.value = 'poster-light';
+    if (fontFamilySelect) fontFamilySelect.value = "'Montserrat', sans-serif";
     if (fontSizeRange) fontSizeRange.value = 56;
     if (fontSizeVal) fontSizeVal.textContent = '56px';
+    if (heroScaleRange) heroScaleRange.value = 22;
+    if (heroScaleVal) heroScaleVal.textContent = '2.2x';
     if (maxWordsRange) maxWordsRange.value = 4;
     if (maxWordsVal) maxWordsVal.textContent = '4 words';
-    if (textColorInput) textColorInput.value = '#ffffff';
-    if (accentColorInput) accentColorInput.value = '#64ffda';
-    if (glowSizeInput) glowSizeInput.value = 25;
-    if (glowSizeVal) glowSizeVal.textContent = '25px';
-    if (glowDensityInput) glowDensityInput.value = 100;
-    if (glowDensityVal) glowDensityVal.textContent = '100%';
-    if (containerStyleSelect) containerStyleSelect.value = 'clean-glow';
-    if (toggleUppercase) toggleUppercase.checked = false;
+    if (textColorInput) textColorInput.value = '#121212';
+    if (accentColorInput) accentColorInput.value = '#F5B010';
+    if (toggleVerticalRot) toggleVerticalRot.checked = true;
+    if (toggleUppercase) toggleUppercase.checked = true;
 
-    renderer.motionStyle = 'liquid-spring';
-    renderer.fontFamily = "'Outfit', sans-serif";
+    renderer.motionStyle = 'poster-collage';
+    renderer.setTheme('poster-light');
+    renderer.fontFamily = "'Montserrat', sans-serif";
     renderer.baseFontSize = 56;
+    renderer.heroScale = 2.2;
+    renderer.allowVerticalRotation = true;
     renderer.setMaxWords(4);
-    renderer.textColor = '#ffffff';
-    renderer.accentColor = '#64ffda';
-    renderer.glowSize = 25;
-    renderer.glowDensity = 1.0;
-    renderer.containerStyle = 'clean-glow';
-    renderer.badgeConfig.uppercase = false;
+    renderer.textColor = '#121212';
+    renderer.accentColor = '#F5B010';
+    renderer.badgeConfig.uppercase = true;
   });
 }
 

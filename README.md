@@ -21,12 +21,14 @@ No static backgrounds or boring repetitive video loops. The environment is proce
 - **Audio-Reactive Physics:** Sub-bass kicks and rhythm frequencies physically ripple and elevate the 3D surface in real time.
 - **Customizable:** Wave Speed (0.2x–3.0x), Wave Height/Amplitude (10px–100px), Particle Colors, and Deep Space Base Colors.
 
-### 2. ✍️ Fluid Kinetic Lyric Engine (Never Monotonous)
-Ditching rigid slide transitions for organic, fluid motion design:
-- **Staggered Liquid-Spring Entrance:** Words arrive sequentially with an organic spring curve (overshoot damping ~0.78), gliding gracefully into place.
-- **Continuous Organic Undulation (Floating Wave):** Once on screen, words subtly breathe and float along a phase-shifted sine wave—keeping the canvas alive and organic.
-- **Active Vocal Spotlight:** The active word being sung scales dynamically with vivid multi-pass neon radiance (`accentColor`), while past words settle elegantly and upcoming words wait softly.
-- **Dissolve & Upward Liquid Glide Exit:** Phrases disperse upward with smooth opacity falloff rather than abrupt cuts.
+### 2. ✍️ Typographic Poster Collage Engine (Word-Cloud / Image Replica)
+Inspired by bold graphic poster typography and word-cloud branding (interlocking horizontal & vertical layouts):
+- **Hero Centerpiece Word:** The dominant keyword or currently sung word commands the center stage in massive, bold **Poster Golden Yellow (`#F5B010`)**.
+- **Interlocking Vertical & Horizontal Rails:** Supporting words wrap closely around the hero word in contrasting **Solid Black (`#111111`)**—some placed horizontally above and below, and others rotated vertically (**&plusmn;90&deg;**) hugging the left and right flanks.
+- **Vocal Spotlight Transitions:** As each word is sung, it lights up in vibrant yellow with an elastic spring punch, while already sung words settle into solid high-contrast black/white.
+- **Organic Liquid Undulation:** Words never freeze like a flat JPEG; subtle phase-shifted sine-wave floating breathes life into every word on screen.
+- **1-Click Theme Switch:** Toggle between **Poster Gallery Light** (clean white canvas like the reference image) and **Obsidian Stage Dark** (deep black with glowing gold & white).
+- **Hero-Morph vs Fixed Poster:** Choose whether the active word actively slides into the giant hero slot or stays as an anchored typographic poster cloud.
 
 ### 3. 🎯 Strict &le; 5 Words Pacing (Viral Reading Cadence)
 - Wall-of-text lyrics kill viewer retention.

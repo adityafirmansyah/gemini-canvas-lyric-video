@@ -7,8 +7,8 @@
  * - 100% Canvas Compositing for 60FPS Video Export and PNG Thumbnail Snapshot
  */
 
-import { ThreeBackground } from './three-background.js?v=4.1';
-import { LrcParser } from './lrc-parser.js?v=4.1';
+import { ThreeBackground } from './three-background.js?v=5.0';
+import { LrcParser } from './lrc-parser.js?v=5.0';
 
 export class CanvasRenderer {
   constructor(canvas) {
@@ -23,16 +23,28 @@ export class CanvasRenderer {
     // 1. Three.js 3D Background Engine
     this.threeBg = new ThreeBackground(this.targetWidth, this.targetHeight);
 
-    // 2. Fluid Kinetic Lyric Configuration
-    this.fontFamily = "'Outfit', sans-serif";
+    // 2. Fluid Kinetic Lyric & Typographic Collage Configuration
+    this.fontFamily = "'Montserrat', sans-serif";
     this.baseFontSize = 56;
-    this.textColor = '#ffffff';
-    this.accentColor = '#64ffda';
-    this.glowSize = 25;
+    this.textColor = '#121212';
+    this.accentColor = '#F5B010'; // Solar Golden Yellow from attached image
+    this.glowSize = 0;
     this.glowDensity = 1.0;
     this.maxWordsPerChunk = 4; // Strictly <= 5 words!
-    this.motionStyle = 'liquid-spring'; // 'liquid-spring', 'vocal-pop', 'ethereal-mist', 'minimal'
+    this.motionStyle = 'poster-collage'; // 'poster-collage', 'hero-morph', 'liquid-spring', 'vocal-pop'
+    this.canvasTheme = 'poster-light'; // 'poster-light' (white background like image) or 'dark-studio'
+    this.heroScale = 2.2;
+    this.allowVerticalRotation = true;
     this.containerStyle = 'clean-glow'; // 'clean-glow', 'pill-badge', 'contrast-box', 'ambient-scrim'
+
+    // Configure 3D Background for Poster Light mode
+    if (this.threeBg) {
+      this.threeBg.updateSettings({
+        bgColor: '#FDFFFC',
+        color: '#F5B010',
+        waveHeight: 35
+      });
+    }
 
     // Container / Badge styling details
     this.badgeConfig = {
@@ -56,6 +68,31 @@ export class CanvasRenderer {
     this.animTime = 0;
 
     this.setAspectRatio('16:9', '1080p');
+  }
+
+  setTheme(theme) {
+    this.canvasTheme = theme;
+    if (theme === 'poster-light') {
+      this.textColor = '#121212';
+      this.accentColor = '#F5B010';
+      if (this.threeBg) {
+        this.threeBg.updateSettings({
+          bgColor: '#FDFFFC',
+          color: '#F5B010',
+          waveHeight: 35
+        });
+      }
+    } else {
+      this.textColor = '#ffffff';
+      this.accentColor = '#F5B010';
+      if (this.threeBg) {
+        this.threeBg.updateSettings({
+          bgColor: '#080B14',
+          color: '#F5B010',
+          waveHeight: 45
+        });
+      }
+    }
   }
 
   setAspectRatio(ratio, resolution = '1080p') {
@@ -214,24 +251,265 @@ export class CanvasRenderer {
 
     ctx.save();
     ctx.globalAlpha = alpha;
-    this.renderFluidChunk({
-      ctx,
-      text: chunk.text,
-      chunkWords: chunk.words, // True AI word timestamps
-      centerX: W / 2,
-      centerY: posterY,
-      maxWidth: W * (this.aspectRatio === '9:16' ? 0.88 : 0.82),
-      baseSize: this.baseFontSize,
-      progress,
-      inTime,
-      currentTime: isPausedAtStart ? (chunk.words ? chunk.words[0].start + 0.1 : chunk.start + 0.2) : t,
-      chunkStart: chunk.start,
-      chunkDuration: duration,
-      isPausedAtStart,
-      beatPulse,
-      overallGlow
-    });
+
+    const useCollage = (this.motionStyle === 'poster-collage' || this.motionStyle === 'hero-morph');
+
+    if (useCollage) {
+      this.renderTypographicCollage({
+        ctx,
+        text: chunk.text,
+        chunkWords: chunk.words,
+        centerX: W / 2,
+        centerY: posterY,
+        maxWidth: W * (this.aspectRatio === '9:16' ? 0.88 : 0.84),
+        baseSize: this.baseFontSize,
+        progress,
+        inTime,
+        currentTime: isPausedAtStart ? (chunk.words ? chunk.words[0].start + 0.1 : chunk.start + 0.2) : t,
+        chunkStart: chunk.start,
+        chunkDuration: duration,
+        isPausedAtStart,
+        beatPulse,
+        overallGlow
+      });
+    } else {
+      this.renderFluidChunk({
+        ctx,
+        text: chunk.text,
+        chunkWords: chunk.words, // True AI word timestamps
+        centerX: W / 2,
+        centerY: posterY,
+        maxWidth: W * (this.aspectRatio === '9:16' ? 0.88 : 0.82),
+        baseSize: this.baseFontSize,
+        progress,
+        inTime,
+        currentTime: isPausedAtStart ? (chunk.words ? chunk.words[0].start + 0.1 : chunk.start + 0.2) : t,
+        chunkStart: chunk.start,
+        chunkDuration: duration,
+        isPausedAtStart,
+        beatPulse,
+        overallGlow
+      });
+    }
+
     ctx.restore();
+  }
+
+  /**
+   * Typographic Poster Collage Engine (Word Cloud Image Replica):
+   * Features giant golden yellow hero focal word + interlocking vertical and horizontal words,
+   * with fluid spring physics and active singing word spotlights.
+   */
+  renderTypographicCollage({ ctx, text, chunkWords, centerX, centerY, maxWidth, baseSize, progress, inTime, currentTime, chunkStart, chunkDuration, isPausedAtStart, beatPulse, overallGlow }) {
+    const isUpper = this.badgeConfig ? this.badgeConfig.uppercase !== false : true; // uppercase by default for poster impact
+    const displayText = isUpper ? text.toUpperCase() : text;
+    const words = displayText.split(/\s+/).filter(Boolean);
+    const totalWords = words.length;
+    if (totalWords === 0) return;
+
+    // 1. Determine active word index from real AI timestamps
+    const hasWordTimestamps = Array.isArray(chunkWords) && chunkWords.length === totalWords;
+    let activeWordIdx = 0;
+
+    if (hasWordTimestamps) {
+      activeWordIdx = -1;
+      for (let j = 0; j < totalWords; j++) {
+        const w = chunkWords[j];
+        if (currentTime >= w.start && currentTime <= w.end) {
+          activeWordIdx = j;
+          break;
+        } else if (j < totalWords - 1 && currentTime > w.end && currentTime < chunkWords[j + 1].start) {
+          activeWordIdx = j;
+          break;
+        }
+      }
+      if (activeWordIdx === -1) {
+        if (currentTime < chunkWords[0].start) activeWordIdx = 0;
+        else activeWordIdx = totalWords - 1;
+      }
+    } else {
+      const wordWeights = words.map(w => Math.max(1, w.length));
+      const totalWeight = wordWeights.reduce((a, b) => a + b, 0) || 1;
+      let elapsedWeight = 0;
+      activeWordIdx = -1;
+      for (let j = 0; j < totalWords; j++) {
+        const wStart = chunkStart + chunkDuration * (elapsedWeight / totalWeight);
+        const wEnd = wStart + chunkDuration * (wordWeights[j] / totalWeight);
+        if (currentTime >= wStart && currentTime <= wEnd) {
+          activeWordIdx = j;
+          break;
+        }
+        elapsedWeight += wordWeights[j];
+      }
+      if (activeWordIdx === -1) {
+        activeWordIdx = isPausedAtStart ? 0 : Math.min(totalWords - 1, Math.floor(progress * totalWords));
+      }
+    }
+
+    // 2. Select Hero Word Index
+    let heroIdx = 0;
+    if (this.motionStyle === 'hero-morph') {
+      heroIdx = activeWordIdx;
+    } else {
+      // In poster-collage: Longest word anchors the center as the hero (like CREATIVE'S in image)
+      let maxLen = -1;
+      for (let j = 0; j < totalWords; j++) {
+        if (words[j].length > maxLen) {
+          maxLen = words[j].length;
+          heroIdx = j;
+        }
+      }
+    }
+
+    const heroWord = words[heroIdx];
+    const isLight = this.canvasTheme === 'poster-light';
+
+    // 3. Size and Measure Hero Word
+    let heroFontSize = Math.round(baseSize * (this.heroScale || 2.2));
+    ctx.font = `900 ${heroFontSize}px ${this.fontFamily}`;
+    let heroWidth = ctx.measureText(heroWord).width;
+
+    // Clamp hero width to 82% of maxWidth so it never clips
+    const heroMaxW = maxWidth * 0.82;
+    if (heroWidth > heroMaxW) {
+      heroFontSize = Math.max(48, Math.floor(heroFontSize * (heroMaxW / heroWidth)));
+      ctx.font = `900 ${heroFontSize}px ${this.fontFamily}`;
+      heroWidth = ctx.measureText(heroWord).width;
+    }
+    const heroHeight = heroFontSize * 0.85;
+
+    // 4. Size for Supporting Words
+    const supFontSize = Math.max(26, Math.round(heroFontSize * 0.38));
+
+    // 5. Assign Roles to Other Words
+    const otherIndices = [];
+    for (let j = 0; j < totalWords; j++) {
+      if (j !== heroIdx) otherIndices.push(j);
+    }
+
+    const allowVert = this.allowVerticalRotation !== false && this.aspectRatio !== '9:16';
+    const roleCycle = allowVert
+      ? ['top', 'left_vert', 'right_vert', 'bottom']
+      : ['top', 'bottom', 'top', 'bottom'];
+
+    const slots = {};
+    slots[heroIdx] = { role: 'hero', x: centerX, y: centerY, angle: 0, fontSize: heroFontSize };
+
+    for (let k = 0; k < otherIndices.length; k++) {
+      const idx = otherIndices[k];
+      const role = roleCycle[k % roleCycle.length];
+      let x = centerX, y = centerY, angle = 0, sz = supFontSize;
+
+      if (role === 'hero') {
+        x = centerX; y = centerY; angle = 0; sz = heroFontSize;
+      } else if (role === 'top') {
+        x = centerX - heroWidth * 0.15 + (k * 20);
+        y = centerY - heroHeight * 0.62 - (supFontSize * 0.55);
+        angle = 0;
+        sz = Math.round(supFontSize * 1.08);
+      } else if (role === 'bottom') {
+        x = centerX + heroWidth * 0.12 - (k * 20);
+        y = centerY + heroHeight * 0.62 + (supFontSize * 0.55);
+        angle = 0;
+        sz = Math.round(supFontSize * 1.08);
+      } else if (role === 'left_vert') {
+        x = centerX - heroWidth / 2 - (supFontSize * 0.7) - 16;
+        y = centerY;
+        angle = -Math.PI / 2; // rotated -90 deg
+        sz = supFontSize;
+      } else if (role === 'right_vert') {
+        x = centerX + heroWidth / 2 + (supFontSize * 0.7) + 16;
+        y = centerY;
+        angle = Math.PI / 2; // rotated 90 deg
+        sz = supFontSize;
+      }
+
+      slots[idx] = { role, x, y, angle, fontSize: sz };
+    }
+
+    // 6. Draw each word in its collage slot
+    for (let i = 0; i < totalWords; i++) {
+      const wordText = words[i];
+      const slot = slots[i];
+      const isActive = (i === activeWordIdx);
+      const isPast = hasWordTimestamps ? (currentTime > chunkWords[i].end) : (i < activeWordIdx);
+
+      // Staggered liquid entrance animation
+      const STAGGER = 0.08;
+      const wordInTime = Math.max(0, inTime - i * STAGGER);
+      const enterDur = 0.38;
+      const p = Math.min(1, wordInTime / enterDur);
+
+      let enterScale = 1.0;
+      let enterY = 0;
+      let enterAlpha = 1.0;
+
+      if (p < 1.0) {
+        const bounce = Math.sin(p * Math.PI) * 0.16;
+        enterScale = 0.75 + (p * 0.25) + bounce;
+        enterY = (1.0 - p) * 22;
+        enterAlpha = p;
+      }
+
+      // Organic micro-floating breathing wave
+      const waveFloatY = Math.sin(this.animTime * 2.2 + i * 1.3) * (3.0 * (1 + beatPulse * 0.4));
+      const waveRot = Math.cos(this.animTime * 1.8 + i * 0.9) * 0.012;
+
+      // Color and Scale styling
+      let finalScale = enterScale;
+      let color = this.textColor;
+      let shadowBlur = 0;
+      let shadowColor = 'transparent';
+
+      if (slot.role === 'hero') {
+        // Hero word is ALWAYS prominent!
+        if (isActive) {
+          finalScale *= (1.1 + beatPulse * 0.14);
+          color = this.accentColor; // Vivid Golden Yellow (#F5B010)
+          shadowBlur = isLight ? 10 : 24;
+          shadowColor = isLight ? 'rgba(245, 176, 16, 0.45)' : this.accentColor;
+        } else {
+          color = this.accentColor; // Yellow hero even when resting (Like image)
+          finalScale *= (1.0 + beatPulse * 0.05);
+        }
+      } else {
+        // Supporting words (Collage elements)
+        if (isActive) {
+          finalScale *= (1.18 + beatPulse * 0.12);
+          color = this.accentColor; // Spotlight active word in yellow!
+          shadowBlur = isLight ? 8 : 20;
+          shadowColor = isLight ? 'rgba(245, 176, 16, 0.4)' : this.accentColor;
+        } else {
+          // Solid crisp black (#111111) like reference image
+          color = isLight ? '#111111' : '#FFFFFF';
+        }
+      }
+
+      ctx.save();
+      ctx.translate(slot.x, slot.y + enterY + waveFloatY);
+      ctx.rotate(slot.angle + waveRot);
+      ctx.scale(finalScale, finalScale);
+      ctx.globalAlpha = (ctx.globalAlpha || 1.0) * enterAlpha;
+
+      ctx.font = `900 ${slot.fontSize}px ${this.fontFamily}`;
+      ctx.fillStyle = color;
+      if (shadowBlur > 0) {
+        ctx.shadowColor = shadowColor;
+        ctx.shadowBlur = shadowBlur;
+      }
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // Draw word
+      ctx.fillText(wordText, 0, 0);
+
+      // If active and glow density high, multi-pass
+      if (isActive && this.glowDensity > 1.25 && isLight === false) {
+        ctx.fillText(wordText, 0, 0);
+      }
+
+      ctx.restore();
+    }
   }
 
   renderFluidChunk({ ctx, text, chunkWords, centerX, centerY, maxWidth, baseSize, progress, inTime, currentTime, chunkStart, chunkDuration, isPausedAtStart, beatPulse, overallGlow }) {
