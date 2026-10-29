@@ -7,8 +7,8 @@
  * - 100% Canvas Compositing for 60FPS Video Export and PNG Thumbnail Snapshot
  */
 
-import { ThreeBackground } from './three-background.js?v=5.0';
-import { LrcParser } from './lrc-parser.js?v=5.0';
+import { ThreeBackground } from './three-background.js?v=5.1';
+import { LrcParser } from './lrc-parser.js?v=5.1';
 
 export class CanvasRenderer {
   constructor(canvas) {
@@ -32,6 +32,7 @@ export class CanvasRenderer {
     this.glowDensity = 1.0;
     this.maxWordsPerChunk = 4; // Strictly <= 5 words!
     this.motionStyle = 'poster-collage'; // 'poster-collage', 'hero-morph', 'liquid-spring', 'vocal-pop'
+    this.wordDisplayMode = 'solo-one-by-one'; // 'solo-one-by-one', 'progressive-build', 'full-collage'
     this.canvasTheme = 'poster-light'; // 'poster-light' (white background like image) or 'dark-studio'
     this.heroScale = 2.2;
     this.allowVerticalRotation = true;
@@ -252,9 +253,28 @@ export class CanvasRenderer {
     ctx.save();
     ctx.globalAlpha = alpha;
 
+    const isSolo = (this.wordDisplayMode === 'solo-one-by-one');
     const useCollage = (this.motionStyle === 'poster-collage' || this.motionStyle === 'hero-morph');
 
-    if (useCollage) {
+    if (isSolo) {
+      this.renderSoloWord({
+        ctx,
+        text: chunk.text,
+        chunkWords: chunk.words,
+        centerX: W / 2,
+        centerY: posterY,
+        maxWidth: W * (this.aspectRatio === '9:16' ? 0.88 : 0.85),
+        baseSize: this.baseFontSize,
+        progress,
+        inTime,
+        currentTime: isPausedAtStart ? (chunk.words ? chunk.words[0].start + 0.1 : chunk.start + 0.2) : t,
+        chunkStart: chunk.start,
+        chunkDuration: duration,
+        isPausedAtStart,
+        beatPulse,
+        overallGlow
+      });
+    } else if (useCollage) {
       this.renderTypographicCollage({
         ctx,
         text: chunk.text,
@@ -290,6 +310,142 @@ export class CanvasRenderer {
         beatPulse,
         overallGlow
       });
+    }
+
+    ctx.restore();
+  }
+
+  /**
+   * Solo Word Engine (Viral Single-Word Poster Flash):
+   * Displays exactly ONE word at a time in massive, high-contrast poster typography,
+   * alternating between Solar Yellow (#F5B010) and Solid Black (#121212) with vertical/horizontal tilt!
+   */
+  renderSoloWord({ ctx, text, chunkWords, centerX, centerY, maxWidth, baseSize, progress, inTime, currentTime, chunkStart, chunkDuration, isPausedAtStart, beatPulse, overallGlow }) {
+    const isUpper = this.badgeConfig ? this.badgeConfig.uppercase !== false : true;
+    const displayText = isUpper ? text.toUpperCase() : text;
+    const words = displayText.split(/\s+/).filter(Boolean);
+    const totalWords = words.length;
+    if (totalWords === 0) return;
+
+    // 1. Determine active word index from real AI timestamps
+    const hasWordTimestamps = Array.isArray(chunkWords) && chunkWords.length === totalWords;
+    let activeWordIdx = 0;
+
+    if (hasWordTimestamps) {
+      activeWordIdx = -1;
+      for (let j = 0; j < totalWords; j++) {
+        const w = chunkWords[j];
+        if (currentTime >= w.start && currentTime <= w.end) {
+          activeWordIdx = j;
+          break;
+        } else if (j < totalWords - 1 && currentTime > w.end && currentTime < chunkWords[j + 1].start) {
+          activeWordIdx = j;
+          break;
+        }
+      }
+      if (activeWordIdx === -1) {
+        if (currentTime < chunkWords[0].start) activeWordIdx = 0;
+        else activeWordIdx = totalWords - 1;
+      }
+    } else {
+      const wordWeights = words.map(w => Math.max(1, w.length));
+      const totalWeight = wordWeights.reduce((a, b) => a + b, 0) || 1;
+      let elapsedWeight = 0;
+      activeWordIdx = -1;
+      for (let j = 0; j < totalWords; j++) {
+        const wStart = chunkStart + chunkDuration * (elapsedWeight / totalWeight);
+        const wEnd = wStart + chunkDuration * (wordWeights[j] / totalWeight);
+        if (currentTime >= wStart && currentTime <= wEnd) {
+          activeWordIdx = j;
+          break;
+        }
+        elapsedWeight += wordWeights[j];
+      }
+      if (activeWordIdx === -1) {
+        activeWordIdx = isPausedAtStart ? 0 : Math.min(totalWords - 1, Math.floor(progress * totalWords));
+      }
+    }
+
+    const wordText = words[activeWordIdx];
+    if (!wordText) return;
+
+    // Time calculations for single word entrance
+    let wordInTime = 1.0;
+    let wordDur = 0.5;
+
+    if (hasWordTimestamps) {
+      const w = chunkWords[activeWordIdx];
+      wordDur = Math.max(0.12, w.end - w.start);
+      wordInTime = isPausedAtStart ? 1.0 : Math.max(0, currentTime - w.start);
+    } else {
+      const wordWeights = words.map(w => Math.max(1, w.length));
+      const totalWeight = wordWeights.reduce((a, b) => a + b, 0) || 1;
+      wordDur = Math.max(0.15, chunkDuration * (wordWeights[activeWordIdx] / totalWeight));
+      wordInTime = isPausedAtStart ? 1.0 : (inTime % wordDur);
+    }
+
+    const enterP = Math.min(1, wordInTime / 0.22);
+    // Punchy elastic spring arrival
+    const springBounce = Math.sin(enterP * Math.PI) * 0.16;
+    const enterScale = 0.82 + (enterP * 0.18) + springBounce;
+    const enterAlpha = enterP;
+
+    // Fluid organic micro-float breathing
+    const waveFloatY = Math.sin(this.animTime * 2.8 + activeWordIdx * 1.5) * (4.5 * (1 + beatPulse * 0.5));
+    const waveRot = Math.cos(this.animTime * 2.0 + activeWordIdx) * 0.012;
+
+    const isLight = this.canvasTheme === 'poster-light';
+
+    // Style variation per word:
+    // Alternate between Solar Yellow (#F5B010) and Solid Black (#121212) or White (#FFFFFF)
+    const isHeroColor = (activeWordIdx % 2 === 1) || (wordText.length >= 6);
+    let color = isHeroColor ? this.accentColor : (isLight ? '#121212' : '#FFFFFF');
+
+    // Orientation:
+    // If vertical rotation enabled, rotate selected words by 90 deg to break visual monotony!
+    let angle = 0;
+    const allowVert = this.allowVerticalRotation !== false && this.aspectRatio !== '9:16';
+    if (allowVert && (activeWordIdx % 3 === 2) && wordText.length >= 4 && wordText.length <= 8) {
+      angle = (activeWordIdx % 2 === 0 ? 1 : -1) * (Math.PI / 2);
+    }
+
+    // Font size: MASSIVE viral impact!
+    let fontSize = Math.round(baseSize * (this.heroScale || 2.2) * 1.45);
+    ctx.font = `900 ${fontSize}px ${this.fontFamily}`;
+
+    // Fit check
+    let measuredW = ctx.measureText(wordText).width;
+    const maxBound = (angle !== 0 ? this.targetHeight * 0.72 : maxWidth * 0.88);
+    if (measuredW > maxBound) {
+      fontSize = Math.max(48, Math.floor(fontSize * (maxBound / measuredW)));
+      ctx.font = `900 ${fontSize}px ${this.fontFamily}`;
+      measuredW = ctx.measureText(wordText).width;
+    }
+
+    const finalScale = enterScale * (1.0 + beatPulse * 0.14);
+
+    ctx.save();
+    ctx.translate(centerX, centerY + waveFloatY);
+    ctx.rotate(angle + waveRot);
+    ctx.scale(finalScale, finalScale);
+    ctx.globalAlpha = (ctx.globalAlpha || 1.0) * enterAlpha;
+
+    ctx.fillStyle = color;
+    if (isHeroColor) {
+      ctx.shadowColor = isLight ? 'rgba(245, 176, 16, 0.45)' : this.accentColor;
+      ctx.shadowBlur = isLight ? 14 : 28;
+    } else {
+      ctx.shadowColor = isLight ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.2)';
+      ctx.shadowBlur = 8;
+    }
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(wordText, 0, 0);
+
+    // If on dark mode and hero color, multi-pass for dense radiance
+    if (!isLight && isHeroColor && this.glowDensity > 1.2) {
+      ctx.fillText(wordText, 0, 0);
     }
 
     ctx.restore();

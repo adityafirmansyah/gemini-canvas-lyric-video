@@ -21,14 +21,18 @@ No static backgrounds or boring repetitive video loops. The environment is proce
 - **Audio-Reactive Physics:** Sub-bass kicks and rhythm frequencies physically ripple and elevate the 3D surface in real time.
 - **Customizable:** Wave Speed (0.2x–3.0x), Wave Height/Amplitude (10px–100px), Particle Colors, and Deep Space Base Colors.
 
-### 2. ✍️ Typographic Poster Collage Engine (Word-Cloud / Image Replica)
+### 2. ✍️ Typographic Poster Engine (Single Word One-by-One & Poster Collage)
 Inspired by bold graphic poster typography and word-cloud branding (interlocking horizontal & vertical layouts):
-- **Hero Centerpiece Word:** The dominant keyword or currently sung word commands the center stage in massive, bold **Poster Golden Yellow (`#F5B010`)**.
-- **Interlocking Vertical & Horizontal Rails:** Supporting words wrap closely around the hero word in contrasting **Solid Black (`#111111`)**—some placed horizontally above and below, and others rotated vertically (**&plusmn;90&deg;**) hugging the left and right flanks.
-- **Vocal Spotlight Transitions:** As each word is sung, it lights up in vibrant yellow with an elastic spring punch, while already sung words settle into solid high-contrast black/white.
-- **Organic Liquid Undulation:** Words never freeze like a flat JPEG; subtle phase-shifted sine-wave floating breathes life into every word on screen.
+- **★ Solo Word One-by-One (Single Word Massive Focus — Default):**
+  - Displays exactly **ONE single word at a time** on screen as it is sung!
+  - Eliminates visual clutter and monotony: each word lands with a massive poster impact (160–240px font size).
+  - Dynamically alternates between **Solar Golden Yellow (`#F5B010`)** and **Solid Black (`#121212`)**.
+  - Words dynamically tilt horizontally or vertically (&plusmn;90&deg;) from word to word to keep the eye engaged.
+- **Hero Centerpiece Word & Word-Cloud:**
+  - Option to switch to *Typographic Poster Cloud* or *Progressive Poster Build* (words drop in one-by-one).
+- **Vocal Spotlight Transitions:** As each word hits its timestamp, it arrives with a punchy elastic spring bounce.
+- **Organic Liquid Undulation:** Subtle phase-shifted sine-wave floating breathes natural motion into every word.
 - **1-Click Theme Switch:** Toggle between **Poster Gallery Light** (clean white canvas like the reference image) and **Obsidian Stage Dark** (deep black with glowing gold & white).
-- **Hero-Morph vs Fixed Poster:** Choose whether the active word actively slides into the giant hero slot or stays as an anchored typographic poster cloud.
 
 ### 3. 🎯 Strict &le; 5 Words Pacing (Viral Reading Cadence)
 - Wall-of-text lyrics kill viewer retention.

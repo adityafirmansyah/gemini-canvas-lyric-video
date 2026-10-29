@@ -15,7 +15,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
   
   <!-- Studio Stylesheet -->
-  <link rel="stylesheet" href="css/style.css?v=5.0">
+  <link rel="stylesheet" href="css/style.css?v=5.1">
 </head>
 <body>
   <div class="app-container">
@@ -192,6 +192,15 @@
             <div class="section-header">
               <h3>✍️ Typographic Collage & Kinetic Style</h3>
               <button type="button" id="btn-reset-lyrics" class="text-link" title="Reset lyric styling">↺ Reset</button>
+            </div>
+
+            <div class="input-group">
+              <label for="word-display-mode">Words Presentation Mode</label>
+              <select id="word-display-mode">
+                <option value="solo-one-by-one" selected>★ Solo Word One-by-One (Single Word Poster Flash — Viral High-Retention)</option>
+                <option value="poster-collage">Typographic Poster Cloud (Hero + Surrounding Words Interlocking)</option>
+                <option value="progressive-build">Progressive Poster Build (Words Drop in One-by-One as Sung)</option>
+              </select>
             </div>
 
             <div class="input-group">
@@ -420,6 +429,6 @@
   <audio id="audio-player" preload="auto"></audio>
 
   <!-- Modular Main Script -->
-  <script type="module" src="js/app.js?v=5.0"></script>
+  <script type="module" src="js/app.js?v=5.1"></script>
 </body>
 </html>
